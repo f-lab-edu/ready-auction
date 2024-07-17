@@ -141,7 +141,4 @@ hs_err_pid*
 replay_pid*
 
 # Gradle
-.gradle
-/build/
-.gradletasknamecache
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij
