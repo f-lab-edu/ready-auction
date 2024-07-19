@@ -2,7 +2,9 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
+
 }
+apply plugin: 'groovy' // groovy 지원
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -26,12 +28,17 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation('org.spockframework:spock-core:2.3-groovy-3.0')
+    testImplementation('org.spockframework:spock-spring:2.3-groovy-3.0')
 }
 
 tasks.named('test') {
