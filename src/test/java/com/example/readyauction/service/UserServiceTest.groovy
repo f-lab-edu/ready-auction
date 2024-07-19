@@ -4,12 +4,6 @@ import com.example.readyauction.controller.request.user.UserSaveRequest
 import com.example.readyauction.controller.response.user.UserSaveResponse
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.repository.UserRepository
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import spock.lang.Shared
 import spock.lang.Specification
 
 class UserServiceTest extends Specification {
@@ -28,15 +22,19 @@ class UserServiceTest extends Specification {
         userSaveResponse != null
         userSaveResponse.getUserId() == userSaveRequest.getUserId()
         userSaveResponse.getName() == userSaveRequest.getName()
-        userSaveRequest.getAddress() == userSaveRequest.getAddress()
     }
-
+    private User user(){
+        return UserSaveRequest.builder()
+                .userId("test")
+                .name("테스트")
+                .password("test")
+                .build();
+    }
 
     private UserSaveRequest createUserSaveRequest(){
         return UserSaveRequest.builder()
                 .userId("test")
                 .name("테스트")
-                .address("서울특별시 송파구 올림픽로240 롯데월드")
                 .password("test")
                 .build();
     }
