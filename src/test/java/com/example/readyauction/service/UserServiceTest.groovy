@@ -13,10 +13,10 @@ class UserServiceTest extends Specification {
 
     UserRepository userRepository = Mock(UserRepository)
     UserService userService = new UserService(userRepository)
+    UserSaveRequest userSaveRequest = createUserSaveRequest()
 
     def "회원가입_성공"() {
         given:
-        UserSaveRequest userSaveRequest = createUserSaveRequest()
         userRepository.save(_) >> userSaveRequest.toEntity()
 
         when:
@@ -27,21 +27,19 @@ class UserServiceTest extends Specification {
         userSaveResponse.getName() == userSaveRequest.getName()
     }
 
+    PasswordUpdateRequest passwordUpdateRequest = new PasswordUpdateRequest("newPassword")
+
     def "비밀번호_수정"() {
         given:
-        String userId = "userId"
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = bCryptPasswordEncoder.encode("oldPassword")
-        User tesUser = new User(userId, "name", encodedPassword)
-
-        PasswordUpdateRequest passwordUpdateRequest = new PasswordUpdateRequest("newPassword")
-        userRepository.findByUserId(userId) >> Optional.of(tesUser)
+        User tesUser = new User("userId", "name", "password")
+        userRepository.findByUserId("userId") >> Optional.of(tesUser)
 
         when:
-        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(passwordUpdateRequest, userId)
+        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(passwordUpdateRequest, "userId")
 
         then:
-        passwordUpdateResponse.userId == userId
+        passwordUpdateResponse.userId == "userId"
         bCryptPasswordEncoder.matches("newPassword", tesUser.encodedPassword)
     }
 

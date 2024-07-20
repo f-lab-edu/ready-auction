@@ -4,11 +4,12 @@ import lombok.Getter;
 
 @Getter
 public class PasswordUpdateRequest {
-  private String password;
+	private String password;
 
-  public PasswordUpdateRequest(){}
-  public PasswordUpdateRequest(String password){
-    this.password = password;
-  }
+	public PasswordUpdateRequest() {
+	}
 
+	public PasswordUpdateRequest(String password) {
+		this.password = password;
+	}
 }
