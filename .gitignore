@@ -141,5 +141,7 @@ hs_err_pid*
 replay_pid*
 
 !gradle/wrapper/gradle-wrapper.jar
+.idea
+build
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij
