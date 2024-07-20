@@ -7,16 +7,14 @@ import lombok.Getter;
 public class UserSaveResponse {
   private String userId;
   private String name;
-  private String address;
-  public UserSaveResponse(){}
-  public UserSaveResponse(String userId, String name, String address){
+
+  public UserSaveResponse(String userId, String name){
     this.userId = userId;
     this.name = name;
-    this.address = address;
   }
 
-  public UserSaveResponse from(User user){
-    return new UserSaveResponse(user.getUserId(),user.getName(),user.getAddress());
+  public static UserSaveResponse from(User user){
+    return new UserSaveResponse(user.getUserId(),user.getName());
 
   }
 }

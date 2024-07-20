@@ -28,7 +28,6 @@ class UserServiceTest extends Specification {
         userSaveResponse != null
         userSaveResponse.getUserId() == userSaveRequest.getUserId()
         userSaveResponse.getName() == userSaveRequest.getName()
-        userSaveRequest.getAddress() == userSaveRequest.getAddress()
     }
 
     def "비밀번호_수정"(){
@@ -50,12 +49,10 @@ class UserServiceTest extends Specification {
         bCryptPasswordEncoder.matches("newPassword",tesUser.encodedPassword)
     }
 
-
     private UserSaveRequest createUserSaveRequest(){
         return UserSaveRequest.builder()
                 .userId("test")
                 .name("테스트")
-                .address("서울특별시 송파구 올림픽로240 롯데월드")
                 .password("test")
                 .build();
     }

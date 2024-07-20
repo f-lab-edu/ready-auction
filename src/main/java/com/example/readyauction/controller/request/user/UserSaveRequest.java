@@ -24,23 +24,17 @@ public class UserSaveRequest {
       message = "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다")
   private String password;
 
-  @NotBlank(message = "주소를 입력해주세요.")
-  private String address;
-
   public UserSaveRequest() {}
 
-  public UserSaveRequest(String name, String userId, String password, String address){
+  public UserSaveRequest(String name, String userId, String password){
     this.name = name;
     this.userId = userId;
     this.password = password;
-    this.address = address;
-
   }
   public User toEntity(){
     return User.builder()
         .userId(userId)
         .name(name)
-        .address(address)
         .build();
   }
 }

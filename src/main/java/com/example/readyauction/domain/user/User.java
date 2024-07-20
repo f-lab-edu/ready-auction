@@ -22,15 +22,12 @@ public class User {
 
   @Setter
   private String encodedPassword;
-  private String address;
-
   public User(){}
 
-  public User(Long id, String userId, String name, String encodedPassword, String address) {
+  public User(Long id, String userId, String name, String encodedPassword) {
     this.id = id;
     this.userId = userId;
     this.name = name;
     this.encodedPassword = encodedPassword;
-    this.address = address;
   }
 }
