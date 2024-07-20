@@ -5,11 +5,9 @@ import lombok.Getter;
 @Getter
 public class PasswordUpdateResponse {
   private String userId;
-  private String msg;
 
-  public PasswordUpdateResponse(String userId, String msg){
+  public PasswordUpdateResponse(String userId){
     this.userId = userId;
-    this.msg = msg;
   }
 
 }

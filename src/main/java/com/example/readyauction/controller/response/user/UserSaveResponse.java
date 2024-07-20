@@ -8,6 +8,7 @@ public class UserSaveResponse {
   private String userId;
   private String name;
 
+  public UserSaveResponse(){}
   public UserSaveResponse(String userId, String name){
     this.userId = userId;
     this.name = name;

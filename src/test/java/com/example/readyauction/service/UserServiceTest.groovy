@@ -6,9 +6,7 @@ import com.example.readyauction.controller.response.user.PasswordUpdateResponse
 import com.example.readyauction.controller.response.user.UserSaveResponse
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.repository.UserRepository
-import org.mockito.Mock
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import spock.lang.Shared
 import spock.lang.Specification
 
 class UserServiceTest extends Specification {
@@ -25,17 +23,16 @@ class UserServiceTest extends Specification {
         UserSaveResponse userSaveResponse = userService.join(userSaveRequest)
 
         then:
-        userSaveResponse != null
         userSaveResponse.getUserId() == userSaveRequest.getUserId()
         userSaveResponse.getName() == userSaveRequest.getName()
     }
 
-    def "비밀번호_수정"(){
+    def "비밀번호_수정"() {
         given:
         String userId = "userId"
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = bCryptPasswordEncoder.encode("oldPassword")
-        User tesUser = new User(1L, userId, "name", encodedPassword, "주소")
+        User tesUser = new User(userId, "name", encodedPassword)
 
         PasswordUpdateRequest passwordUpdateRequest = new PasswordUpdateRequest("newPassword")
         userRepository.findByUserId(userId) >> Optional.of(tesUser)
@@ -45,11 +42,10 @@ class UserServiceTest extends Specification {
 
         then:
         passwordUpdateResponse.userId == userId
-        passwordUpdateResponse.msg == "success"
-        bCryptPasswordEncoder.matches("newPassword",tesUser.encodedPassword)
+        bCryptPasswordEncoder.matches("newPassword", tesUser.encodedPassword)
     }
 
-    private UserSaveRequest createUserSaveRequest(){
+    private UserSaveRequest createUserSaveRequest() {
         return UserSaveRequest.builder()
                 .userId("test")
                 .name("테스트")

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 public class ReadyAuctionApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ReadyAuctionApplication.class, args); // 무슨 동작을 한느지 찾아보기
+    SpringApplication.run(ReadyAuctionApplication.class, args);
   }
 
 }

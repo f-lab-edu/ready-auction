@@ -49,6 +49,6 @@ public class UserService {
     String encodedPassword = bCryptPasswordEncoder.encode(passwordUpdateRequest.getPassword());
     findUser.setEncodedPassword(encodedPassword);
 
-    return new PasswordUpdateResponse(findUser.getUserId(), "success");
+    return new PasswordUpdateResponse(findUser.getUserId());
   }
 }

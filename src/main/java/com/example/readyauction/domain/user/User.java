@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Builder
 @Getter
 public class User {
 
@@ -23,9 +22,8 @@ public class User {
   @Setter
   private String encodedPassword;
   public User(){}
-
-  public User(Long id, String userId, String name, String encodedPassword) {
-    this.id = id;
+  @Builder
+  public User(String userId, String name, String encodedPassword) {
     this.userId = userId;
     this.name = name;
     this.encodedPassword = encodedPassword;
