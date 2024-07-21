@@ -1,4 +1,4 @@
-package com.example.readyauction.service;
+package com.example.readyauction.service.user;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
