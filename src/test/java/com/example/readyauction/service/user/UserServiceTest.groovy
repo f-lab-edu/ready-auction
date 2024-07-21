@@ -1,4 +1,4 @@
-package com.example.readyauction.service
+package com.example.readyauction.service.user
 
 import com.example.readyauction.controller.request.user.PasswordUpdateRequest
 import com.example.readyauction.controller.request.user.UserSaveRequest
