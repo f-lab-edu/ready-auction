@@ -7,8 +7,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class UserSaveRequest {
 
 	@NotBlank(message = "이름을 입력해주세요.")
@@ -22,9 +24,6 @@ public class UserSaveRequest {
 	@Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}",
 		message = "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다")
 	private String password;
-
-	public UserSaveRequest() {
-	}
 
 	@Builder
 	public UserSaveRequest(String name, String userId, String password) {

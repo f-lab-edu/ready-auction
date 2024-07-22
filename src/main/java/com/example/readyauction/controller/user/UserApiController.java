@@ -28,14 +28,12 @@ public class UserApiController {
 		this.loginService = loginService;
 	}
 
-	// 회원가입
 	@PostMapping("/v1/users") // RestDocs
 	public UserSaveResponse join(@Valid @RequestBody UserSaveRequest userSaveRequest) {
 		UserSaveResponse userSaveResponse = userService.join(userSaveRequest);
 		return userSaveResponse;
 	}
 
-	// 회원정보 비밀번호 수정
 	@PutMapping("/v1/users/{userId}/changePassword")
 	public PasswordUpdateResponse update(@Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest,
 		@PathVariable String userId) {
@@ -43,7 +41,6 @@ public class UserApiController {
 		return passwordUpdateResponse;
 	}
 
-	// 로그인
 	@PostMapping("/v1/login")
 	public void login(@Valid @RequestBody LoginRequest loginRequest) {
 		loginService.login(loginRequest);

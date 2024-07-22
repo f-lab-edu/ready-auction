@@ -6,9 +6,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class User {
 
 	@Id
@@ -19,9 +21,6 @@ public class User {
 
 	private String encodedPassword;
 
-	public User() {
-	}
-
 	@Builder
 	public User(String userId, String name, String encodedPassword) {
 		this.userId = userId;
@@ -29,7 +28,7 @@ public class User {
 		this.encodedPassword = encodedPassword;
 	}
 
-	public void setEncodedPassword(String encodedPassword) {
+	public void updateEncodedPassword(String encodedPassword) {
 		this.encodedPassword = encodedPassword;
 	}
 }

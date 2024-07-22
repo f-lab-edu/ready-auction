@@ -27,7 +27,7 @@ public class UserService {
 		User user = userSaveRequest.toEntity();
 
 		String encodedPassword = bCryptPasswordEncoder.encode(userSaveRequest.getPassword());
-		user.setEncodedPassword(encodedPassword);
+		user.updateEncodedPassword(encodedPassword);
 
 		User savedUser = userRepository.save(user);
 		return new UserSaveResponse().from(savedUser);
@@ -40,7 +40,7 @@ public class UserService {
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
 		String encodedPassword = bCryptPasswordEncoder.encode(passwordUpdateRequest.getPassword());
-		user.setEncodedPassword(encodedPassword);
+		user.updateEncodedPassword(encodedPassword);
 
 		return new PasswordUpdateResponse(user.getUserId());
 	}

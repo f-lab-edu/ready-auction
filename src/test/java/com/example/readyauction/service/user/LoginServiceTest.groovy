@@ -46,6 +46,5 @@ class LoginServiceTest extends Specification {
         loginService.logout()
         then:
         1 * httpSession.invalidate()
-
     }
 }

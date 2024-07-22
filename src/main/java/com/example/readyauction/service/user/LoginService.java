@@ -27,13 +27,13 @@ public class LoginService {
 		String password = loginRequest.getPassword();
 
 		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+			.orElseThrow(() -> new IllegalArgumentException("로그인 실패."));
 
 		if (bCryptPasswordEncoder.matches(password, user.getEncodedPassword())) {
 			httpSession.setAttribute(USER_ID, userId);
 			httpSession.setMaxInactiveInterval(3600);
 		} else {
-			throw new IllegalArgumentException("잘못된 로그인 정보입니다.");
+			throw new IllegalArgumentException("로그인 실패.");
 		}
 	}
 
