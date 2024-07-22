@@ -9,6 +9,8 @@ import com.example.readyauction.controller.request.user.UserSaveRequest;
 import com.example.readyauction.controller.response.user.PasswordUpdateResponse;
 import com.example.readyauction.controller.response.user.UserSaveResponse;
 import com.example.readyauction.domain.user.User;
+import com.example.readyauction.exception.user.DuplicatedUserIdException;
+import com.example.readyauction.exception.user.NotFoundUserException;
 import com.example.readyauction.repository.UserRepository;
 
 @Service
@@ -24,24 +26,33 @@ public class UserService {
 
 	@Transactional
 	public UserSaveResponse join(UserSaveRequest userSaveRequest) {
+		checkedDuplicatedUser(userSaveRequest.getUserId());
 		User user = userSaveRequest.toEntity();
 
-		String encodedPassword = bCryptPasswordEncoder.encode(userSaveRequest.getPassword());
-		user.updateEncodedPassword(encodedPassword);
+		encryptPassword(userSaveRequest.getPassword(), user);
 
 		User savedUser = userRepository.save(user);
 		return new UserSaveResponse().from(savedUser);
 	}
 
-	// 비밀번호 수정
 	@Transactional
 	public PasswordUpdateResponse updatePassword(PasswordUpdateRequest passwordUpdateRequest, String userId) {
 		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+			.orElseThrow(() -> new NotFoundUserException());
 
-		String encodedPassword = bCryptPasswordEncoder.encode(passwordUpdateRequest.getPassword());
-		user.updateEncodedPassword(encodedPassword);
+		encryptPassword(passwordUpdateRequest.getPassword(), user);
 
 		return new PasswordUpdateResponse(user.getUserId());
+	}
+
+	private void encryptPassword(String password, User user) {
+		String encodedPassword = bCryptPasswordEncoder.encode(password);
+		user.updateEncodedPassword(encodedPassword);
+	}
+
+	private void checkedDuplicatedUser(String userId) {
+		userRepository.findByUserId(userId).ifPresent((user) -> {
+			throw new DuplicatedUserIdException();
+		});
 	}
 }

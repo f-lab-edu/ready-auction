@@ -2,6 +2,7 @@ package com.example.readyauction.service.user
 
 import com.example.readyauction.controller.request.user.LoginRequest
 import com.example.readyauction.domain.user.User
+import com.example.readyauction.exception.user.LoginFailException
 import com.example.readyauction.repository.UserRepository
 import jakarta.servlet.http.HttpSession
 import org.springframework.mock.web.MockHttpSession
@@ -38,7 +39,7 @@ class LoginServiceTest extends Specification {
         loginService.login(new LoginRequest(userId, "FailPassword"))
 
         then:
-        thrown IllegalArgumentException
+        thrown LoginFailException
     }
 
     def "로그아웃_성공"() {
