@@ -2,9 +2,11 @@ package com.example.readyauction.service.user;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.readyauction.controller.request.user.LoginRequest;
 import com.example.readyauction.domain.user.User;
+import com.example.readyauction.exception.user.LoginFailException;
 import com.example.readyauction.repository.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -22,21 +24,23 @@ public class LoginService {
 		this.userRepository = userRepository;
 	}
 
+	@Transactional
 	public void login(LoginRequest loginRequest) {
 		String userId = loginRequest.getUserId();
 		String password = loginRequest.getPassword();
 
 		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException("로그인 실패."));
+			.orElseThrow(() -> new LoginFailException());
 
 		if (bCryptPasswordEncoder.matches(password, user.getEncodedPassword())) {
 			httpSession.setAttribute(USER_ID, userId);
 			httpSession.setMaxInactiveInterval(3600);
 		} else {
-			throw new IllegalArgumentException("로그인 실패.");
+			throw new LoginFailException();
 		}
 	}
 
+	@Transactional
 	public void logout() {
 		httpSession.invalidate();
 	}

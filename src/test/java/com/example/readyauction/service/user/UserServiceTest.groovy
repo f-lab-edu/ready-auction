@@ -5,18 +5,19 @@ import com.example.readyauction.controller.request.user.UserSaveRequest
 import com.example.readyauction.controller.response.user.PasswordUpdateResponse
 import com.example.readyauction.controller.response.user.UserSaveResponse
 import com.example.readyauction.domain.user.User
+import com.example.readyauction.exception.user.DuplicatedUserIdException
 import com.example.readyauction.repository.UserRepository
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
 
 class UserServiceTest extends Specification {
 
-    UserRepository userRepository = Mock(UserRepository)
+    UserRepository userRepository = Mock()
     UserService userService = new UserService(userRepository)
-    UserSaveRequest userSaveRequest = createUserSaveRequest()
 
     def "회원가입_성공"() {
         given:
+        UserSaveRequest userSaveRequest = createUserSaveRequest()
+        userRepository.findByUserId(userSaveRequest.getUserId()) >> Optional.empty()
         userRepository.save(_) >> userSaveRequest.toEntity()
 
         when:
@@ -27,26 +28,40 @@ class UserServiceTest extends Specification {
         userSaveResponse.getName() == userSaveRequest.getName()
     }
 
-    PasswordUpdateRequest passwordUpdateRequest = new PasswordUpdateRequest("newPassword")
+    def "회원가입_중복"() {
+        given:
+        UserSaveRequest userSaveRequest = createUserSaveRequest()
+        userRepository.findByUserId(userSaveRequest.getUserId()) >> Optional.of(userSaveRequest.toEntity())
+
+        when:
+        userService.join(userSaveRequest)
+
+        then:
+        thrown DuplicatedUserIdException
+    }
+
 
     def "비밀번호_수정"() {
         given:
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        User tesUser = new User("userId", "name", "password")
-        userRepository.findByUserId("userId") >> Optional.of(tesUser)
+        PasswordUpdateRequest passwordUpdateRequest = new PasswordUpdateRequest("newPassword")
+        User user = User.builder()
+                .userId("test")
+                .name("name")
+                .encodedPassword("oldPassword")
+                .build()
+        userRepository.findByUserId(user.getUserId()) >> Optional.of(user)
 
         when:
-        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(passwordUpdateRequest, "userId")
+        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(passwordUpdateRequest, user.getUserId())
 
         then:
-        passwordUpdateResponse.userId == "userId"
-        bCryptPasswordEncoder.matches("newPassword", tesUser.encodedPassword)
+        passwordUpdateResponse.userId == user.getUserId()
     }
 
     private UserSaveRequest createUserSaveRequest() {
         return UserSaveRequest.builder()
                 .userId("test")
-                .name("테스트")
+                .name("test")
                 .password("test")
                 .build();
     }

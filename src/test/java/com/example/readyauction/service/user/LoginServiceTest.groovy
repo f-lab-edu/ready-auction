@@ -2,14 +2,14 @@ package com.example.readyauction.service.user
 
 import com.example.readyauction.controller.request.user.LoginRequest
 import com.example.readyauction.domain.user.User
+import com.example.readyauction.exception.user.LoginFailException
 import com.example.readyauction.repository.UserRepository
 import jakarta.servlet.http.HttpSession
-import org.springframework.mock.web.MockHttpSession
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
 
 class LoginServiceTest extends Specification {
-    HttpSession httpSession = new MockHttpSession()
+    HttpSession httpSession = Mock(HttpSession)
     UserRepository userRepository = Mock(UserRepository)
     LoginService loginService = new LoginService(httpSession, userRepository)
 
@@ -26,7 +26,7 @@ class LoginServiceTest extends Specification {
         loginService.login(new LoginRequest(userId, rawPassword))
 
         then:
-        httpSession.getAttribute(LoginService.USER_ID) == userId
+        1 * httpSession.setAttribute(LoginService.USER_ID, userId)
 
     }
 
@@ -38,7 +38,7 @@ class LoginServiceTest extends Specification {
         loginService.login(new LoginRequest(userId, "FailPassword"))
 
         then:
-        thrown IllegalArgumentException
+        thrown LoginFailException
     }
 
     def "로그아웃_성공"() {
