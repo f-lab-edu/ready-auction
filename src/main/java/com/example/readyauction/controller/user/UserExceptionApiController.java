@@ -17,26 +17,27 @@ public class UserExceptionApiController {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse validFailException(MethodArgumentNotValidException e) {
-		return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getBindingResult().getFieldError().getDefaultMessage());
+		return new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
+			e.getBindingResult().getFieldError().getDefaultMessage());
 
 	}
 
 	@ExceptionHandler(NotFoundUserException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ErrorResponse notFoundUser(NotFoundUserException e) {
-		return new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
+		return new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
 	}
 
 	@ExceptionHandler(DuplicatedUserIdException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public ErrorResponse duplicatedUser(DuplicatedUserIdException e) {
-		return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
+		return new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
 	}
 
 	@ExceptionHandler(LoginFailException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse loginFail(LoginFailException e) {
-		return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+		return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 	}
 
 }
