@@ -30,14 +30,19 @@ class UserServiceTest extends Specification {
 
     def "회원가입_중복"() {
         given:
-        UserSaveRequest userSaveRequest = createUserSaveRequest()
-        userRepository.findByUserId(userSaveRequest.getUserId()) >> Optional.of(userSaveRequest.toEntity())
+        User user = User.builder()
+                .userId("test")
+                .name("test")
+                .encodedPassword("test")
+                .build()
+        userRepository.findByUserId(user.getUserId()) >> Optional.of(user)
 
         when:
-        userService.join(userSaveRequest)
+        userService.join(createUserSaveRequest())
 
         then:
-        thrown DuplicatedUserIdException
+        def e = thrown(DuplicatedUserIdException)
+        e.message == user.getUserId() + ": 이미 등록된 아이디입니다."
     }
 
 

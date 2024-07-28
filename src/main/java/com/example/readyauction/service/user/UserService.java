@@ -29,7 +29,8 @@ public class UserService {
 		checkedDuplicatedUser(userSaveRequest.getUserId());
 		User user = userSaveRequest.toEntity();
 
-		encryptPassword(userSaveRequest.getPassword(), user);
+		String encodedPassword = encryptPassword(userSaveRequest.getPassword());
+		user.updateEncodedPassword(encodedPassword);
 
 		User savedUser = userRepository.save(user);
 		return new UserSaveResponse().from(savedUser);
@@ -38,21 +39,22 @@ public class UserService {
 	@Transactional
 	public PasswordUpdateResponse updatePassword(PasswordUpdateRequest passwordUpdateRequest, String userId) {
 		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new NotFoundUserException());
+			.orElseThrow(() -> new NotFoundUserException(userId));
 
-		encryptPassword(passwordUpdateRequest.getPassword(), user);
+		String encodedPassword = encryptPassword(passwordUpdateRequest.getPassword());
+		user.updateEncodedPassword(encodedPassword);
 
 		return new PasswordUpdateResponse(user.getUserId());
 	}
 
-	private void encryptPassword(String password, User user) {
+	private String encryptPassword(String password) {
 		String encodedPassword = bCryptPasswordEncoder.encode(password);
-		user.updateEncodedPassword(encodedPassword);
+		return encodedPassword;
 	}
 
 	private void checkedDuplicatedUser(String userId) {
 		userRepository.findByUserId(userId).ifPresent((user) -> {
-			throw new DuplicatedUserIdException();
+			throw new DuplicatedUserIdException(userId);
 		});
 	}
 }

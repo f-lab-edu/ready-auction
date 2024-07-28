@@ -30,13 +30,13 @@ public class LoginService {
 		String password = loginRequest.getPassword();
 
 		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new LoginFailException());
+			.orElseThrow(() -> new LoginFailException(userId));
 
 		if (bCryptPasswordEncoder.matches(password, user.getEncodedPassword())) {
 			httpSession.setAttribute(USER_ID, userId);
 			httpSession.setMaxInactiveInterval(3600);
 		} else {
-			throw new LoginFailException();
+			throw new LoginFailException(userId);
 		}
 	}
 

@@ -38,7 +38,8 @@ class LoginServiceTest extends Specification {
         loginService.login(new LoginRequest(userId, "FailPassword"))
 
         then:
-        thrown LoginFailException
+        def e = thrown(LoginFailException)
+        e.message == userId + ": 로그인 실패했습니다."
     }
 
     def "로그아웃_성공"() {
