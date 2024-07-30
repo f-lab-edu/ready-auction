@@ -28,10 +28,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "Product")
 public class Product {
 	@Builder
-	public Product(User user, String name, String description, LocalDateTime startDate, LocalDateTime closeDate,
+	public Product(User user, String productName, String description, LocalDateTime startDate, LocalDateTime closeDate,
 		int startPrice) {
 		this.user = user;
-		this.name = name;
+		this.productName = productName;
 		this.description = description;
 		this.startDate = startDate;
 		this.closeDate = closeDate;
@@ -49,7 +49,7 @@ public class Product {
 	private User user;
 
 	@Column(name = "product_name", nullable = false)
-	private String name;
+	private String productName;
 
 	@Column(name = "description", nullable = false)
 	private String description;
@@ -73,9 +73,10 @@ public class Product {
 	@Column(name = "status", nullable = false)
 	private Status status;
 
-	public void updateProductInfo(String name, String description, List<String> imagePaths, LocalDateTime startDate,
+	public void updateProductInfo(String productName, String description, List<String> imagePaths,
+		LocalDateTime startDate,
 		LocalDateTime closeDate, int startPrice) {
-		this.name = name;
+		this.productName = productName;
 		this.description = description;
 		this.imagePaths = imagePaths;
 		this.startDate = startDate;
