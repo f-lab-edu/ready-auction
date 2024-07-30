@@ -21,11 +21,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
 @Table(name = "Product")
+@Getter
 public class Product {
 	@Builder
 	public Product(User user, String productName, String description, LocalDateTime startDate, LocalDateTime closeDate,
