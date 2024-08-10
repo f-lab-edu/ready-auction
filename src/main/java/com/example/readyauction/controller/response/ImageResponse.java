@@ -1,5 +1,7 @@
 package com.example.readyauction.controller.response;
 
+import com.example.readyauction.domain.product.ProductImage;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,5 +14,9 @@ public class ImageResponse {
 	public ImageResponse(String originalName, String imagePath) {
 		this.originalName = originalName;
 		this.imagePath = imagePath;
+	}
+
+	public static ImageResponse from(ProductImage productImage) {
+		return new ImageResponse(productImage.getOriginalName(), productImage.getImageFullPath());
 	}
 }

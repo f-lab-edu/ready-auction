@@ -9,7 +9,7 @@ import com.example.readyauction.domain.product.Product;
 import com.example.readyauction.domain.product.ProductImage;
 
 public interface FileService {
-	ProductImage uploadImage(String userId, MultipartFile file);
+	//List<ProductImage> uploadImage(String userId, MultipartFile file);
 
 	List<ProductImage> uploadImages(String userId, List<MultipartFile> files);
 

@@ -27,8 +27,10 @@ import com.example.readyauction.repository.ProductImageRepository;
 @Service
 @Profile("dev")
 public class LocalFileService implements FileService {
-	// dev일땐 로컬에 이미지 저장 같은 방식으로.
-	// 운영 서버일때는 S3 이런걸로 할 수 있도록 프로파일링 하기
+	/*
+		dev : 개발환경일 땐 로컬에 이미지 저장.
+		prod : 운영 환경일 때는 S3에 이미지 저장.
+	*/
 
 	@Value("${ready.auction.image.file.base.url}")
 	private String baseUrl;
@@ -39,19 +41,11 @@ public class LocalFileService implements FileService {
 		this.productImageRepository = productImageRepository;
 	}
 
-	@Override
-	public ProductImage uploadImage(String userId, MultipartFile file) {
-		ProductImage productImage = createProductImage(file, userId);
-		isExistDirectory(userId);
-
-		try {
-			file.transferTo(new File(productImage.getImageFullPath()));
-			productImageRepository.save(productImage);
-			return productImage;
-		} catch (IOException e) {
-			throw new ImageFileUploadFailException(e);
-		}
-	}
+	/* @Override
+	public List<ProductImage> uploadImage(String userId, MultipartFile file) {
+	 	List<ProductImage> productImages = uploadImages(userId, List.of(file));
+	 	return productImages;
+	 }*/
 
 	@Override
 	public List<ProductImage> uploadImages(String userId, List<MultipartFile> files) {
@@ -60,12 +54,7 @@ public class LocalFileService implements FileService {
 
 		for (MultipartFile file : files) {
 			ProductImage productImage = createProductImage(file, userId);
-			try {
-				file.transferTo(new File(productImage.getImageFullPath()));
-				productImages.add(productImage);
-			} catch (IOException e) {
-				throw new ImageFileUploadFailException(e);
-			}
+			imageSave(productImages, file, productImage);
 		}
 		productImageRepository.saveAll(productImages);
 		return productImages;
@@ -75,10 +64,7 @@ public class LocalFileService implements FileService {
 	public List<ImageResponse> loadImages(Product product) {
 		List<ProductImage> productImages = productImageRepository.findByProduct(product);
 		List<ImageResponse> imageResponses = productImages.stream()
-			.map(productImage -> new ImageResponse(
-				productImage.getOriginalName(),
-				productImage.getImageFullPath()
-			))
+			.map(ImageResponse::from)
 			.collect(Collectors.toList());
 		return imageResponses;
 	}
@@ -97,7 +83,18 @@ public class LocalFileService implements FileService {
 
 	@Override
 	public void deleteImagesDB(Product product) {
+		// deleteImagesLocal과 하나의 Transaction으로 묶고, 먼저 DB에서 삭제.
+		// 로컬 삭제 후 DB 삭제하면 DB에서 예외가 터지면 DB만 rollback이 되니까.
 		productImageRepository.deleteByProduct(product);
+	}
+
+	private void imageSave(List<ProductImage> productImages, MultipartFile file, ProductImage productImage) {
+		try {
+			file.transferTo(new File(productImage.getImageFullPath()));
+			productImages.add(productImage);
+		} catch (IOException e) {
+			throw new ImageFileUploadFailException(e);
+		}
 	}
 
 	private ProductImage createProductImage(MultipartFile file, String userId) {

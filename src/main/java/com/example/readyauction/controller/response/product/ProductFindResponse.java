@@ -5,7 +5,10 @@ import java.util.List;
 
 import com.example.readyauction.controller.response.ImageResponse;
 import com.example.readyauction.controller.response.user.UserResponse;
+import com.example.readyauction.domain.product.Product;
+import com.example.readyauction.domain.user.User;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,18 +16,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductFindResponse {
 	private UserResponse userResponse;
-	private List<ImageResponse> imagePath;
+	private List<ImageResponse> imageResponses;
 	private String productName;
 	private String description;
 	private LocalDateTime startDate;
 	private LocalDateTime closeDate;
 	private int startPrice;
 
-	public ProductFindResponse(UserResponse userResponse, List<ImageResponse> imagePath, String productName,
-		String description,
-		LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
-		this.userResponse = userResponse;
-		this.imagePath = imagePath;
+	@Builder
+	public ProductFindResponse(User user, List<ImageResponse> imageResponses, String productName,
+		String description, LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
+		this.userResponse = new UserResponse().from(user);
+		this.imageResponses = imageResponses;
 		this.productName = productName;
 		this.description = description;
 		this.startDate = startDate;
@@ -32,12 +35,16 @@ public class ProductFindResponse {
 		this.startPrice = startPrice;
 	}
 
-	public ProductFindResponse from(UserResponse userResponse, List<ImageResponse> imagePath,
-		ProductSaveResponse productSaveResponse) {
-		return new ProductFindResponse(userResponse, imagePath, productSaveResponse.getProductName(),
-			productSaveResponse.getDescription(),
-			productSaveResponse.getStartDate(), productSaveResponse.getCloseDate(),
-			productSaveResponse.getStartPrice());
+	public ProductFindResponse from(Product product, List<ImageResponse> imageResponses) {
+		return ProductFindResponse.builder()
+			.user(product.getUser())
+			.imageResponses(imageResponses)
+			.productName(product.getProductName())
+			.description(product.getDescription())
+			.startDate(product.getStartDate())
+			.closeDate(product.getCloseDate())
+			.startPrice(product.getStartPrice())
+			.build();
 
 	}
 }
