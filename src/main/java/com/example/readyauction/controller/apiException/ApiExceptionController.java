@@ -1,6 +1,9 @@
 package com.example.readyauction.controller.apiException;
 
 import com.example.readyauction.controller.apiException.error.ErrorResponse;
+import com.example.readyauction.exception.file.CreateDirectoryFailException;
+import com.example.readyauction.exception.file.DeleteImageFailException;
+import com.example.readyauction.exception.file.ImageFileUploadFailException;
 import com.example.readyauction.exception.product.NotFoundProductException;
 import com.example.readyauction.exception.product.ProductNotPendingException;
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException;
@@ -48,6 +51,24 @@ public class ApiExceptionController {
     @ExceptionHandler(ProductNotPendingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse productStatusNotPending(ProductNotPendingException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(CreateDirectoryFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse createDirectoryFail(CreateDirectoryFailException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(DeleteImageFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse deleteImageFail(DeleteImageFailException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(ImageFileUploadFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse imageFilUploadFail(ImageFileUploadFailException e) {
         return new ErrorResponse(e.getMessage());
     }
 
