@@ -144,5 +144,6 @@ replay_pid*
 .idea
 build
 data/*
+Images/*
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij

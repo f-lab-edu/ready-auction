@@ -7,17 +7,17 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserSaveResponse {
+public class UserResponse {
 	private String userId;
 	private String name;
 
-	public UserSaveResponse(String userId, String name) {
+	public UserResponse(String userId, String name) {
 		this.userId = userId;
 		this.name = name;
 	}
 
-	public UserSaveResponse from(User user) {
-		return new UserSaveResponse(user.getUserId(), user.getName());
+	public UserResponse from(User user) {
+		return new UserResponse(user.getUserId(), user.getName());
 
 	}
 }

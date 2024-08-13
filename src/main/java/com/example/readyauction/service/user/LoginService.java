@@ -41,6 +41,15 @@ public class LoginService {
 	}
 
 	@Transactional
+	public String getCurrentLoginUserId() {
+		Object userId = httpSession.getAttribute(USER_ID);
+		if (userId == null) {
+			return null;
+		}
+		return (String)userId;
+	}
+
+	@Transactional
 	public void logout() {
 		httpSession.invalidate();
 	}

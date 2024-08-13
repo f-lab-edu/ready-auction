@@ -11,7 +11,7 @@ import com.example.readyauction.controller.request.user.LoginRequest;
 import com.example.readyauction.controller.request.user.PasswordUpdateRequest;
 import com.example.readyauction.controller.request.user.UserSaveRequest;
 import com.example.readyauction.controller.response.user.PasswordUpdateResponse;
-import com.example.readyauction.controller.response.user.UserSaveResponse;
+import com.example.readyauction.controller.response.user.UserResponse;
 import com.example.readyauction.service.user.LoginService;
 import com.example.readyauction.service.user.UserService;
 
@@ -29,9 +29,9 @@ public class UserApiController {
 	}
 
 	@PostMapping("/v1/users") // RestDocs
-	public UserSaveResponse join(@Valid @RequestBody UserSaveRequest userSaveRequest) {
-		UserSaveResponse userSaveResponse = userService.join(userSaveRequest);
-		return userSaveResponse;
+	public UserResponse join(@Valid @RequestBody UserSaveRequest userSaveRequest) {
+		UserResponse userResponse = userService.join(userSaveRequest);
+		return userResponse;
 	}
 
 	@PutMapping("/v1/users/{userId}/changePassword")

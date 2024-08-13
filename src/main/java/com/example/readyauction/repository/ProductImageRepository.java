@@ -1,15 +1,10 @@
 package com.example.readyauction.repository;
 
-import java.util.List;
-
+import com.example.readyauction.domain.product.ProductImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.readyauction.domain.product.Product;
-import com.example.readyauction.domain.product.ProductImage;
+import java.util.List;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
-	List<ProductImage> findByProduct(Product product);
-
-	void deleteByProduct(Product product);
-
+    List<ProductImage> findByProductId(Long productId);
 }
