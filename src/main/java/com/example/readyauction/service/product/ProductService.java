@@ -95,13 +95,18 @@ public class ProductService {
     public ProductResponse delete(String userId, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundProductException(productId));
+
         checkProductAccessPermission(productId, userId);
+
         List<ProductImage> productImages = productImageRepository.findByProductId(product.getId());
         List<ImageResponse> imageResponses = fileService.loadImages(productImages);
 
+        for (ProductImage productImage : productImages) {
+            productImageRepository.deleteById(productImage.getId());
+        }
         fileService.delete(imageResponses);
         productRepository.deleteById(productId);
-
+        
         return ProductResponse.from(product.getId());
     }
 

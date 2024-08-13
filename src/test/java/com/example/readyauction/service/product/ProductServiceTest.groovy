@@ -232,6 +232,12 @@ class ProductServiceTest extends Specification {
 
         productRepository.findById(product.getId()) >> Optional.of(product)
 
+        List<ProductImage> productImages = new ArrayList<>()
+        productImages.add(productImage1)
+        productImages.add(productImage2)
+        productImageRepository.findByProductId(product.getId()) >> productImages
+        fileService.loadImages(productImages) >> _
+
         when:
         def response = productService.delete(userId, product.getId())
         then:
