@@ -3,6 +3,7 @@ package com.example.readyauction.service.file;
 import com.example.readyauction.controller.response.ImageResponse;
 import com.example.readyauction.domain.product.Product;
 import com.example.readyauction.domain.product.ProductImage;
+import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.file.CreateDirectoryFailException;
 import com.example.readyauction.exception.file.DeleteImageFailException;
 import com.example.readyauction.exception.file.ImageFileUploadFailException;
@@ -34,13 +35,14 @@ public class LocalFileService implements FileService {
     private String baseUrl;
 
     @Override
-    public List<ProductImage> uploadImages(String userId, List<MultipartFile> files, Product product) {
-        List<ProductImage> productImages = new ArrayList<>();
-        isExistDirectory(userId);
+    public List<ProductImage> uploadImages(User user, Product product, List<MultipartFile> images) {
+        isExistDirectory(user);
 
-        for (MultipartFile file : files) {
-            ProductImage productImage = createProductImage(file, userId, product);
-            saveImage(file, productImage.getImageFullPath());
+        List<ProductImage> productImages = new ArrayList<>();
+
+        for (MultipartFile image : images) {
+            ProductImage productImage = createProductImage(image, user, product);
+            saveImage(image, productImage.getImageFullPath());
             productImages.add(productImage);
         }
         return productImages;
@@ -48,14 +50,24 @@ public class LocalFileService implements FileService {
 
     @Override
     public List<ImageResponse> loadImages(List<ProductImage> productImages) {
-        List<ImageResponse> imageResponses = productImages.stream()
+        return productImages.stream()
                 .map(ImageResponse::from)
                 .collect(Collectors.toList());
-        return imageResponses;
     }
 
     @Override
-    public void delete(List<ImageResponse> imageResponses) {
+    public List<ProductImage> updateImages(User user, Product product, List<ProductImage> productImages, List<MultipartFile> images) {
+        // 기존 이미지 삭제
+        this.deleteImages(productImages);
+        // 새로운 이미지 저장
+        List<ProductImage> updateImages = this.uploadImages(user, product, images);
+        return updateImages;
+
+    }
+
+    @Override
+    public void deleteImages(List<ProductImage> productImages) {
+        List<ImageResponse> imageResponses = this.loadImages(productImages);
         for (ImageResponse imageResponse : imageResponses) {
             Path path = Path.of(imageResponse.getImagePath());
             try {
@@ -74,10 +86,10 @@ public class LocalFileService implements FileService {
         }
     }
 
-    private ProductImage createProductImage(MultipartFile file, String userId, Product product) {
+    private ProductImage createProductImage(MultipartFile file, User user, Product product) {
         String originalFileName = file.getOriginalFilename();
         String savedFileName = createNewImageFileName(originalFileName);
-        String savedImageFullPath = createSavedImageFullPath(userId, savedFileName);
+        String savedImageFullPath = createSavedImageFullPath(user.getUserId(), savedFileName);
         return new ProductImage(product.getId(), originalFileName, savedFileName, savedImageFullPath);
     }
 
@@ -101,8 +113,8 @@ public class LocalFileService implements FileService {
         return String.valueOf(fullDirectoryPath);
     }
 
-    private void isExistDirectory(String userId) {
-        Path dirPath = Paths.get(baseUrl, userId);
+    private void isExistDirectory(User user) {
+        Path dirPath = Paths.get(baseUrl, user.getUserId());
         if (!Files.exists(dirPath)) {
             try {
                 Files.createDirectories(dirPath);

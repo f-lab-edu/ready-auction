@@ -6,6 +6,7 @@ import com.example.readyauction.exception.file.DeleteImageFailException;
 import com.example.readyauction.exception.file.ImageFileUploadFailException;
 import com.example.readyauction.exception.product.NotFoundProductException;
 import com.example.readyauction.exception.product.ProductNotPendingException;
+import com.example.readyauction.exception.product.UnauthorizedEnrollException;
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException;
 import com.example.readyauction.exception.user.DuplicatedUserIdException;
 import com.example.readyauction.exception.user.LoginFailException;
@@ -42,8 +43,14 @@ public class ApiExceptionController {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler(UnauthorizedEnrollException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse productEnroll(UnauthorizedEnrollException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler(UnauthorizedProductAccessException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse productNotAccess(UnauthorizedProductAccessException e) {
         return new ErrorResponse(e.getMessage());
     }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "product_Image")
+@Table(name = "product_image")
 @Getter
 public class ProductImage {
 

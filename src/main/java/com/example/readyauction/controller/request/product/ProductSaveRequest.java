@@ -10,14 +10,20 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class ProductSaveRequest {
+    private String userId;
     private String productName;
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
     private int startPrice;
 
-    public ProductSaveRequest(String productName, String description, LocalDateTime startDate, LocalDateTime closeDate,
+    public ProductSaveRequest(String userId,
+                              String productName,
+                              String description,
+                              LocalDateTime startDate,
+                              LocalDateTime closeDate,
                               int startPrice) {
+        this.userId = userId;
         this.productName = productName;
         this.description = description;
         this.startDate = startDate;
@@ -25,7 +31,7 @@ public class ProductSaveRequest {
         this.startPrice = startPrice;
     }
 
-    public Product toEntity(String userId) {
+    public Product toEntity() {
         return Product.builder()
                 .userId(userId)
                 .productName(productName)

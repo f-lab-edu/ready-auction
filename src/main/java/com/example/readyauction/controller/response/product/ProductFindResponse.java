@@ -32,7 +32,7 @@ public class ProductFindResponse {
         this.startPrice = startPrice;
     }
 
-    public ProductFindResponse from(Product product, List<ImageResponse> imageResponses) {
+    public static ProductFindResponse from(Product product, List<ImageResponse> imageResponses) {
         return ProductFindResponse.builder()
                 .userId(product.getUserId())
                 .imageResponses(imageResponses)
