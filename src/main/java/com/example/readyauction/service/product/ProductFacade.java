@@ -31,6 +31,7 @@ public class ProductFacade {
         this.productService = productService;
     }
 
+    @Transactional
     public ProductResponse enroll(User user, ProductSaveRequest productSaveRequest, List<MultipartFile> images) {
         validateUser(user, productSaveRequest);
         validateSaveRequest(productSaveRequest, images);
@@ -61,7 +62,7 @@ public class ProductFacade {
 
     @Transactional
     public ProductResponse delete(User user, Long productId) {
-        productService.delete(user.getUserId(), productId);
+        productService.delete(user, productId);
         List<ProductImage> productImages = productImageService.deleteImage(productId);
         fileService.deleteImages(productImages);
         return ProductResponse.from(productId);

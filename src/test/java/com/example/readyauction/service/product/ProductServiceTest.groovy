@@ -3,184 +3,166 @@ package com.example.readyauction.service.product
 import com.example.readyauction.controller.request.product.ProductSaveRequest
 import com.example.readyauction.controller.request.product.ProductUpdateRequest
 import com.example.readyauction.domain.product.Product
-import com.example.readyauction.domain.product.ProductImage
 import com.example.readyauction.domain.product.Status
+import com.example.readyauction.domain.user.User
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException
-import com.example.readyauction.repository.ProductImageRepository
 import com.example.readyauction.repository.ProductRepository
-import com.example.readyauction.service.file.FileService
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
 
 import java.time.LocalDateTime
 
 class ProductServiceTest extends Specification {
+    final USER_ID = "테스트"
 
     final PRODUCT_NAME = "상품 이름"
     final PRODUCT_DESCRIPTION = "상품 설명"
+    final PRODUCT_START_DATE = LocalDateTime.now().plusDays(1)
+    final PRODUCT_CLOSE_DATE = LocalDateTime.now().plusDays(5)
+    final PRODUCT_START_PRICE = 5000
+    final PENDING = Status.PENDING
+    final ACTIVE = Status.ACTIVE
+    final DONE = Status.DONE
+
     final UPDATE_PRODUCT_NAME = "수정된 상품 이름"
     final UPDATE_PRODUCT_DESCRIPTION = "수정된 상품 설명"
-    String userId = "TEST"
-    ProductRepository productRepository = Mock()
-    ProductImageRepository productImageRepository = Mock()
-    FileService fileService = Mock()
-    ProductService productService = new ProductService(productRepository, productImageRepository, fileService)
+    final UPDATE_PRODUCT_START_DATE = LocalDateTime.now().plusDays(10)
+    final UPDATE_PRODUCT_CLOSE_DATE = LocalDateTime.now().plusDays(20)
+    final UPDATE_PRODUCT_START_PRICE = 10000
 
-    Product product = Product.builder()
-            .userId(userId)
-            .productName(PRODUCT_NAME)
-            .description(PRODUCT_DESCRIPTION)
-            .startDate(LocalDateTime.now().plusDays(1))
-            .closeDate(LocalDateTime.now().plusDays(5))
-            .startPrice(5000)
-            .status(Status.PENDING)
-            .build()
+    ProductRepository productRepository = Mock(ProductRepository)
+    ProductService productService = new ProductService(productRepository)
 
-    MockMultipartFile mockMultipartFile1 = new MockMultipartFile(
-            "productImage1",
-            "originalProductImageFileName1",
-            "image/jpg",
-            "productImageFileName1".getBytes()
-    )
-    MockMultipartFile mockMultipartFile2 = new MockMultipartFile(
-            "productImage2",
-            "originalProductImageFileName2",
-            "image/jpg",
-            "productImageFileName2".getBytes()
-    )
-
-    ProductImage productImage1 = ProductImage.builder()
-            .originalName("originalName1")
-            .savedName("savedName1")
-            .imageFullPath("path1")
-            .build()
-
-    ProductImage productImage2 = ProductImage.builder()
-            .originalName("originalName2")
-            .savedName("savedName2")
-            .imageFullPath("path2")
+    User user = User.builder()
+            .userId(USER_ID)
+            .name("테스트")
+            .encodedPassword("pwd")
             .build()
 
     def "경매 상품 등록"() {
         given:
-
         ProductSaveRequest request = new ProductSaveRequest(
+                USER_ID,
                 PRODUCT_NAME,
                 PRODUCT_DESCRIPTION,
-                LocalDateTime.now().plusDays(1),
-                LocalDateTime.now().plusDays(5),
-                5000
+                PRODUCT_START_DATE,
+                PRODUCT_CLOSE_DATE,
+                PRODUCT_START_PRICE
         )
-
-        List<MultipartFile> images = new ArrayList<>()
-        images.add(mockMultipartFile1)
-        images.add(mockMultipartFile2)
-
-        List<ProductImage> productImages = new ArrayList<>()
-        productImages.add(productImage1)
-        productImages.add(productImage2)
-
-        fileService.uploadImages(userId, images) >> productImages
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(Status.PENDING)
+                .build()
         product.id = 1L
-        productRepository.save(_) >> product
+
+        productRepository.save(_) >> product // _를 언제해야하는지 잘 모르겠음. 질문 ㄱ
 
         when:
-        def response = productService.enroll(userId, request, images)
+        def response = productService.enroll(request)
 
         then:
-        response.id == product.getId()
-
+        response.id == product.id
     }
 
     def "특정 id 경매 상품 조회"() {
         given:
-        productRepository.save(product)
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(Status.PENDING)
+                .build()
         product.id = 1L
+        productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
 
         when:
         def response = productService.findById(product.getId())
 
         then:
-        response.productName == product.getProductName()
-        response.description == product.getDescription()
+        response.productName == PRODUCT_NAME
+        response.description == PRODUCT_DESCRIPTION
+        response.startDate == PRODUCT_START_DATE
+        response.closeDate == PRODUCT_CLOSE_DATE
+        response.startPrice == PRODUCT_START_PRICE
+        response.status == PENDING
 
     }
 
     def "경매 상품 정보만 수정"() {
         given:
-        productRepository.save(product)
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(Status.PENDING)
+                .build()
         product.id = 1L
+        productRepository.save(product)
 
         productRepository.findById(product.getId()) >> Optional.of(product)
+
         ProductUpdateRequest request = new ProductUpdateRequest(
                 UPDATE_PRODUCT_NAME,
                 UPDATE_PRODUCT_DESCRIPTION,
-                LocalDateTime.now().plusDays(5),
-                LocalDateTime.now().plusDays(10),
-                105000
+                UPDATE_PRODUCT_START_DATE,
+                UPDATE_PRODUCT_CLOSE_DATE,
+                UPDATE_PRODUCT_START_PRICE
         )
-        List<MultipartFile> images = new ArrayList<>()// 이 부분은 어떻게 해야하는거지
 
         when:
-        def response = productService.update(userId, product.getId(), request, images)
+        def response = productService.update(user, product.getId(), request)
 
         then:
-        response.id == product.id
+        response.productName == UPDATE_PRODUCT_NAME
+        response.description == UPDATE_PRODUCT_DESCRIPTION
+        response.startDate == UPDATE_PRODUCT_START_DATE
+        response.closeDate == UPDATE_PRODUCT_CLOSE_DATE
+        response.startPrice == UPDATE_PRODUCT_START_PRICE
+        response.status == PENDING
     }
 
-    def "경매 상품 정보 및 이미지 수정"() {
+    def "내가 등록한 경매 상품이 아닐때 수정하면 예외 발생"() {
         given:
-        productRepository.save(product)
-        product.id = 1L
+        User user = User.builder()
+                .userId("HELLO")
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
 
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(Status.PENDING)
+                .build()
+        product.id = 1L
+        productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
 
         ProductUpdateRequest request = new ProductUpdateRequest(
                 UPDATE_PRODUCT_NAME,
                 UPDATE_PRODUCT_DESCRIPTION,
-                LocalDateTime.now().plusDays(5),
-                LocalDateTime.now().plusDays(10),
-                105000
+                UPDATE_PRODUCT_START_DATE,
+                UPDATE_PRODUCT_CLOSE_DATE,
+                UPDATE_PRODUCT_START_PRICE
         )
 
-        List<MultipartFile> images = new ArrayList<>()
-        images.add(mockMultipartFile1)
-
-        List<ProductImage> productImages = new ArrayList<>()
-        productImages.add(productImage1)
-        productImages.add(productImage2)
-
-        productImageRepository.findByProductId(product.getId()) >> productImages
-        fileService.loadImages(productImages) >> _
-        fileService.uploadImages(images) >> _
-
         when:
-        def response = productService.update(userId, product.getId(), request, images)
-
-        then:
-        response.id == product.id
-    }
-
-    def "내가 등록한 경매 상품이 아닌데 수정하면 예외 발생"() {
-        given:
-        String userId = "HELLO"
-        productRepository.save(product)
-        product.id = 1L
-
-        productRepository.findById(product.getId()) >> Optional.of(product)
-        ProductUpdateRequest request = new ProductUpdateRequest(
-                UPDATE_PRODUCT_NAME,
-                UPDATE_PRODUCT_DESCRIPTION,
-                LocalDateTime.now().plusDays(5),
-                LocalDateTime.now().plusDays(10),
-                105000
-        )
-        List<MultipartFile> images = new ArrayList<>()// 이 부분은 어떻게 해야하는거지
-
-        when:
-        productService.update(userId, product.getId(), request, images)
+        productService.update(user, product.getId(), request)
 
         then:
         def e = thrown(UnauthorizedProductAccessException)
@@ -188,38 +170,35 @@ class ProductServiceTest extends Specification {
 
     def "경매 상품 상태가 대기중이 아닐때 수정하면 예외 발생"() {
         given:
-        String userId = "HELLO"
-        product.status = Status.ACTIVE
-        productRepository.save(product)
-        product.id = 1L
+        User user = User.builder()
+                .userId("HELLO")
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
 
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(ACTIVE)
+                .build()
+        product.id = 1L
+        productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
+
         ProductUpdateRequest request = new ProductUpdateRequest(
                 UPDATE_PRODUCT_NAME,
                 UPDATE_PRODUCT_DESCRIPTION,
-                LocalDateTime.now().plusDays(5),
-                LocalDateTime.now().plusDays(10),
-                105000
+                UPDATE_PRODUCT_START_DATE,
+                UPDATE_PRODUCT_CLOSE_DATE,
+                UPDATE_PRODUCT_START_PRICE
         )
-        List<MultipartFile> images = new ArrayList<>()// 이 부분은 어떻게 해야하는거지
 
         when:
-        productService.update(userId, product.getId(), request, images)
-
-        then:
-        def e = thrown(UnauthorizedProductAccessException)
-    }
-
-    def "내가 등록한 경매 상품이 아닐시 삭제하면 예외 발생"() {
-        given:
-        String userId = "HELLo"
-        productRepository.save(product)
-        product.id = 1L
-
-        productRepository.findById(product.getId()) >> Optional.of(product)
-
-        when:
-        productService.delete(userId, product.getId())
+        productService.update(user, product.getId(), request)
 
         then:
         def e = thrown(UnauthorizedProductAccessException)
@@ -227,34 +206,87 @@ class ProductServiceTest extends Specification {
 
     def "내가 등록한 경매 상품이면 삭제"() {
         given:
-        productRepository.save(product)
+        User user = User.builder()
+                .userId(USER_ID)
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
+
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(PENDING)
+                .build()
         product.id = 1L
+        productRepository.save(_) >> product
 
         productRepository.findById(product.getId()) >> Optional.of(product)
 
-        List<ProductImage> productImages = new ArrayList<>()
-        productImages.add(productImage1)
-        productImages.add(productImage2)
-        productImageRepository.findByProductId(product.getId()) >> productImages
-        fileService.loadImages(productImages) >> _
-
         when:
-        def response = productService.delete(userId, product.getId())
+        def response = productService.delete(user, product.getId())
+
         then:
-        response.id == product.getId()
+        response == product.getId()
     }
 
-    def "경매 상품 상태가 대기중이 아니면 예외 발생"() {
+    def "내가 등록한 경매 상품이 아닐시 삭제하면 예외 발생"() {
         given:
-        String userId = "HELLo"
-        product.status = Status.ACTIVE
-        productRepository.save(product)
+        User user = User.builder()
+                .userId("HELLO")
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
+
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(PENDING)
+                .build()
         product.id = 1L
+        productRepository.save(product)
 
         productRepository.findById(product.getId()) >> Optional.of(product)
 
         when:
-        productService.delete(userId, product.getId())
+        productService.delete(user, product.getId())
+
+        then:
+        def e = thrown(UnauthorizedProductAccessException)
+    }
+
+
+    def "경매 상품 상태가 대기중이 아니면 접근하면 예외 발생"() {
+        given:
+        User user = User.builder()
+                .userId("HELLO")
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
+
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(ACTIVE)
+                .build()
+        product.id = 1L
+        productRepository.save(product)
+
+        productRepository.findById(product.getId()) >> Optional.of(product)
+
+        when:
+        productService.delete(user, product.getId())
 
         then:
         def e = thrown(UnauthorizedProductAccessException)

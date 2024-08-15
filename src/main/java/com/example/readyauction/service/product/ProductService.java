@@ -25,7 +25,6 @@ public class ProductService {
     public Product enroll(ProductSaveRequest productSaveRequest) {
         Product product = productSaveRequest.toEntity();
         Product saved = productRepository.save(product);
-
         return saved;
     }
 
@@ -41,7 +40,7 @@ public class ProductService {
     public Product update(User user, Long productId, ProductUpdateRequest productUpdateRequest) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundProductException(productId));
-        checkProductAccessPermission(productId, user.getUserId());
+        checkProductAccessPermission(product, user.getUserId());
 
         product.updateProductInfo(
                 productUpdateRequest.getProductName(),
@@ -55,23 +54,22 @@ public class ProductService {
     }
 
     @Transactional
-    public Long delete(String userId, Long productId) {
+    public Long delete(User user, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundProductException(productId));
 
-        checkProductAccessPermission(productId, userId);
+        checkProductAccessPermission(product, user.getUserId());
         productRepository.deleteById(product.getId());
 
         return product.getId();
     }
 
-    private void checkProductAccessPermission(Long id, String userId) {
-        Product product = productRepository.findById(id).get();
+    private void checkProductAccessPermission(Product product, String userId) {
         if (!product.getUserId().equals(userId)) {
-            throw new UnauthorizedProductAccessException(userId, id);
+            throw new UnauthorizedProductAccessException(userId, product.getId());
         }
         if (product.getStatus() != Status.PENDING) {
-            throw new ProductNotPendingException(id);
+            throw new ProductNotPendingException(product.getId());
         }
     }
 
