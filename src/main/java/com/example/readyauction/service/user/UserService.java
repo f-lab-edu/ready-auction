@@ -78,8 +78,8 @@ public class UserService {
                 "비밀번호는 8자 이상 15자 이하로 입력해주세요.");
 
         // 정규 표현식으로 비밀번호 검증
-        String passwordRegex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
-        Preconditions.checkArgument(passwordUpdateRequest.getPassword().matches(passwordRegex),
+        String regex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
+        Preconditions.checkArgument(passwordUpdateRequest.getPassword().matches(regex),
                 "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다.");
     }
 
