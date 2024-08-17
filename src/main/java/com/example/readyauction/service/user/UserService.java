@@ -65,7 +65,7 @@ public class UserService {
         Preconditions.checkArgument(userSaveRequest.getPassword().length() >= 8 && userSaveRequest.getPassword().length() <= 15,
                 "비밀번호는 8자 이상 15자 이하로 입력해주세요.");
 
-        // 정규 표현식으로 비밀번호 검증
+        // 정규 표현식으로 비밀번호 검증 (하드코딩된 비밀번호 아님)
         String passwordRegex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
         Preconditions.checkArgument(userSaveRequest.getPassword().matches(passwordRegex),
                 "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다.");
