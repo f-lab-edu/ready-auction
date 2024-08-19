@@ -32,11 +32,13 @@ class ProductServiceTest extends Specification {
     ProductRepository productRepository = Mock(ProductRepository)
     ProductService productService = new ProductService(productRepository)
 
-    User user = User.builder()
-            .userId(USER_ID)
-            .name("테스트")
-            .encodedPassword("pwd")
-            .build()
+    private User createUser(String userId) {
+        return User.builder()
+                .userId(userId)
+                .name("테스트")
+                .encodedPassword("pwd")
+                .build()
+    }
 
     def "경매 상품 등록"() {
         given:
@@ -48,18 +50,8 @@ class ProductServiceTest extends Specification {
                 PRODUCT_CLOSE_DATE,
                 PRODUCT_START_PRICE
         )
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(Status.PENDING)
-                .build()
-        product.id = 1L
-
-        productRepository.save(_) >> product // _를 언제해야하는지 잘 모르겠음. 질문 ㄱ
+        Product product = createProduct(PENDING)
+        productRepository.save(_) >> product
 
         when:
         def response = productService.enroll(request)
@@ -70,16 +62,7 @@ class ProductServiceTest extends Specification {
 
     def "특정 id 경매 상품 조회"() {
         given:
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(Status.PENDING)
-                .build()
-        product.id = 1L
+        Product product = createProduct(PENDING)
         productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
 
@@ -98,27 +81,13 @@ class ProductServiceTest extends Specification {
 
     def "경매 상품 정보만 수정"() {
         given:
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(Status.PENDING)
-                .build()
-        product.id = 1L
+        User user = createUser(USER_ID)
+        Product product = createProduct(PENDING)
         productRepository.save(product)
 
         productRepository.findById(product.getId()) >> Optional.of(product)
 
-        ProductUpdateRequest request = new ProductUpdateRequest(
-                UPDATE_PRODUCT_NAME,
-                UPDATE_PRODUCT_DESCRIPTION,
-                UPDATE_PRODUCT_START_DATE,
-                UPDATE_PRODUCT_CLOSE_DATE,
-                UPDATE_PRODUCT_START_PRICE
-        )
+        ProductUpdateRequest request = createProductUpdateRequest()
 
         when:
         def response = productService.update(user, product.getId(), request)
@@ -134,32 +103,13 @@ class ProductServiceTest extends Specification {
 
     def "내가 등록한 경매 상품이 아닐때 수정하면 예외 발생"() {
         given:
-        User user = User.builder()
-                .userId("HELLO")
-                .name("테스트")
-                .encodedPassword("pwd")
-                .build()
+        User user = createUser("TEST")
 
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(Status.PENDING)
-                .build()
-        product.id = 1L
+        Product product = createProduct(PENDING)
         productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
 
-        ProductUpdateRequest request = new ProductUpdateRequest(
-                UPDATE_PRODUCT_NAME,
-                UPDATE_PRODUCT_DESCRIPTION,
-                UPDATE_PRODUCT_START_DATE,
-                UPDATE_PRODUCT_CLOSE_DATE,
-                UPDATE_PRODUCT_START_PRICE
-        )
+        ProductUpdateRequest request = createProductUpdateRequest()
 
         when:
         productService.update(user, product.getId(), request)
@@ -170,32 +120,13 @@ class ProductServiceTest extends Specification {
 
     def "경매 상품 상태가 대기중이 아닐때 수정하면 예외 발생"() {
         given:
-        User user = User.builder()
-                .userId("HELLO")
-                .name("테스트")
-                .encodedPassword("pwd")
-                .build()
+        User user = createUser("TEST")
 
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(ACTIVE)
-                .build()
-        product.id = 1L
+        Product product = createProduct(ACTIVE)
         productRepository.save(_) >> product
         productRepository.findById(product.getId()) >> Optional.of(product)
 
-        ProductUpdateRequest request = new ProductUpdateRequest(
-                UPDATE_PRODUCT_NAME,
-                UPDATE_PRODUCT_DESCRIPTION,
-                UPDATE_PRODUCT_START_DATE,
-                UPDATE_PRODUCT_CLOSE_DATE,
-                UPDATE_PRODUCT_START_PRICE
-        )
+        ProductUpdateRequest request = createProductUpdateRequest()
 
         when:
         productService.update(user, product.getId(), request)
@@ -206,22 +137,10 @@ class ProductServiceTest extends Specification {
 
     def "내가 등록한 경매 상품이면 삭제"() {
         given:
-        User user = User.builder()
-                .userId(USER_ID)
-                .name("테스트")
-                .encodedPassword("pwd")
-                .build()
+        User user = createUser(USER_ID)
 
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(PENDING)
-                .build()
-        product.id = 1L
+
+        Product product = createProduct(PENDING)
         productRepository.save(_) >> product
 
         productRepository.findById(product.getId()) >> Optional.of(product)
@@ -235,22 +154,9 @@ class ProductServiceTest extends Specification {
 
     def "내가 등록한 경매 상품이 아닐시 삭제하면 예외 발생"() {
         given:
-        User user = User.builder()
-                .userId("HELLO")
-                .name("테스트")
-                .encodedPassword("pwd")
-                .build()
+        User user = createUser("TEST")
 
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(PENDING)
-                .build()
-        product.id = 1L
+        Product product = createProduct(PENDING)
         productRepository.save(product)
 
         productRepository.findById(product.getId()) >> Optional.of(product)
@@ -265,22 +171,9 @@ class ProductServiceTest extends Specification {
 
     def "경매 상품 상태가 대기중이 아니면 접근하면 예외 발생"() {
         given:
-        User user = User.builder()
-                .userId("HELLO")
-                .name("테스트")
-                .encodedPassword("pwd")
-                .build()
+        User user = createUser("TEST")
 
-        Product product = Product.builder()
-                .userId(USER_ID)
-                .productName(PRODUCT_NAME)
-                .description(PRODUCT_DESCRIPTION)
-                .startDate(PRODUCT_START_DATE)
-                .closeDate(PRODUCT_CLOSE_DATE)
-                .startPrice(PRODUCT_START_PRICE)
-                .status(ACTIVE)
-                .build()
-        product.id = 1L
+        Product product = createProduct(ACTIVE)
         productRepository.save(product)
 
         productRepository.findById(product.getId()) >> Optional.of(product)
@@ -292,5 +185,29 @@ class ProductServiceTest extends Specification {
         def e = thrown(UnauthorizedProductAccessException)
     }
 
+    private Product createProduct(Status status) {
+        Product product = Product.builder()
+                .userId(USER_ID)
+                .productName(PRODUCT_NAME)
+                .description(PRODUCT_DESCRIPTION)
+                .startDate(PRODUCT_START_DATE)
+                .closeDate(PRODUCT_CLOSE_DATE)
+                .startPrice(PRODUCT_START_PRICE)
+                .status(status)
+                .build()
+        product.id = 1L
+        return product;
+    }
+
+    private ProductUpdateRequest createProductUpdateRequest() {
+        ProductUpdateRequest request = new ProductUpdateRequest(
+                UPDATE_PRODUCT_NAME,
+                UPDATE_PRODUCT_DESCRIPTION,
+                UPDATE_PRODUCT_START_DATE,
+                UPDATE_PRODUCT_CLOSE_DATE,
+                UPDATE_PRODUCT_START_PRICE
+        )
+        return request;
+    }
 
 }
