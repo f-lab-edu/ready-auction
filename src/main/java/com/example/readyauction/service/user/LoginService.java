@@ -8,6 +8,8 @@ import com.example.readyauction.controller.request.user.LoginRequest;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.user.LoginFailException;
 import com.example.readyauction.repository.UserRepository;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,17 +28,16 @@ public class LoginService {
 
 	@Transactional
 	public void login(LoginRequest loginRequest) {
-		String userId = loginRequest.getUserId();
-		String password = loginRequest.getPassword();
+		validLoginRequest(loginRequest);
 
-		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new LoginFailException(userId));
+		User user = userRepository.findByUserId(loginRequest.getUserId())
+			.orElseThrow(() -> new LoginFailException(loginRequest.getUserId()));
 
-		if (bCryptPasswordEncoder.matches(password, user.getEncodedPassword())) {
-			httpSession.setAttribute(USER_ID, userId);
+		if (bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getEncodedPassword())) {
+			httpSession.setAttribute(USER_ID, loginRequest.getUserId());
 			httpSession.setMaxInactiveInterval(3600);
 		} else {
-			throw new LoginFailException(userId);
+			throw new LoginFailException(loginRequest.getUserId());
 		}
 	}
 
@@ -52,6 +53,14 @@ public class LoginService {
 	@Transactional
 	public void logout() {
 		httpSession.invalidate();
+	}
+
+	private void validLoginRequest(LoginRequest loginRequest) {
+		// 검증: userId가 비어있지 않은지 확인
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(loginRequest.getUserId()), "아이디를 입력해주세요.");
+
+		// 검증: password가 비어있지 않은지 확인
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(loginRequest.getPassword()), "비밀번호를 입력해주세요.");
 	}
 
 }
