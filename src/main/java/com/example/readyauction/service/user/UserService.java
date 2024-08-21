@@ -3,6 +3,7 @@ package com.example.readyauction.service.user;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import com.example.readyauction.controller.request.user.PasswordUpdateRequest;
 import com.example.readyauction.controller.request.user.UserSaveRequest;
@@ -13,7 +14,6 @@ import com.example.readyauction.exception.user.DuplicatedUserIdException;
 import com.example.readyauction.exception.user.NotFoundUserException;
 import com.example.readyauction.repository.UserRepository;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 @Service
 public class UserService {
@@ -30,6 +30,7 @@ public class UserService {
 
 	@Transactional
 	public UserResponse join(UserSaveRequest userSaveRequest) {
+		validUserSaveRequest(userSaveRequest);
 		checkedDuplicatedUser(userSaveRequest.getUserId());
 		User user = userSaveRequest.toEntity();
 
@@ -37,7 +38,7 @@ public class UserService {
 		user.updateEncodedPassword(encodedPassword);
 
 		User savedUser = userRepository.save(user);
-		return new UserResponse().from(savedUser);
+		return UserResponse.from(savedUser);
 	}
 
 	@Transactional
@@ -62,16 +63,16 @@ public class UserService {
 
 	private void validUserSaveRequest(UserSaveRequest userSaveRequest) {
 		// 검증: 이름이 비어있지 않은지 확인
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(userSaveRequest.getName()), "이름을 입력해주세요.");
+		Preconditions.checkArgument(!ObjectUtils.isEmpty(userSaveRequest.getName()), "이름을 입력해주세요.");
 
 		// 검증: 아이디가 비어있지 않고 길이가 6~10자인지 확인
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(userSaveRequest.getUserId()), "아이디를 입력해주세요.");
+		Preconditions.checkArgument(!ObjectUtils.isEmpty(userSaveRequest.getUserId()), "아이디를 입력해주세요.");
 		Preconditions.checkArgument(
 			userSaveRequest.getUserId().length() >= 6 && userSaveRequest.getUserId().length() <= 10,
 			"아이디는 6자 이상 10자 이하로 입력해주세요.");
 
 		// 검증: 비밀번호가 비어있지 않고 규칙에 맞는지 확인
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(userSaveRequest.getPassword()), "비밀번호를 입력해주세요.");
+		Preconditions.checkArgument(!ObjectUtils.isEmpty(userSaveRequest.getPassword()), "비밀번호를 입력해주세요.");
 		Preconditions.checkArgument(
 			userSaveRequest.getPassword().length() >= 8 && userSaveRequest.getPassword().length() <= 15,
 			"비밀번호는 8자 이상 15자 이하로 입력해주세요.");
@@ -84,7 +85,7 @@ public class UserService {
 
 	private void validUpdatePasswordRequest(PasswordUpdateRequest passwordUpdateRequest) {
 		// 검증: 비밀번호가 비어있지 않고 규칙에 맞는지 확인
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(passwordUpdateRequest.getPassword()), "비밀번호를 입력해주세요.");
+		Preconditions.checkArgument(!ObjectUtils.isEmpty(passwordUpdateRequest.getPassword()), "비밀번호를 입력해주세요.");
 		Preconditions.checkArgument(
 			passwordUpdateRequest.getPassword().length() >= 8 && passwordUpdateRequest.getPassword().length() <= 15,
 			"비밀번호는 8자 이상 15자 이하로 입력해주세요.");

@@ -11,13 +11,12 @@ public class UserResponse {
 	private String userId;
 	private String name;
 
-	public UserResponse(String userId, String name) {
+	private UserResponse(String userId, String name) {
 		this.userId = userId;
 		this.name = name;
 	}
 
-	public UserResponse from(User user) {
+	public static UserResponse from(User user) {
 		return new UserResponse(user.getUserId(), user.getName());
-
 	}
 }

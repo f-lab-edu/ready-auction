@@ -2,6 +2,7 @@ package com.example.readyauction.controller.request.product;
 
 import java.time.LocalDateTime;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class ProductUpdateRequest {
 	private LocalDateTime closeDate;
 	private int startPrice;
 
+	@Builder
 	public ProductUpdateRequest(String productName, String description, LocalDateTime startDate,
 		LocalDateTime closeDate,
 		int startPrice) {
