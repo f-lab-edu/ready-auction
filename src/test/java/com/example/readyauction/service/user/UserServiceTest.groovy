@@ -3,7 +3,7 @@ package com.example.readyauction.service.user
 import com.example.readyauction.controller.request.user.PasswordUpdateRequest
 import com.example.readyauction.controller.request.user.UserSaveRequest
 import com.example.readyauction.controller.response.user.PasswordUpdateResponse
-import com.example.readyauction.controller.response.user.UserSaveResponse
+import com.example.readyauction.controller.response.user.UserResponse
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.exception.user.DuplicatedUserIdException
 import com.example.readyauction.repository.UserRepository
@@ -21,7 +21,8 @@ class UserServiceTest extends Specification {
 
 
     UserRepository userRepository = Mock()
-    UserService userService = new UserService(userRepository)
+    LoginService loginService = Mock()
+    UserService userService = new UserService(userRepository, loginService)
 
     def "회원가입 성공"() {
         given:
@@ -30,7 +31,7 @@ class UserServiceTest extends Specification {
         userRepository.save(_) >> userSaveRequest.toEntity()
 
         when:
-        UserSaveResponse userSaveResponse = userService.join(userSaveRequest)
+        UserResponse userSaveResponse = userService.join(userSaveRequest)
 
         then:
         userSaveResponse.getUserId() == userSaveRequest.getUserId()
