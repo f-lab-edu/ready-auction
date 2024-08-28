@@ -1,5 +1,6 @@
 package com.example.readyauction.service.user;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import com.example.readyauction.controller.response.user.UserResponse;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.user.DuplicatedUserIdException;
 import com.example.readyauction.exception.user.NotFoundUserException;
+import com.example.readyauction.exception.user.UnauthorizedUserException;
 import com.example.readyauction.repository.UserRepository;
 import com.google.common.base.Preconditions;
 
@@ -19,13 +21,11 @@ import com.google.common.base.Preconditions;
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-	private final LoginService loginService;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	public UserService(UserRepository userRepository,
-		LoginService loginService) {
+	public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userRepository = userRepository;
-		this.loginService = loginService;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	@Transactional
@@ -42,7 +42,9 @@ public class UserService {
 	}
 
 	@Transactional
-	public PasswordUpdateResponse updatePassword(PasswordUpdateRequest passwordUpdateRequest, String userId) {
+	public PasswordUpdateResponse updatePassword(UserDetails userDetails, PasswordUpdateRequest passwordUpdateRequest,
+		String userId) {
+		validateUser(userDetails, userId);
 		validUpdatePasswordRequest(passwordUpdateRequest);
 		User user = userRepository.findByUserId(userId)
 			.orElseThrow(() -> new NotFoundUserException(userId));
@@ -53,12 +55,10 @@ public class UserService {
 		return PasswordUpdateResponse.from(user.getUserId());
 	}
 
-	@Transactional
-	public User getCurrentLoginUser() {
-		String userId = loginService.getCurrentLoginUserId();
-		User user = userRepository.findByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException());
-		return user;
+	private void validateUser(UserDetails userDetails, String userId) {
+		if (!userId.equals(userDetails.getUsername())) {
+			throw new UnauthorizedUserException(userId);
+		}
 	}
 
 	private void validUserSaveRequest(UserSaveRequest userSaveRequest) {

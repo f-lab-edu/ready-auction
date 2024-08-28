@@ -4,9 +4,12 @@ import com.example.readyauction.controller.request.user.PasswordUpdateRequest
 import com.example.readyauction.controller.request.user.UserSaveRequest
 import com.example.readyauction.controller.response.user.PasswordUpdateResponse
 import com.example.readyauction.controller.response.user.UserResponse
+import com.example.readyauction.domain.user.CustomUserDetails
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.exception.user.DuplicatedUserIdException
 import com.example.readyauction.repository.UserRepository
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
 
 class UserServiceTest extends Specification {
@@ -21,8 +24,9 @@ class UserServiceTest extends Specification {
 
 
     UserRepository userRepository = Mock()
-    LoginService loginService = Mock()
-    UserService userService = new UserService(userRepository, loginService)
+    BCryptPasswordEncoder bCryptPasswordEncoder = Mock()
+
+    UserService userService = new UserService(userRepository, bCryptPasswordEncoder)
 
     def "회원가입 성공"() {
         given:
@@ -139,10 +143,11 @@ class UserServiceTest extends Specification {
                 .name(OK_USER_NAME)
                 .encodedPassword(OK_USER_PASSWORD)
                 .build()
+        UserDetails userDetails = new CustomUserDetails(user);
         userRepository.findByUserId(user.getUserId()) >> Optional.of(user)
 
         when:
-        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(passwordUpdateRequest, user.getUserId())
+        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(userDetails, passwordUpdateRequest, user.getUserId())
 
         then:
         passwordUpdateResponse.userId == user.getUserId()
@@ -156,10 +161,11 @@ class UserServiceTest extends Specification {
                 .name(OK_USER_NAME)
                 .encodedPassword(OK_USER_PASSWORD)
                 .build()
+        UserDetails userDetails = new CustomUserDetails(user);
         userRepository.findByUserId(user.getUserId()) >> Optional.of(user)
 
         when:
-        userService.updatePassword(passwordUpdateRequest, user.getUserId())
+        userService.updatePassword(userDetails, passwordUpdateRequest, user.getUserId())
 
         then:
         def e = thrown(IllegalArgumentException)
@@ -174,10 +180,11 @@ class UserServiceTest extends Specification {
                 .name(OK_USER_NAME)
                 .encodedPassword(OK_USER_PASSWORD)
                 .build()
+        UserDetails userDetails = new CustomUserDetails(user);
         userRepository.findByUserId(user.getUserId()) >> Optional.of(user)
 
         when:
-        userService.updatePassword(passwordUpdateRequest, user.getUserId())
+        userService.updatePassword(userDetails, passwordUpdateRequest, user.getUserId())
 
         then:
         def e = thrown(IllegalArgumentException)

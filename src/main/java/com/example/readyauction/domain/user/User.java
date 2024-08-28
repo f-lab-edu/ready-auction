@@ -1,7 +1,10 @@
 package com.example.readyauction.domain.user;
 
-import com.example.readyauction.domain.BaseEntity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import com.example.readyauction.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,8 +25,9 @@ public class User extends BaseEntity {
 	private Long id;
 	private String userId;
 	private String name;
-
 	private String encodedPassword;
+	@Enumerated(EnumType.STRING)
+	private Role role = Role.ROLE_USER;
 
 	@Builder
 	public User(String userId, String name, String encodedPassword) {
@@ -31,7 +35,7 @@ public class User extends BaseEntity {
 		this.name = name;
 		this.encodedPassword = encodedPassword;
 	}
-
+  
 	public void updateEncodedPassword(String encodedPassword) {
 		this.encodedPassword = encodedPassword;
 	}
