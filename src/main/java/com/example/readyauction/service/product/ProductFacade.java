@@ -2,6 +2,7 @@ package com.example.readyauction.service.product;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.controller.response.ImageResponse;
+import com.example.readyauction.controller.response.product.ProductCursorResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.Product;
@@ -50,6 +52,22 @@ public class ProductFacade {
 		List<ProductImage> productImages = productImageService.getImage(productId);
 		List<ImageResponse> imageResponses = fileService.loadImages(productImages);
 		return ProductFindResponse.from(product, imageResponses);
+	}
+
+	@Transactional
+	public ProductCursorResponse findAll(Long cursorId, String sortedBy, int size) {
+		List<Product> products = productService.findAll(cursorId, sortedBy, size);
+		List<ProductFindResponse> productFindResponses = products.stream()
+			.map(product -> {
+				List<ProductImage> productImages = productImageService.getImage(product.getId());
+				List<ImageResponse> imageResponses = fileService.loadImages(productImages);
+				return ProductFindResponse.from(product, imageResponses);
+			})
+			.collect(Collectors.toList());
+
+		boolean hasNext = products.size() == size;
+		Long nextCursorId = hasNext ? products.get(products.size() - 1).getId() : -1;
+		return ProductCursorResponse.from(productFindResponses, nextCursorId, hasNext);
 	}
 
 	@Transactional

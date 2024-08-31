@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
+import com.example.readyauction.controller.response.product.ProductCursorResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.user.CustomUserDetails;
@@ -23,7 +25,7 @@ import com.example.readyauction.service.product.ProductFacade;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductApiController {
-
+	private static final int DEFAULT_SIZE = 6;
 	private final ProductFacade productFacade;
 
 	public ProductApiController(ProductFacade productFacade) {
@@ -43,6 +45,14 @@ public class ProductApiController {
 	public ProductFindResponse findById(@PathVariable Long id) {
 		ProductFindResponse productFindResponse = productFacade.findById(id);
 		return productFindResponse;
+	}
+
+	@GetMapping
+	public ProductCursorResponse findAll(
+		@RequestParam(value = "cursorId", required = false) Long cursorId,
+		@RequestParam(value = "sortedBy", required = false) String sortedBy) {
+		ProductCursorResponse productCursorResponse = productFacade.findAll(cursorId, sortedBy, DEFAULT_SIZE);
+		return productCursorResponse;
 	}
 
 	@PutMapping("/{id}")
