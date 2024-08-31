@@ -14,5 +14,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByIdLessThanOrderByIdDesc(Long cursorId, Pageable pageable);
 
+	List<Product> findAllByOrderByStartDateAsc(Pageable pageable);
+
 	List<Product> findAllByIdLessThanOrderByStartDateAsc(Long cursorId, Pageable pageable);
+
 }

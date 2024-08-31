@@ -51,19 +51,37 @@ public class ProductService {
 	}
 
 	private List<Product> getProducts(Long cursorId, String sortedBy, Pageable pageable) {
-		if (cursorId == null) { // 최초 조회면 최신순으로 size만큼
-			return productRepository.findAllByOrderByIdDesc(pageable);
-		}
 
-		if (sortedBy == null) {
-			return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
+		if (cursorId == null) {
+			if (sortedBy == null) { // /api/v1/products : 최신순
+				return productRepository.findAllByOrderByIdDesc(pageable);
+			} else { // api/v1/products?sortedBy=startDate
+				return getProductBySortedBy(sortedBy, pageable);
+			}
+		} else {
+			if (sortedBy == null) { // /api/v1/products?cursorId=5
+				return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
+			} else { // /api/v1/products?cursorId=5&sortedBy=startDate
+				return getProductByCursorIdAndSortedBy(cursorId, sortedBy, pageable);
+			}
 		}
+	}
 
+	private List<Product> getProductByCursorIdAndSortedBy(Long cursorId, String sortedBy, Pageable pageable) {
+		switch (sortedBy) {
+			case "startDate":
+				return productRepository.findAllByIdLessThanOrderByStartDateAsc(cursorId, pageable);
+			default:
+				return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
+		}
+	}
+
+	private List<Product> getProductBySortedBy(String sortedBy, Pageable pageable) {
 		switch (sortedBy) {
 			case "startDate": // 경매 시작일이 가장 빠른 순
-				return productRepository.findAllByIdLessThanOrderByStartDateAsc(cursorId, pageable);
-			default: // 디폴트 : 최신순
-				return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
+				return productRepository.findAllByOrderByStartDateAsc(pageable);
+			default:
+				return productRepository.findAllByOrderByIdDesc(pageable);
 		}
 	}
 
