@@ -14,3 +14,12 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 16379
+      password: root
+
+
+

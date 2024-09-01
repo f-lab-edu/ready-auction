@@ -25,12 +25,15 @@ public class ProductFacade {
 	private final FileService fileService;
 	private final ProductImageService productImageService;
 	private final ProductService productService;
+	private final ProductLikeService productLikeService;
 
 	public ProductFacade(FileService fileService, ProductImageService productImageService,
-		ProductService productService) {
+		ProductService productService,
+		ProductLikeService productLikeService) {
 		this.fileService = fileService;
 		this.productImageService = productImageService;
 		this.productService = productService;
+		this.productLikeService = productLikeService;
 	}
 
 	@Transactional
@@ -70,6 +73,16 @@ public class ProductFacade {
 		fileService.deleteImages(productImages);
 		return ProductResponse.from(productId);
 
+	}
+
+	@Transactional
+	public int productLike(User user, Long productId) {
+		return productLikeService.productLike(user, productId);
+	}
+
+	@Transactional
+	public int getProductLikes(Long productId) {
+		return productLikeService.getProductLikesByProductId(productId);
 	}
 
 	private void validateUser(User currentUser, ProductSaveRequest productSaveRequest) {
