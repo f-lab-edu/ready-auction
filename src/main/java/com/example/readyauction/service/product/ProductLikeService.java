@@ -1,5 +1,7 @@
 package com.example.readyauction.service.product;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,11 +13,6 @@ import com.example.readyauction.domain.user.User;
 
 @Service
 public class ProductLikeService {
-	/*
-		1. Redis에 해당 사용자(id)가 해당 상품(id)에 대한 "좋아요" 정보가 없으면 좋아요 + 1
-		2. Redis에 해당 사용자(id)가 해당 상품(id)에 대한 "좋아요" 정보가 있으면 좋아요 - 1
-		3. Redis에 좋아요 정보가 있는지 없는지를 확인하는 메서드
-	 */
 
 	private final RedisTemplate<Long, Long> redisTemplate;
 
@@ -24,21 +21,14 @@ public class ProductLikeService {
 	}
 
 	@Transactional
-	public int productLike(User user, Long productId) {
-		if (checkIfUserLikesProduct(user, productId)) {
-			return deleteProductLike(user, productId);
-		} else {
-			return addProductLike(user, productId);
-		}
-	}
-
-	private int addProductLike(User user, Long productId) {
+	public int addLike(User user, Long productId) {
 		SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
 		setOperations.add(productId, user.getId());
 		return countProductLikesByProductId(productId);
 	}
 
-	private int deleteProductLike(User user, Long productId) {
+	@Transactional
+	public int deleteLike(User user, Long productId) {
 		SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
 		setOperations.remove(productId, user.getId());
 		return countProductLikesByProductId(productId);
@@ -50,9 +40,9 @@ public class ProductLikeService {
 	}
 
 	@Transactional
-	public Set<Long> getUsersByProductId(Long productId) {
+	public List<Long> getUsersByProductId(Long productId) {
 		Set<Long> userIds = redisTemplate.opsForSet().members(productId);
-		return userIds;
+		return new ArrayList<>(userIds);
 	}
 
 	@Transactional

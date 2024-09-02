@@ -76,8 +76,13 @@ public class ProductFacade {
 	}
 
 	@Transactional
-	public int productLike(User user, Long productId) {
-		return productLikeService.productLike(user, productId);
+	public int addLike(User user, Long productId) {
+		return productLikeService.addLike(user, productId);
+	}
+
+	@Transactional
+	public int productLikeDelete(User user, Long productId) {
+		return productLikeService.deleteLike(user, productId);
 	}
 
 	@Transactional

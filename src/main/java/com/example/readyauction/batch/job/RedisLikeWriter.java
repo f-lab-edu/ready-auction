@@ -1,4 +1,4 @@
-package com.example.readyauction.batch;
+package com.example.readyauction.batch.job;
 
 import java.util.List;
 

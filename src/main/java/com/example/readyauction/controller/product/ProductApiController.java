@@ -64,7 +64,12 @@ public class ProductApiController {
 
 	@PostMapping("/{id}/likes")
 	public int productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
-		return productFacade.productLike(user.getUser(), id);
+		return productFacade.addLike(user.getUser(), id);
+	}
+
+	@DeleteMapping("/{id}/likes")
+	public int productLikeDelete(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+		return productFacade.productLikeDelete(user.getUser(), id);
 	}
 
 	@GetMapping("{id}/likes")

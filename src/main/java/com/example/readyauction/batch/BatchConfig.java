@@ -1,4 +1,4 @@
-package com.example.readyauction.config;
+package com.example.readyauction.batch;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.example.readyauction.batch.RedisLikeReader;
-import com.example.readyauction.batch.RedisLikeWriter;
+import com.example.readyauction.batch.job.RedisLikeReader;
+import com.example.readyauction.batch.job.RedisLikeWriter;
 
 @Configuration
 @EnableBatchProcessing
@@ -42,7 +42,7 @@ public class BatchConfig {
 	@Bean
 	public Step updateStep() {
 		return new StepBuilder("updateProductLikeDB", jobRepository)
-			.chunk(10, platformTransactionManager)
+			.chunk(500, platformTransactionManager)
 			.reader(redisLikeReader)
 			.writer(redisLikeWriter)
 			.taskExecutor(new SimpleAsyncTaskExecutor())
