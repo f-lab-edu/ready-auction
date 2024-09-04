@@ -14,51 +14,40 @@ import com.example.readyauction.domain.user.User;
 @Service
 public class ProductLikeService {
 
-	private final RedisTemplate<Long, Long> redisTemplate;
+    private final RedisTemplate<Long, Long> redisTemplate;
 
-	public ProductLikeService(RedisTemplate<Long, Long> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
+    public ProductLikeService(RedisTemplate<Long, Long> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
-	@Transactional
-	public int addLike(User user, Long productId) {
-		SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
-		setOperations.add(productId, user.getId());
-		return countProductLikesByProductId(productId);
-	}
+    @Transactional
+    public int addLike(User user, Long productId) {
+        SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
+        setOperations.add(productId, user.getId());
+        return countProductLikesByProductId(productId);
+    }
 
-	@Transactional
-	public int deleteLike(User user, Long productId) {
-		SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
-		setOperations.remove(productId, user.getId());
-		return countProductLikesByProductId(productId);
-	}
+    @Transactional
+    public int deleteLike(User user, Long productId) {
+        SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
+        setOperations.remove(productId, user.getId());
+        return countProductLikesByProductId(productId);
+    }
 
-	@Transactional
-	public int getProductLikesByProductId(Long productId) {
-		return countProductLikesByProductId(productId);
-	}
+    @Transactional
+    public int getProductLikesByProductId(Long productId) {
+        return countProductLikesByProductId(productId);
+    }
 
-	@Transactional
-	public List<Long> getUsersByProductId(Long productId) {
-		Set<Long> userIds = redisTemplate.opsForSet().members(productId);
-		return new ArrayList<>(userIds);
-	}
+    @Transactional
+    public List<Long> getUsersByProductId(Long productId) {
+        Set<Long> userIds = redisTemplate.opsForSet().members(productId);
+        return new ArrayList<>(userIds);
+    }
 
-	@Transactional
-	public int countProductLikesByProductId(Long productId) {
-		Long count = redisTemplate.opsForSet().size(productId);
-		return count == null ? 0 : count.intValue();
-	}
-
-	private Boolean checkIfUserLikesProduct(User user, Long productId) {
-		if (user == null) {
-			return Boolean.FALSE;
-		}
-		Set<Long> userIds = redisTemplate.opsForSet().members(productId);
-		if (userIds == null) {
-			return Boolean.FALSE;
-		}
-		return userIds.contains(user.getId());
-	}
+    @Transactional
+    public int countProductLikesByProductId(Long productId) {
+        Long count = redisTemplate.opsForSet().size(productId);
+        return count == null ? 0 : count.intValue();
+    }
 }
