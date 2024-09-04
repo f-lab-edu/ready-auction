@@ -1,9 +1,6 @@
 package com.example.readyauction.service.product;
 
-import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,107 +17,68 @@ import com.example.readyauction.repository.ProductRepository;
 @Service
 public class ProductService {
 
-	private final ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-	public ProductService(ProductRepository productRepository) {
-		this.productRepository = productRepository;
-	}
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
-	@Transactional
-	public Product enroll(ProductSaveRequest productSaveRequest) {
-		Product product = productSaveRequest.toEntity();
-		Product saved = productRepository.save(product);
-		return saved;
-	}
+    @Transactional
+    public Product enroll(ProductSaveRequest productSaveRequest) {
+        Product product = productSaveRequest.toEntity();
+        Product saved = productRepository.save(product);
+        return saved;
+    }
 
-	@Transactional
-	public Product findById(Long id) {
-		Product product = productRepository.findById(id)
-			.orElseThrow(() -> new NotFoundProductException(id));
-		return product;
-	}
+    @Transactional
+    public Product findById(Long id) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new NotFoundProductException(id));
+        return product;
+    }
 
-	@Transactional
-	public List<Product> findAll(Long cursorId, String sortedBy, int size) {
-		Pageable pageable = PageRequest.of(0, size + 1);
-		List<Product> products = getProducts(cursorId, sortedBy, pageable);
-		if (products.size() > size) {
-			products.remove(products.size() - 1); // 마지막꺼는 삭
-		}
-		return products;
-	}
+    @Transactional
+    public Page<Product> findProductWithCriteria(String keyword, int pageNo, int pageSize, OrderBy order) {
+        Page<Product> products = productRepository.findProductsWithCriteria(keyword, pageNo, pageSize, order);
+        return products;
+    }
 
-	private List<Product> getProducts(Long cursorId, String sortedBy, Pageable pageable) {
+    @Transactional
+    public Product update(User user, Long productId, ProductUpdateRequest productUpdateRequest) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new NotFoundProductException(productId));
+        checkProductAccessPermission(product, user.getUserId());
 
-		if (cursorId == null) {
-			if (sortedBy == null) { // /api/v1/products : 최신순
-				return productRepository.findAllByOrderByIdDesc(pageable);
-			} else { // api/v1/products?sortedBy=startDate
-				return getProductBySortedBy(sortedBy, pageable);
-			}
-		} else {
-			if (sortedBy == null) { // /api/v1/products?cursorId=5
-				return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
-			} else { // /api/v1/products?cursorId=5&sortedBy=startDate
-				return getProductByCursorIdAndSortedBy(cursorId, sortedBy, pageable);
-			}
-		}
-	}
+        product.updateProductInfo(
+            productUpdateRequest.getProductName(),
+            productUpdateRequest.getDescription(),
+            productUpdateRequest.getStartDate(),
+            productUpdateRequest.getCloseDate(),
+            productUpdateRequest.getStartPrice()
+        );
 
-	private List<Product> getProductByCursorIdAndSortedBy(Long cursorId, String sortedBy, Pageable pageable) {
-		switch (sortedBy) {
-			case "startDate":
-				return productRepository.findAllByIdLessThanOrderByStartDateAsc(cursorId, pageable);
-			default:
-				return productRepository.findAllByIdLessThanOrderByIdDesc(cursorId, pageable);
-		}
-	}
+        return product;
+    }
 
-	private List<Product> getProductBySortedBy(String sortedBy, Pageable pageable) {
-		switch (sortedBy) {
-			case "startDate": // 경매 시작일이 가장 빠른 순
-				return productRepository.findAllByOrderByStartDateAsc(pageable);
-			default:
-				return productRepository.findAllByOrderByIdDesc(pageable);
-		}
-	}
+    @Transactional
+    public Long delete(User user, Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new NotFoundProductException(productId));
 
-	@Transactional
-	public Product update(User user, Long productId, ProductUpdateRequest productUpdateRequest) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundProductException(productId));
-		checkProductAccessPermission(product, user.getUserId());
+        checkProductAccessPermission(product, user.getUserId());
+        productRepository.deleteById(product.getId());
 
-		product.updateProductInfo(
-			productUpdateRequest.getProductName(),
-			productUpdateRequest.getDescription(),
-			productUpdateRequest.getStartDate(),
-			productUpdateRequest.getCloseDate(),
-			productUpdateRequest.getStartPrice()
-		);
+        return product.getId();
+    }
 
-		return product;
-	}
-
-	@Transactional
-	public Long delete(User user, Long productId) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundProductException(productId));
-
-		checkProductAccessPermission(product, user.getUserId());
-		productRepository.deleteById(product.getId());
-
-		return product.getId();
-	}
-
-	private void checkProductAccessPermission(Product product, String userId) {
-		if (!product.getUserId().equals(userId)) {
-			throw new UnauthorizedProductAccessException(userId, product.getId());
-		}
-		if (product.getStatus() != Status.PENDING) {
-			throw new ProductNotPendingException(product.getId());
-		}
-	}
+    private void checkProductAccessPermission(Product product, String userId) {
+        if (!product.getUserId().equals(userId)) {
+            throw new UnauthorizedProductAccessException(userId, product.getId());
+        }
+        if (product.getStatus() != Status.PENDING) {
+            throw new ProductNotPendingException(product.getId());
+        }
+    }
 
 }
 
