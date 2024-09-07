@@ -2,8 +2,8 @@ package com.example.readyauction.repository;
 
 import org.springframework.data.domain.Page;
 
+import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
-import com.example.readyauction.service.product.OrderBy;
 
 public interface ProductRepositoryCustom {
 

@@ -12,9 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.controller.response.ImageResponse;
+import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
-import com.example.readyauction.controller.response.product.ProductPagingResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
+import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
 import com.example.readyauction.domain.product.ProductImage;
 import com.example.readyauction.domain.user.User;
@@ -56,12 +57,12 @@ public class ProductFacade {
     }
 
     @Transactional
-    public ProductPagingResponse findAll(String keyword, int pageNo, int pageSize, OrderBy order) {
+    public PagingResponse<ProductFindResponse> findAll(String keyword, int pageNo, int pageSize, OrderBy order) {
         Page<Product> page = productService.findProductWithCriteria(keyword, pageNo, pageSize, order);
         List<ProductFindResponse> productFindResponses = page.getContent().stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-        return ProductPagingResponse.from(productFindResponses, pageNo, pageSize, page);
+        return PagingResponse.from(productFindResponses, pageNo, pageSize, page);
     }
 
     private ProductFindResponse convertToProductFindResponse(Product product) {

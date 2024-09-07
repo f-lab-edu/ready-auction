@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
+import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
 import com.example.readyauction.domain.product.Status;
 import com.example.readyauction.domain.user.User;

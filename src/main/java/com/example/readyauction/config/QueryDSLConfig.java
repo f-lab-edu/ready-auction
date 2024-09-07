@@ -9,14 +9,8 @@ import jakarta.persistence.EntityManager;
 
 @Configuration
 public class QueryDSLConfig {
-    private final EntityManager entityManager;
-
-    public QueryDSLConfig(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
-
     @Bean
-    public JPAQueryFactory jpaQueryFactory() {
+    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
         return new JPAQueryFactory(entityManager);
     }
 }

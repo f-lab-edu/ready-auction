@@ -1,10 +1,8 @@
-package com.example.readyauction.controller.response.product;
+package com.example.readyauction.controller.response;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-
-import com.example.readyauction.domain.product.Product;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class ProductPagingResponse {
-    private List<ProductFindResponse> products;
+public class PagingResponse<T> {
+    private List<T> items;
     private int pageNo; // 현재 페이지 넘버
     private int pageSize; // 페이지 사이즈
     private long totalElements; //  최초 시작점
@@ -22,9 +20,9 @@ public class ProductPagingResponse {
     private boolean last; // 첫번째 페이지인지
 
     @Builder
-    private ProductPagingResponse(List<ProductFindResponse> products, int pageNo, int pageSize, long totalElements,
+    private PagingResponse(List<T> items, int pageNo, int pageSize, long totalElements,
         int totalPages, boolean first, boolean last) {
-        this.products = products;
+        this.items = items;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.totalElements = totalElements;
@@ -33,10 +31,10 @@ public class ProductPagingResponse {
         this.last = last;
     }
 
-    public static ProductPagingResponse from(List<ProductFindResponse> productFindResponses, int pageNo, int pageSize,
-        Page<Product> page) {
-        return ProductPagingResponse.builder()
-            .products(productFindResponses)
+    public static <T> PagingResponse<T> from(List<T> items, int pageNo, int pageSize,
+        Page page) {
+        return PagingResponse.<T>builder()
+            .items(items)
             .pageNo(pageNo)
             .pageSize(pageSize)
             .totalElements(page.getTotalElements())

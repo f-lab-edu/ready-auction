@@ -16,11 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
+import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
-import com.example.readyauction.controller.response.product.ProductPagingResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
+import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.user.CustomUserDetails;
-import com.example.readyauction.service.product.OrderBy;
 import com.example.readyauction.service.product.ProductFacade;
 
 @RestController
@@ -49,13 +49,13 @@ public class ProductApiController {
     }
 
     @GetMapping
-    
-    public ProductPagingResponse findAll(
-        @RequestParam(value = "keyword", defaultValue = "", required = false) String keyword,
+    public PagingResponse findAll(
+        @RequestParam(value = "keyword", required = false) String keyword,
         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
         @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize,
         @RequestParam(value = "orderBy", required = false) OrderBy order) {
-        ProductPagingResponse productPagingResponse = productFacade.findAll(keyword, pageNo, pageSize, order);
+        PagingResponse<ProductFindResponse> productPagingResponse = productFacade.findAll(keyword, pageNo, pageSize,
+            order);
         return productPagingResponse;
     }
 
@@ -64,7 +64,7 @@ public class ProductApiController {
         @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long id,
         @RequestPart(name = "product") ProductUpdateRequest productUpdateRequest,
-        @RequestPart(name = "Images") List<MultipartFile> files) {
+        @RequestPart(name = "images") List<MultipartFile> files) {
         ProductResponse ProductUpdateResponse = productFacade.update(user.getUser(), id, productUpdateRequest, files);
         return ProductUpdateResponse;
     }
