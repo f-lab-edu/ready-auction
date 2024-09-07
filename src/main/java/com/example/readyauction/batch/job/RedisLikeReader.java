@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
+import com.example.readyauction.batch.BatchConfig;
 import com.example.readyauction.domain.product.ProductLike;
 import com.example.readyauction.service.product.ProductLikeService;
 
@@ -33,18 +34,16 @@ public class RedisLikeReader implements ItemReader<List<ProductLike>> {
         NonTransientResourceException {
 
         List<ProductLike> productLikes = new ArrayList<>();
-        ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(10).build();
+        ScanOptions scanOptions = ScanOptions.scanOptions().match("*").count(BatchConfig.CHUNK_SIZE).build();
         Cursor<Long> cursor = redisTemplate.scan(scanOptions);
 
         while (cursor.hasNext()) {
             Long productId = cursor.next();
-            List<Long> usersIds = productLikeService.getUsersByProductId(productId);
+            productLikeService.getUsersByProductId(productId)
+                .stream()
+                .map(userId -> new ProductLike(productId, userId))
+                .forEach(productLikes::add);
 
-            if (usersIds != null) {
-                usersIds.stream()
-                    .map(userId -> new ProductLike(productId, userId))
-                    .forEach(productLikes::add);
-            }
         }
         return productLikes;
     }

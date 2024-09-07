@@ -1,6 +1,7 @@
 package com.example.readyauction.service.product;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -42,6 +43,10 @@ public class ProductLikeService {
     @Transactional
     public List<Long> getUsersByProductId(Long productId) {
         Set<Long> userIds = redisTemplate.opsForSet().members(productId);
+        // null이 아닌 빈 Set을 반환
+        if (userIds == null) {
+            userIds = Collections.emptySet();
+        }
         return new ArrayList<>(userIds);
     }
 

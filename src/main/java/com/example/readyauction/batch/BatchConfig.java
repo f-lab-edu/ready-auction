@@ -19,35 +19,38 @@ import com.example.readyauction.batch.job.RedisLikeWriter;
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
-	private final JobRepository jobRepository;
-	private final PlatformTransactionManager platformTransactionManager;
-	private final ItemReader redisLikeReader;
-	private final ItemWriter redisLikeWriter;
 
-	public BatchConfig(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager,
-		RedisLikeReader redisLikeReader, RedisLikeWriter redisLikeWriter) {
-		this.jobRepository = jobRepository;
-		this.platformTransactionManager = platformTransactionManager;
-		this.redisLikeReader = redisLikeReader;
-		this.redisLikeWriter = redisLikeWriter;
-	}
+    public static final int CHUNK_SIZE = 500;
 
-	@Bean
-	public Job readLikeInRedis() {
-		return new JobBuilder("readLikeInRedis", jobRepository)
-			.start(updateStep())
-			.build();
-	}
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager platformTransactionManager;
+    private final ItemReader redisLikeReader;
+    private final ItemWriter redisLikeWriter;
 
-	@Bean
-	public Step updateStep() {
-		return new StepBuilder("updateProductLikeDB", jobRepository)
-			.chunk(500, platformTransactionManager)
-			.reader(redisLikeReader)
-			.writer(redisLikeWriter)
-			.taskExecutor(new SimpleAsyncTaskExecutor())
-			.transactionManager(platformTransactionManager)
-			.build();
-	}
+    public BatchConfig(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager,
+        RedisLikeReader redisLikeReader, RedisLikeWriter redisLikeWriter) {
+        this.jobRepository = jobRepository;
+        this.platformTransactionManager = platformTransactionManager;
+        this.redisLikeReader = redisLikeReader;
+        this.redisLikeWriter = redisLikeWriter;
+    }
+
+    @Bean
+    public Job readLikeInRedis() {
+        return new JobBuilder("readLikeInRedis", jobRepository)
+            .start(updateStep())
+            .build();
+    }
+
+    @Bean
+    public Step updateStep() {
+        return new StepBuilder("updateProductLikeDB", jobRepository)
+            .chunk(CHUNK_SIZE, platformTransactionManager)
+            .reader(redisLikeReader)
+            .writer(redisLikeWriter)
+            .taskExecutor(new SimpleAsyncTaskExecutor())
+            .transactionManager(platformTransactionManager)
+            .build();
+    }
 
 }
