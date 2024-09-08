@@ -13,4 +13,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  profiles:
+    active: dev
+
+logging:
+  level:
+    org.hibernate.sql: debug
