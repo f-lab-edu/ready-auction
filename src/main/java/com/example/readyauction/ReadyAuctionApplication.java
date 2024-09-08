@@ -11,4 +11,3 @@ public class ReadyAuctionApplication {
     }
 
 }
-//http://localhost:8080/api/v1/products?keyword=product&pageNo=0&orderBy=START_PRICE
