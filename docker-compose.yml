@@ -2,6 +2,7 @@ services:
   mysql:
     image: mysql:latest
     container_name: ready-auction-db
+    restart: always # 컨테이너가 종료되면 재실행
     environment:
       MYSQL_DATABASE: ready-auction
       MYSQL_ROOT_USER: root
@@ -14,3 +15,9 @@ services:
       - "33306:3306"
     volumes:
       - ./data/:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    ports:
+      - "16379:6379"
+    restart: always

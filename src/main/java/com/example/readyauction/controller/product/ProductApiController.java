@@ -26,6 +26,7 @@ import com.example.readyauction.service.product.ProductFacade;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductApiController {
+	private final ProductFacade productFacade;
     private static final String DEFAULT_SIZE = "9";
     private final ProductFacade productFacade;
 
@@ -69,11 +70,26 @@ public class ProductApiController {
         return ProductUpdateResponse;
     }
 
-    @DeleteMapping("/{id}")
-    public ProductResponse delete(
-        @AuthenticationPrincipal CustomUserDetails user,
-        @PathVariable Long id) {
-        ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
-        return ProductDeleteResponse;
-    }
+	@DeleteMapping("/{id}")
+	public ProductResponse delete(
+		@AuthenticationPrincipal CustomUserDetails user,
+		@PathVariable Long id) {
+		ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
+		return ProductDeleteResponse;
+	}
+
+	@PostMapping("/{id}/likes")
+	public int productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+		return productFacade.addLike(user.getUser(), id);
+	}
+
+	@DeleteMapping("/{id}/likes")
+	public int productLikeDelete(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+		return productFacade.productLikeDelete(user.getUser(), id);
+	}
+
+	@GetMapping("{id}/likes")
+	public int getProductLike(@PathVariable Long id) {
+		return productFacade.getProductLikes(id);
+	}
 }

@@ -97,7 +97,6 @@ class ProductFacadeTest extends Specification {
         User user = createUser(userId)
         def productImages = [new ProductImage()]
 
-
         productService.delete(user, productId) >> productId
         productImageService.deleteImage(productId) >> productImages
         fileService.deleteImages(productImages)
