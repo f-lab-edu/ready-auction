@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableBatchProcessing
 public class ReadyAuctionApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ReadyAuctionApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ReadyAuctionApplication.class, args);
+    }
 
 }

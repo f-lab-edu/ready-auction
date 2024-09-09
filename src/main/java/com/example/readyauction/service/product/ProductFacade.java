@@ -2,7 +2,9 @@ package com.example.readyauction.service.product;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.controller.response.ImageResponse;
+import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
+import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
 import com.example.readyauction.domain.product.ProductImage;
 import com.example.readyauction.domain.user.User;
@@ -21,7 +25,6 @@ import com.google.common.base.Preconditions;
 
 @Service
 public class ProductFacade {
-
 	private final FileService fileService;
 	private final ProductImageService productImageService;
 	private final ProductService productService;
