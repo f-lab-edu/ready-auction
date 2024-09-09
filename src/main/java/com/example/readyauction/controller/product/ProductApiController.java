@@ -28,7 +28,6 @@ import com.example.readyauction.service.product.ProductFacade;
 public class ProductApiController {
 	private final ProductFacade productFacade;
     private static final String DEFAULT_SIZE = "9";
-    private final ProductFacade productFacade;
 
     public ProductApiController(ProductFacade productFacade) {
         this.productFacade = productFacade;
@@ -38,7 +37,7 @@ public class ProductApiController {
     public ProductResponse enroll(
         @AuthenticationPrincipal CustomUserDetails user,
         @RequestPart(name = "product") ProductSaveRequest productSaveRequest,
-        @RequestPart(name = "Images") List<MultipartFile> files) {
+        @RequestPart(name = "images") List<MultipartFile> files) {
         ProductResponse productSaveResponse = productFacade.enroll(user.getUser(), productSaveRequest, files);
         return productSaveResponse;
     }

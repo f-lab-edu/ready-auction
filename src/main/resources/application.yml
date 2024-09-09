@@ -10,6 +10,12 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 16379
+      password: root
+
   jpa:
     hibernate:
       ddl-auto: create

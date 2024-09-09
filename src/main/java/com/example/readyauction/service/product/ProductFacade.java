@@ -58,6 +58,21 @@ public class ProductFacade {
 		return ProductFindResponse.from(product, imageResponses);
 	}
 
+    @Transactional
+    public PagingResponse<ProductFindResponse> findAll(String keyword, int pageNo, int pageSize, OrderBy order) {
+        Page<Product> page = productService.findProductWithCriteria(keyword, pageNo, pageSize, order);
+        List<ProductFindResponse> productFindResponses = page.getContent().stream()
+            .map(this::convertToProductFindResponse)
+            .collect(Collectors.toList());
+        return PagingResponse.from(productFindResponses, pageNo, pageSize, page);
+    }
+
+    private ProductFindResponse convertToProductFindResponse(Product product) {
+        List<ProductImage> productImages = productImageService.getImage(product.getId());
+        List<ImageResponse> imageResponses = fileService.loadImages(productImages);
+        return ProductFindResponse.from(product, imageResponses);
+    }
+
 	@Transactional
 	public ProductResponse update(User user, Long productId, ProductUpdateRequest productUpdateRequest,
 		List<MultipartFile> images) {
