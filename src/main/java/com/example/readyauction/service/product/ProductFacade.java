@@ -60,11 +60,11 @@ public class ProductFacade {
 
     @Transactional
     public PagingResponse<ProductFindResponse> findAll(String keyword, int pageNo, int pageSize, OrderBy order) {
-        Page<Product> page = productService.findProductWithCriteria(keyword, pageNo, pageSize, order);
-        List<ProductFindResponse> productFindResponses = page.getContent().stream()
+        List<Product> products = productService.findProductWithCriteria(keyword, pageNo, pageSize, order);
+        List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-        return PagingResponse.from(productFindResponses, pageNo, pageSize, page);
+        return PagingResponse.from(productFindResponses, pageNo, pageSize);
     }
 
     private ProductFindResponse convertToProductFindResponse(Product product) {
