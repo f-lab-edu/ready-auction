@@ -4,21 +4,20 @@ import com.querydsl.core.types.OrderSpecifier;
 
 public enum OrderBy {
     START_DATE("시작일") {
-        @Override
-        public OrderSpecifier<?> toOrderSpecifier(QProduct product) {
-            return product.startDate.asc();
+        public OrderSpecifier<?> toOrderSpecifier() {
+            return QProduct.product.startDate.asc();
         }
     },
     LIKE("좋아요") {
         @Override
-        public OrderSpecifier<?> toOrderSpecifier(QProduct product) {
-            return product.startDate.asc();
+        public OrderSpecifier<?> toOrderSpecifier() {
+            return QProductLike.productLike.count().desc();
         }
     },
     START_PRICE("시작가") {
         @Override
-        public OrderSpecifier<?> toOrderSpecifier(QProduct product) {
-            return product.startPrice.asc();
+        public OrderSpecifier<?> toOrderSpecifier() {
+            return QProduct.product.startPrice.asc();
         }
     };
 
@@ -32,5 +31,5 @@ public enum OrderBy {
         return description;
     }
 
-    public abstract OrderSpecifier<?> toOrderSpecifier(QProduct product);
+    public abstract OrderSpecifier<?> toOrderSpecifier();
 }

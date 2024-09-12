@@ -25,14 +25,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     @Override
     public List<Product> findProductsWithCriteria(String keyword, int pageNo, int pageSize, OrderBy order) {
         // 정렬 조건 설정
-        OrderSpecifier<?> orderSpecifier = order != null ? order.toOrderSpecifier(product) : product.id.desc();
+        OrderSpecifier<?> orderSpecifier = order != null ? order.toOrderSpecifier() : product.id.desc();
 
-        if (orderSpecifier == null && order == OrderBy.LIKE) {
+        if (order == OrderBy.LIKE) {
             List<Product> products = jpaQueryFactory.selectFrom(product)
                 .leftJoin(productLike).on(product.id.eq(productLike.productId))
                 .where(containsKeyword(keyword))
                 .groupBy(product.id)
-                .orderBy(productLike.count().desc())
+                .orderBy(orderSpecifier)
                 .offset(pageNo * pageSize)
                 .limit(pageSize)
                 .fetch();
