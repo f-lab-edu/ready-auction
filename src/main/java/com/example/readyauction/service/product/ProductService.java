@@ -2,7 +2,6 @@ package com.example.readyauction.service.product;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +40,9 @@ public class ProductService {
     }
 
     @Transactional
-    public List<Product> findProductWithCriteria(String keyword, int pageNo, int pageSize, OrderBy order) {
-        List<Product> products = productRepository.findProductsWithCriteria(keyword, pageNo, pageSize, order);
+    public List<Product> findProductWithCriteria(String keyword, Status status, int pageNo, int pageSize,
+        OrderBy order) {
+        List<Product> products = productRepository.findProductsWithCriteria(keyword, status, pageNo, pageSize, order);
         return products;
     }
 
@@ -78,7 +78,7 @@ public class ProductService {
         if (!product.getUserId().equals(userId)) {
             throw new UnauthorizedProductAccessException(userId, product.getId());
         }
-        if (product.getStatus() != Status.PENDING) {
+        if (product.getStatus() != Status.READY) {
             throw new ProductNotPendingException(product.getId());
         }
     }

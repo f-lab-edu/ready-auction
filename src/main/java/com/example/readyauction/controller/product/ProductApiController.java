@@ -20,13 +20,14 @@ import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
+import com.example.readyauction.domain.product.Status;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.product.ProductFacade;
 
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductApiController {
-	private final ProductFacade productFacade;
+    private final ProductFacade productFacade;
     private static final String DEFAULT_SIZE = "9";
 
     public ProductApiController(ProductFacade productFacade) {
@@ -51,10 +52,12 @@ public class ProductApiController {
     @GetMapping
     public PagingResponse findAll(
         @RequestParam(value = "keyword", required = false) String keyword,
+        @RequestParam(value = "Status", required = false) Status status,
         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
         @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize,
         @RequestParam(value = "orderBy", required = false) OrderBy order) {
-        PagingResponse<ProductFindResponse> productPagingResponse = productFacade.findAll(keyword, pageNo, pageSize,
+        PagingResponse<ProductFindResponse> productPagingResponse = productFacade.findAll(keyword, status, pageNo,
+            pageSize,
             order);
         return productPagingResponse;
     }
@@ -69,26 +72,26 @@ public class ProductApiController {
         return ProductUpdateResponse;
     }
 
-	@DeleteMapping("/{id}")
-	public ProductResponse delete(
-		@AuthenticationPrincipal CustomUserDetails user,
-		@PathVariable Long id) {
-		ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
-		return ProductDeleteResponse;
-	}
+    @DeleteMapping("/{id}")
+    public ProductResponse delete(
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable Long id) {
+        ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
+        return ProductDeleteResponse;
+    }
 
-	@PostMapping("/{id}/likes")
-	public int productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
-		return productFacade.addLike(user.getUser(), id);
-	}
+    @PostMapping("/{id}/likes")
+    public int productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+        return productFacade.addLike(user.getUser(), id);
+    }
 
-	@DeleteMapping("/{id}/likes")
-	public int productLikeDelete(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
-		return productFacade.productLikeDelete(user.getUser(), id);
-	}
+    @DeleteMapping("/{id}/likes")
+    public int productLikeDelete(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+        return productFacade.productLikeDelete(user.getUser(), id);
+    }
 
-	@GetMapping("{id}/likes")
-	public int getProductLike(@PathVariable Long id) {
-		return productFacade.getProductLikes(id);
-	}
+    @GetMapping("{id}/likes")
+    public int getProductLike(@PathVariable Long id) {
+        return productFacade.getProductLikes(id);
+    }
 }
