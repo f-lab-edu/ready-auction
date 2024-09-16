@@ -3,7 +3,14 @@ package com.example.readyauction.domain.product;
 import com.querydsl.core.types.OrderSpecifier;
 
 public enum OrderBy {
+    LATEST("최신순") {
+        @Override
+        public OrderSpecifier<?> toOrderSpecifier() {
+            return QProduct.product.id.desc();
+        }
+    },
     START_DATE("시작일") {
+        @Override
         public OrderSpecifier<?> toOrderSpecifier() {
             return QProduct.product.startDate.asc();
         }
@@ -11,7 +18,7 @@ public enum OrderBy {
     LIKE("좋아요") {
         @Override
         public OrderSpecifier<?> toOrderSpecifier() {
-            return QProductLike.productLike.count().desc();
+            return QProductLike.productLike.id.count().desc();
         }
     },
     START_PRICE("시작가") {

@@ -16,8 +16,8 @@ import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
+import com.example.readyauction.domain.product.ProductCondition;
 import com.example.readyauction.domain.product.ProductImage;
-import com.example.readyauction.domain.product.Status;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.product.UnauthorizedEnrollException;
 import com.example.readyauction.service.file.FileService;
@@ -59,9 +59,23 @@ public class ProductFacade {
     }
 
     @Transactional
-    public PagingResponse<ProductFindResponse> findAll(String keyword, Status status, int pageNo, int pageSize,
+    public PagingResponse<ProductFindResponse> findAll(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
         OrderBy order) {
-        List<Product> products = productService.findProductWithCriteria(keyword, status, pageNo, pageSize, order);
+        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
+        List<ProductFindResponse> productFindResponses = products.stream()
+            .map(this::convertToProductFindResponse)
+            .collect(Collectors.toList());
+        return PagingResponse.from(productFindResponses, pageNo);
+    }
+
+    @Transactional
+    public PagingResponse<ProductFindResponse> findAll2(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
+        OrderBy order) {
+        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
         List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());

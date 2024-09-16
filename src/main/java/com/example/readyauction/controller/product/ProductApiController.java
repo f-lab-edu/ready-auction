@@ -20,7 +20,7 @@ import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
-import com.example.readyauction.domain.product.Status;
+import com.example.readyauction.domain.product.ProductCondition;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.product.ProductFacade;
 
@@ -39,27 +39,22 @@ public class ProductApiController {
         @AuthenticationPrincipal CustomUserDetails user,
         @RequestPart(name = "product") ProductSaveRequest productSaveRequest,
         @RequestPart(name = "images") List<MultipartFile> files) {
-        ProductResponse productSaveResponse = productFacade.enroll(user.getUser(), productSaveRequest, files);
-        return productSaveResponse;
+        return productFacade.enroll(user.getUser(), productSaveRequest, files);
     }
 
     @GetMapping("/{id}")
     public ProductFindResponse findById(@PathVariable Long id) {
-        ProductFindResponse productFindResponse = productFacade.findById(id);
-        return productFindResponse;
+        return productFacade.findById(id);
     }
 
     @GetMapping
-    public PagingResponse findAll(
+    public PagingResponse<ProductFindResponse> findAll(
         @RequestParam(value = "keyword", required = false) String keyword,
-        @RequestParam(value = "Status", required = false) Status status,
+        @RequestParam(value = "productCondition", required = false) ProductCondition productCondition,
         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
         @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize,
         @RequestParam(value = "orderBy", required = false) OrderBy order) {
-        PagingResponse<ProductFindResponse> productPagingResponse = productFacade.findAll(keyword, status, pageNo,
-            pageSize,
-            order);
-        return productPagingResponse;
+        return productFacade.findAll(keyword, productCondition, pageNo, pageSize, order);
     }
 
     @PutMapping("/{id}")
@@ -68,16 +63,14 @@ public class ProductApiController {
         @PathVariable Long id,
         @RequestPart(name = "product") ProductUpdateRequest productUpdateRequest,
         @RequestPart(name = "images") List<MultipartFile> files) {
-        ProductResponse ProductUpdateResponse = productFacade.update(user.getUser(), id, productUpdateRequest, files);
-        return ProductUpdateResponse;
+        return productFacade.update(user.getUser(), id, productUpdateRequest, files);
     }
 
     @DeleteMapping("/{id}")
     public ProductResponse delete(
         @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long id) {
-        ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
-        return ProductDeleteResponse;
+        return productFacade.delete(user.getUser(), id);
     }
 
     @PostMapping("/{id}/likes")

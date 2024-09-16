@@ -4,8 +4,8 @@ import com.example.readyauction.controller.request.product.ProductSaveRequest
 import com.example.readyauction.controller.request.product.ProductUpdateRequest
 import com.example.readyauction.controller.response.ImageResponse
 import com.example.readyauction.domain.product.Product
+import com.example.readyauction.domain.product.ProductCondition
 import com.example.readyauction.domain.product.ProductImage
-import com.example.readyauction.domain.product.Status
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.service.file.FileService
 import org.springframework.mock.web.MockMultipartFile
@@ -143,7 +143,7 @@ class ProductFacadeTest extends Specification {
                 .startDate(LocalDateTime.now().plusDays(1))
                 .closeDate(LocalDateTime.now().plusDays(5))
                 .startPrice(5000)
-                .status(Status.PENDING)
+                .status(ProductCondition.PENDING)
                 .build()
     }
 

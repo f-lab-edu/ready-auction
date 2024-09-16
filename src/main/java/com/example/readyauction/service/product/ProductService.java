@@ -9,12 +9,12 @@ import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
-import com.example.readyauction.domain.product.Status;
+import com.example.readyauction.domain.product.ProductCondition;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.product.NotFoundProductException;
 import com.example.readyauction.exception.product.ProductNotPendingException;
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException;
-import com.example.readyauction.repository.ProductRepository;
+import com.example.readyauction.repository.product.ProductRepository;
 
 @Service
 public class ProductService {
@@ -40,9 +40,13 @@ public class ProductService {
     }
 
     @Transactional
-    public List<Product> findProductWithCriteria(String keyword, Status status, int pageNo, int pageSize,
+    public List<Product> findProductWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
         OrderBy order) {
-        List<Product> products = productRepository.findProductsWithCriteria(keyword, status, pageNo, pageSize, order);
+        if (order == null)
+            order = OrderBy.LATEST;
+        List<Product> products = productRepository.findProductsWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
         return products;
     }
 
@@ -78,7 +82,7 @@ public class ProductService {
         if (!product.getUserId().equals(userId)) {
             throw new UnauthorizedProductAccessException(userId, product.getId());
         }
-        if (product.getStatus() != Status.READY) {
+        if (product.getProductCondition() != ProductCondition.READY) {
             throw new ProductNotPendingException(product.getId());
         }
     }

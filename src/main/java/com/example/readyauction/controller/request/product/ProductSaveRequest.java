@@ -3,7 +3,7 @@ package com.example.readyauction.controller.request.product;
 import java.time.LocalDateTime;
 
 import com.example.readyauction.domain.product.Product;
-import com.example.readyauction.domain.product.Status;
+import com.example.readyauction.domain.product.ProductCondition;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -42,7 +42,7 @@ public class ProductSaveRequest {
             .startDate(startDate)
             .closeDate(closeDate)
             .startPrice(startPrice)
-            .status(Status.READY)
+            .productCondition(ProductCondition.READY)
             .build();
     }
 
