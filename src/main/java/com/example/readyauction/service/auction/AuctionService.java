@@ -92,7 +92,7 @@ public class AuctionService {
     private void sendToUser(CustomUserDetails user, Long productId, Object data, String comment) {
         List<Map<User, SseEmitter>> sseEmitters = emitterRepository.get(productId);
         for (Map<User, SseEmitter> sseEmitterMap : sseEmitters) {
-            SseEmitter sseEmitter = sseEmitterMap.get(user);
+            SseEmitter sseEmitter = sseEmitterMap.get(user.getUser());
             send(sseEmitter, user.getUser(), productId, data, comment);
         }
     }
@@ -136,9 +136,9 @@ public class AuctionService {
     private double calculateIncreaseRate(Long productId, int previousPrice, int nextPrice) {
         if (previousPrice == -1) {
             ProductFindResponse product = productFacade.findById(productId);
-            return ((nextPrice - product.getStartPrice()) / previousPrice) * 100;
+            return ((double)(nextPrice - product.getStartPrice()) / previousPrice) * 100;
         }
-        return ((nextPrice - previousPrice) / previousPrice) * 100;
+        return ((double)(nextPrice - previousPrice) / previousPrice) * 100;
     }
 
 }
