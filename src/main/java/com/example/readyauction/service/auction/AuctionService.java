@@ -57,7 +57,7 @@ public class AuctionService {
     @Transactional
     public TenderResponse tenderPrice(CustomUserDetails user, TenderRequest tenderRequest, Long productId) {
         // 여기서 최고가로 갱신되면 sendToUser()
-        Optional<Auction> findAuction = auctionRepository.findById(productId);
+        Optional<Auction> findAuction = auctionRepository.findByProductId(productId);
         if (findAuction.get() == null) { // null이면 아직 최고가를 제안한 사람이 없다는 것
             Auction newAuction = Auction.builder()
                 .userId(user.getUser().getUserId())
