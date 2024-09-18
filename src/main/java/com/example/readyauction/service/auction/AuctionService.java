@@ -3,7 +3,6 @@ package com.example.readyauction.service.auction;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -43,7 +42,8 @@ public class AuctionService {
 
         // 503 에러 방지를 위한 데이터 전송
         // Emitter를 생성하고 나서 만료 시간까지 아무런 데이터도 보내지 않으면 재연결 요청시 503 Service Unavailable 에러가 발생할 수 있음.
-        sendToUser(user, productId, "SSE Emitter Created. [userId=" + user.getUser().getUserId() + "]", "SSE CONNECT.");
+        send(emitter, user.getUser(), productId, "SSE Emitter Created. [userId=" + user.getUser().getUserId() + "]",
+            "SSE CONNECT.");
         return emitter;
     }
 
@@ -77,7 +77,7 @@ public class AuctionService {
                 throw new BiddingFailException(productId);
             } else {
                 action.updateActionInfo(user.getUser().getUserId(), tenderRequest.getBiddingPrice());
-                sendToUser(user, productId, "최고가가 " + tenderRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
+                sendToAllUsers(productId, "최고가가 " + tenderRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
             }
 
             return TenderResponse.builder()
@@ -89,11 +89,12 @@ public class AuctionService {
     }
 
     // 해당 경매에 참여한 User들에게 해당 경매 상품의 최고가가 갱신될때마다 SSE 알림.
-    private void sendToUser(CustomUserDetails user, Long productId, Object data, String comment) {
-        List<Map<User, SseEmitter>> sseEmitters = emitterRepository.get(productId);
-        for (Map<User, SseEmitter> sseEmitterMap : sseEmitters) {
-            SseEmitter sseEmitter = sseEmitterMap.get(user.getUser());
-            send(sseEmitter, user.getUser(), productId, data, comment);
+    private void sendToAllUsers(Long productId, Object data, String comment) {
+        Map<User, SseEmitter> sseEmitterMap = emitterRepository.get(productId);
+        for (Map.Entry<User, SseEmitter> entry : sseEmitterMap.entrySet()) {
+            User user = entry.getKey();
+            SseEmitter sseEmitter = entry.getValue();
+            send(sseEmitter, user, productId, data, comment);
         }
     }
 
@@ -101,7 +102,7 @@ public class AuctionService {
         try {
             sseEmitter.send(SseEmitter.event() // SSE 이벤트를 생성하고 해당 Emitter로 전송합.
                 .id(productId.toString()) // 이벤트의 고유 ID (문자열 형태로 변환)
-                .name("sse") // 이벤트의 이름을 "sse"로 지정
+                .name("BEST PRICE UPDATE") // 이벤트의 이름을 "sse"로 지정
                 .data(data) // 전송할 데이터
                 .comment(comment)); // 이벤트에 대한 코멘트
         } catch (IOException e) {
