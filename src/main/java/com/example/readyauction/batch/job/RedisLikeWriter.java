@@ -7,20 +7,20 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import com.example.readyauction.domain.product.ProductLike;
-import com.example.readyauction.repository.ProductLikeRepository;
+import com.example.readyauction.repository.product.ProductLikeRepository;
 
 @Component
 public class RedisLikeWriter implements ItemWriter<ProductLike> {
-	private final ProductLikeRepository productLikeRepository;
+    private final ProductLikeRepository productLikeRepository;
 
-	public RedisLikeWriter(ProductLikeRepository productLikeRepository) {
-		this.productLikeRepository = productLikeRepository;
-	}
+    public RedisLikeWriter(ProductLikeRepository productLikeRepository) {
+        this.productLikeRepository = productLikeRepository;
+    }
 
-	@Override
-	public void write(Chunk<? extends ProductLike> chunk) throws Exception {
-		List<? extends ProductLike> items = chunk.getItems();
-		productLikeRepository.saveAll(items);
+    @Override
+    public void write(Chunk<? extends ProductLike> chunk) throws Exception {
+        List<? extends ProductLike> items = chunk.getItems();
+        productLikeRepository.saveAll(items);
 
-	}
+    }
 }

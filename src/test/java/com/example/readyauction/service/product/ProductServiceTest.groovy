@@ -3,10 +3,10 @@ package com.example.readyauction.service.product
 import com.example.readyauction.controller.request.product.ProductSaveRequest
 import com.example.readyauction.controller.request.product.ProductUpdateRequest
 import com.example.readyauction.domain.product.Product
-import com.example.readyauction.domain.product.Status
+import com.example.readyauction.domain.product.ProductCondition
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException
-import com.example.readyauction.repository.ProductRepository
+import com.example.readyauction.repository.product.ProductRepository
 import spock.lang.Specification
 
 import java.time.LocalDateTime
@@ -19,9 +19,9 @@ class ProductServiceTest extends Specification {
     final PRODUCT_START_DATE = LocalDateTime.now().plusDays(1)
     final PRODUCT_CLOSE_DATE = LocalDateTime.now().plusDays(5)
     final PRODUCT_START_PRICE = 5000
-    final PENDING = Status.PENDING
-    final ACTIVE = Status.ACTIVE
-    final DONE = Status.DONE
+    final PENDING = ProductCondition.PENDING
+    final ACTIVE = ProductCondition.ACTIVE
+    final DONE = ProductCondition.DONE
 
     final UPDATE_PRODUCT_NAME = "수정된 상품 이름"
     final UPDATE_PRODUCT_DESCRIPTION = "수정된 상품 설명"
@@ -75,7 +75,7 @@ class ProductServiceTest extends Specification {
         response.startDate == PRODUCT_START_DATE
         response.closeDate == PRODUCT_CLOSE_DATE
         response.startPrice == PRODUCT_START_PRICE
-        response.status == PENDING
+        response.productCondition == PENDING
 
     }
 
@@ -98,7 +98,7 @@ class ProductServiceTest extends Specification {
         response.startDate == UPDATE_PRODUCT_START_DATE
         response.closeDate == UPDATE_PRODUCT_CLOSE_DATE
         response.startPrice == UPDATE_PRODUCT_START_PRICE
-        response.status == PENDING
+        response.productCondition == PENDING
     }
 
     def "내가 등록한 경매 상품이 아닐때 수정하면 예외 발생"() {
@@ -185,7 +185,7 @@ class ProductServiceTest extends Specification {
         def e = thrown(UnauthorizedProductAccessException)
     }
 
-    private Product createProduct(Status status) {
+    private Product createProduct(ProductCondition status) {
         Product product = Product.builder()
                 .userId(USER_ID)
                 .productName(PRODUCT_NAME)
