@@ -1,11 +1,8 @@
 package com.example.readyauction.service.product;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +21,9 @@ import com.example.readyauction.repository.product.ProductRepository;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final RedisTemplate<String, String> redisTemplate;
 
-    public ProductService(ProductRepository productRepository, RedisTemplate<String, String> redisTemplate) {
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.redisTemplate = redisTemplate;
     }
 
     @Transactional
@@ -43,12 +38,10 @@ public class ProductService {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new NotFoundProductException(id));
 
-        if (requestTime.isAfter(product.getStartDate())) {
-            String auctionStatus = redisTemplate.opsForValue().get("auction:" + id);
-            if (auctionStatus == null) {
-                long TTL = Duration.between(LocalDateTime.now(), product.getCloseDate()).getSeconds();
-                redisTemplate.opsForValue().set("auction:" + id, "started", TTL, TimeUnit.SECONDS);
-            }
+        if (requestTime.isAfter(product.getStartDate()) && requestTime.isBefore(product.getCloseDate())) {
+            product.updateProductCondition(ProductCondition.ACTIVE);
+        } else if (requestTime.isAfter(product.getCloseDate())) {
+            product.updateProductCondition(ProductCondition.DONE);
         }
         return product;
     }
