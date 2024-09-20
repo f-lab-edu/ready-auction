@@ -1,6 +1,5 @@
 package com.example.readyauction.repository.auction;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +15,7 @@ public class EmitterRepository {
     private final Map<Long, Map<User, SseEmitter>> emittersMaps = new ConcurrentHashMap<>();
 
     public void save(Long productId, User user, SseEmitter emitter) {
-        Map<User, SseEmitter> emitters = emittersMaps.computeIfAbsent(productId, k -> new HashMap<>());
+        Map<User, SseEmitter> emitters = emittersMaps.computeIfAbsent(productId, k -> new ConcurrentHashMap<>());
         emitters.put(user, emitter);
     }
 

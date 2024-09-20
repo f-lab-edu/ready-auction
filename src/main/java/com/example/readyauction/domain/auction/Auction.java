@@ -29,7 +29,7 @@ public class Auction extends BaseEntity { // 경매 엔티티
     private String userId; // 현재 최고가를 부른 유저 Id
 
     @Column(name = "user_Id", nullable = false, updatable = false)
-    private int bestPrice; // 유저가 부른 최고가
+    private int bestPrice; // 최고가를 부른 유저가 부른 최고가
 
     @Builder
     public Auction(Long productId, String userId, int bestPrice) {

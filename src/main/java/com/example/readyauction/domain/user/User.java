@@ -48,13 +48,11 @@ public class User extends BaseEntity {
         if (o == null || getClass() != o.getClass())
             return false;
         User user = (User)o;
-        return Objects.equals(getId(), user.getId()) && Objects.equals(getUserId(), user.getUserId())
-            && Objects.equals(getName(), user.getName()) && Objects.equals(getEncodedPassword(),
-            user.getEncodedPassword()) && getRole() == user.getRole();
+        return Objects.equals(getId(), user.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getName(), getEncodedPassword(), getRole());
+        return Objects.hash(getId());
     }
 }

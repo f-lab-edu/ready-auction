@@ -102,7 +102,7 @@ public class AuctionService {
         try {
             sseEmitter.send(SseEmitter.event() // SSE 이벤트를 생성하고 해당 Emitter로 전송합.
                 .id(productId.toString()) // 이벤트의 고유 ID (문자열 형태로 변환)
-                .name("BEST PRICE UPDATE") // 이벤트의 이름을 "sse"로 지정
+                .name("THE HIGHEST PRICE UPDATE") // 이벤트의 이름을 "THE HIGHEST PRICE UPDATE"로 지정
                 .data(data) // 전송할 데이터
                 .comment(comment)); // 이벤트에 대한 코멘트
         } catch (IOException e) {

@@ -16,7 +16,7 @@ import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.auction.AuctionService;
 
 @RestController
-@RequestMapping("/api/v1/auction")
+@RequestMapping("/api/v1/auctions")
 public class AuctionController {
 
     private final AuctionService auctionService;
@@ -26,7 +26,7 @@ public class AuctionController {
     }
 
     // 경매 참여 API - SSE 구독 API
-    @GetMapping(value = "/{productId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/product/{productId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId) {
         return auctionService.subscribe(user, productId);
     }
