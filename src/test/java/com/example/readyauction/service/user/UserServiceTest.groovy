@@ -7,7 +7,7 @@ import com.example.readyauction.controller.response.user.UserResponse
 import com.example.readyauction.domain.user.CustomUserDetails
 import com.example.readyauction.domain.user.User
 import com.example.readyauction.exception.user.DuplicatedUserIdException
-import com.example.readyauction.repository.UserRepository
+import com.example.readyauction.repository.user.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
