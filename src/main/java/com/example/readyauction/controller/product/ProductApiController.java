@@ -73,12 +73,7 @@ public class ProductApiController {
     public ProductResponse delete(
         @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long id) {
-<<<<<<< HEAD
-        ProductResponse ProductDeleteResponse = productFacade.delete(user.getUser(), id);
-        return ProductDeleteResponse;
-=======
         return productFacade.delete(user.getUser(), id);
->>>>>>> main
     }
 
     @PostMapping("/{id}/likes")
