@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +16,7 @@ import com.example.readyauction.controller.response.product.ProductFindResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
+import com.example.readyauction.domain.product.ProductCondition;
 import com.example.readyauction.domain.product.ProductImage;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.product.UnauthorizedEnrollException;
@@ -59,12 +59,27 @@ public class ProductFacade {
     }
 
     @Transactional
-    public PagingResponse<ProductFindResponse> findAll(String keyword, int pageNo, int pageSize, OrderBy order) {
-        Page<Product> page = productService.findProductWithCriteria(keyword, pageNo, pageSize, order);
-        List<ProductFindResponse> productFindResponses = page.getContent().stream()
+    public PagingResponse<ProductFindResponse> findAll(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
+        OrderBy order) {
+        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
+        List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-        return PagingResponse.from(productFindResponses, pageNo, pageSize, page);
+        return PagingResponse.from(productFindResponses, pageNo);
+    }
+
+    @Transactional
+    public PagingResponse<ProductFindResponse> findAll2(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
+        OrderBy order) {
+        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
+        List<ProductFindResponse> productFindResponses = products.stream()
+            .map(this::convertToProductFindResponse)
+            .collect(Collectors.toList());
+        return PagingResponse.from(productFindResponses, pageNo);
     }
 
     private ProductFindResponse convertToProductFindResponse(Product product) {

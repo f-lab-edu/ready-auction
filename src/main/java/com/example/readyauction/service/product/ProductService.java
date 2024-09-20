@@ -2,9 +2,9 @@ package com.example.readyauction.service.product;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +13,12 @@ import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
-import com.example.readyauction.domain.product.Status;
+import com.example.readyauction.domain.product.ProductCondition;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.product.NotFoundProductException;
 import com.example.readyauction.exception.product.ProductNotPendingException;
 import com.example.readyauction.exception.product.UnauthorizedProductAccessException;
-import com.example.readyauction.repository.ProductRepository;
+import com.example.readyauction.repository.product.ProductRepository;
 
 @Service
 public class ProductService {
@@ -54,8 +54,13 @@ public class ProductService {
     }
 
     @Transactional
-    public Page<Product> findProductWithCriteria(String keyword, int pageNo, int pageSize, OrderBy order) {
-        Page<Product> products = productRepository.findProductsWithCriteria(keyword, pageNo, pageSize, order);
+    public List<Product> findProductWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
+        int pageSize,
+        OrderBy order) {
+        if (order == null)
+            order = OrderBy.LATEST;
+        List<Product> products = productRepository.findProductsWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
         return products;
     }
 
@@ -91,7 +96,7 @@ public class ProductService {
         if (!product.getUserId().equals(userId)) {
             throw new UnauthorizedProductAccessException(userId, product.getId());
         }
-        if (product.getStatus() != Status.PENDING) {
+        if (product.getProductCondition() != ProductCondition.READY) {
             throw new ProductNotPendingException(product.getId());
         }
     }
