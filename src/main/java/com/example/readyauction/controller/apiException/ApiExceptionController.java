@@ -1,6 +1,12 @@
 package com.example.readyauction.controller.apiException;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import com.example.readyauction.controller.apiException.error.ErrorResponse;
+import com.example.readyauction.exception.auction.BiddingFailException;
 import com.example.readyauction.exception.file.CreateDirectoryFailException;
 import com.example.readyauction.exception.file.DeleteImageFailException;
 import com.example.readyauction.exception.file.ImageFileUploadFailException;
@@ -11,10 +17,6 @@ import com.example.readyauction.exception.product.UnauthorizedProductAccessExcep
 import com.example.readyauction.exception.user.DuplicatedUserIdException;
 import com.example.readyauction.exception.user.LoginFailException;
 import com.example.readyauction.exception.user.NotFoundUserException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionController {
@@ -76,6 +78,12 @@ public class ApiExceptionController {
     @ExceptionHandler(ImageFileUploadFailException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse imageFilUploadFail(ImageFileUploadFailException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(BiddingFailException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse biddingFailException(BiddingFailException e) {
         return new ErrorResponse(e.getMessage());
     }
 
