@@ -69,4 +69,8 @@ public class Product extends BaseEntity {
         this.startPrice = startPrice;
     }
 
+    public void updateProductCondition(ProductCondition productCondition) {
+        this.productCondition = productCondition;
+    }
+
 }
