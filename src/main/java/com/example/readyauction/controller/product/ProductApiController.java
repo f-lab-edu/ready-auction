@@ -45,9 +45,9 @@ public class ProductApiController {
 
     @GetMapping("/{id}")
     public ProductFindResponse findById(@PathVariable Long id) {
-        LocalDateTime request = LocalDateTime.now();
-        ProductFindResponse productFindResponse = productFacade.findById(id, request);
-        return productFindResponse;
+        LocalDateTime requestTime = LocalDateTime.now();
+        return productFacade.findById(id, requestTime);
+        ;
     }
 
     @GetMapping
