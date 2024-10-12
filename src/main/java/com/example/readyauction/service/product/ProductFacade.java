@@ -51,8 +51,8 @@ public class ProductFacade {
     }
 
     @Transactional
-    public ProductFindResponse findById(Long productId) {
-        Product product = productService.findById(productId);
+    public ProductFindResponse findById(Long productId, LocalDateTime request) {
+        Product product = productService.findById(productId, request);
         List<ProductImage> productImages = productImageService.getImage(productId);
         List<ImageResponse> imageResponses = fileService.loadImages(productImages);
         return ProductFindResponse.from(product, imageResponses);

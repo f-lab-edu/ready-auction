@@ -1,5 +1,6 @@
 package com.example.readyauction.service.product;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -33,9 +34,15 @@ public class ProductService {
     }
 
     @Transactional
-    public Product findById(Long id) {
+    public Product findById(Long id, LocalDateTime requestTime) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new NotFoundProductException(id));
+
+        if (requestTime.isAfter(product.getStartDate()) && requestTime.isBefore(product.getCloseDate())) {
+            product.updateProductCondition(ProductCondition.ACTIVE);
+        } else if (requestTime.isAfter(product.getCloseDate())) {
+            product.updateProductCondition(ProductCondition.DONE);
+        }
         return product;
     }
 

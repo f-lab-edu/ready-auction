@@ -1,5 +1,6 @@
 package com.example.readyauction.controller.product;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,7 +45,8 @@ public class ProductApiController {
 
     @GetMapping("/{id}")
     public ProductFindResponse findById(@PathVariable Long id) {
-        return productFacade.findById(id);
+        LocalDateTime requestTime = LocalDateTime.now();
+        return productFacade.findById(id, requestTime);
     }
 
     @GetMapping
