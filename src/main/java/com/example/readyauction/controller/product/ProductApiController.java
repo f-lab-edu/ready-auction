@@ -47,7 +47,6 @@ public class ProductApiController {
     public ProductFindResponse findById(@PathVariable Long id) {
         LocalDateTime requestTime = LocalDateTime.now();
         return productFacade.findById(id, requestTime);
-        ;
     }
 
     @GetMapping
