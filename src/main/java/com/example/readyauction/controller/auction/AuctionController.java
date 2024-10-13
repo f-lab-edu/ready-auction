@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.example.readyauction.controller.request.auction.TenderRequest;
-import com.example.readyauction.controller.response.auction.TenderResponse;
+import com.example.readyauction.controller.request.auction.BidRequest;
+import com.example.readyauction.controller.response.auction.BidResponse;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.auction.AuctionService;
 
@@ -39,9 +39,9 @@ public class AuctionController {
 
     // 가격 입찰 API
     @PostMapping(value = "/{productId}")
-    public TenderResponse tender(@AuthenticationPrincipal CustomUserDetails user,
-        @RequestBody TenderRequest tenderRequest,
+    public BidResponse tender(@AuthenticationPrincipal CustomUserDetails user,
+        @RequestBody BidRequest bidRequest,
         @PathVariable Long productId) {
-        return auctionService.tenderPrice(user, tenderRequest, productId);
+        return auctionService.biddingPrice(user, bidRequest, productId);
     }
 }

@@ -146,5 +146,7 @@ build
 data/*
 Images/*
 .gradle
+META-INF/*
+redis/*
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij

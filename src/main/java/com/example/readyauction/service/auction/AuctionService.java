@@ -4,19 +4,24 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import org.redisson.api.RLock;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.example.readyauction.controller.request.auction.TenderRequest;
-import com.example.readyauction.controller.response.auction.TenderResponse;
+import com.example.readyauction.controller.request.auction.BidRequest;
+import com.example.readyauction.controller.response.auction.BidResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
-import com.example.readyauction.domain.auction.Auction;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.domain.user.User;
 import com.example.readyauction.exception.auction.BiddingFailException;
+import com.example.readyauction.exception.auction.RedisLockAcquisitionException;
+import com.example.readyauction.exception.auction.RedisLockOperationException;
 import com.example.readyauction.repository.auction.AuctionRepository;
 import com.example.readyauction.repository.auction.EmitterRepository;
 import com.example.readyauction.service.product.ProductFacade;
@@ -27,12 +32,14 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final EmitterRepository emitterRepository;
     private final ProductFacade productFacade;
+    private final RedissonClient redissonClient;
 
     public AuctionService(AuctionRepository auctionRepository, EmitterRepository emitterRepository,
-        ProductFacade productFacade) {
+        ProductFacade productFacade, RedissonClient redissonClient) {
         this.auctionRepository = auctionRepository;
         this.emitterRepository = emitterRepository;
         this.productFacade = productFacade;
+        this.redissonClient = redissonClient;
     }
 
     @Transactional
@@ -55,37 +62,54 @@ public class AuctionService {
     }
 
     @Transactional
-    public TenderResponse tenderPrice(CustomUserDetails user, TenderRequest tenderRequest, Long productId) {
-        // 여기서 최고가로 갱신되면 sendToUser()
-        Optional<Auction> findAuction = auctionRepository.findByProductId(productId);
-        if (findAuction.get() == null) { // null이면 아직 최고가를 제안한 사람이 없다는 것
-            Auction newAuction = Auction.builder()
-                .userId(user.getUser().getUserId())
-                .productId(productId)
-                .bestPrice(tenderRequest.getBiddingPrice())
-                .build();
-            auctionRepository.save(newAuction);
-            return TenderResponse.builder()
-                .productId(productId)
-                .rateOfIncrease(calculateIncreaseRate(productId, -1, tenderRequest.getBiddingPrice()))
-                .build();
-        } else { // 있다는건 최고가를 제안한 사람이 있다는 것
-            Auction action = findAuction.get();
+    public BidResponse biddingPrice(CustomUserDetails user, BidRequest bidRequest, Long productId) {
+        RLock lock = redissonClient.getLock("lock:" + productId);
+        Long currentHighestPrice = null;
 
-            // 동시성 제어가 필요한 부분?
-            if (tenderRequest.getBiddingPrice() < action.getBestPrice()) {
+        try {
+            if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+                throw new RedisLockAcquisitionException(productId);
+            }
+            currentHighestPrice = processBid(user, bidRequest, productId);
+        } catch (Exception e) {
+            throw new RedisLockOperationException(productId, e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+
+        return BidResponse.from(productId,
+            calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
+    }
+
+    private Long processBid(CustomUserDetails user, BidRequest bidRequest, Long productId) {
+        Long currentHighestPrice = 0L;
+
+        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
+            String.valueOf(productId));// productId : (userId, bestPrice)
+        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+
+        if (highestBidMap == null) { // 최초 입찰
+            updateRedisBidData(user, highestBidMap, bidRequest, productId);
+            return Long.valueOf(bidRequest.getBiddingPrice());
+        } else {
+            currentHighestPrice = userIdAndCurrentPrice.getSecond();
+
+            if (bidRequest.getBiddingPrice() <= currentHighestPrice) {
                 throw new BiddingFailException(productId);
-            } else {
-                action.updateActionInfo(user.getUser().getUserId(), tenderRequest.getBiddingPrice());
-                sendToAllUsers(productId, "최고가가 " + tenderRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
             }
 
-            return TenderResponse.builder()
-                .productId(productId)
-                .rateOfIncrease(
-                    calculateIncreaseRate(productId, action.getBestPrice(), tenderRequest.getBiddingPrice()))
-                .build();
+            updateRedisBidData(user, highestBidMap, bidRequest, productId);
+            sendToAllUsers(productId, "최고가가 " + bidRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
         }
+        return currentHighestPrice;
+    }
+
+    private void updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,
+        Long productId) {
+        Pair<Long, Long> newPair = Pair.of(user.getUser().getId(), Long.valueOf(bidRequest.getBiddingPrice()));
+        bidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
     }
 
     // 해당 경매에 참여한 User들에게 해당 경매 상품의 최고가가 갱신될때마다 SSE 알림.
@@ -118,7 +142,6 @@ public class AuctionService {
 
         SseEmitter emitter = new SseEmitter(timeOut);
         emitterRepository.save(productId, user, emitter);
-        // [나중에 추가 예정] 사용자가 "최고가 알람 끄기" 선택하면 delete
         emitter.onCompletion(() -> emitterRepository.deleteEmitter(user, productId));
         emitter.onTimeout(() -> emitterRepository.deleteEmitter(user, productId));
 
@@ -134,8 +157,8 @@ public class AuctionService {
         return time.atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
     }
 
-    private double calculateIncreaseRate(Long productId, int previousPrice, int nextPrice) {
-        if (previousPrice == -1) {
+    private double calculateIncreaseRate(Long productId, Long previousPrice, int nextPrice) {
+        if (previousPrice == nextPrice) {
             ProductFindResponse product = productFacade.findById(productId);
             return ((double)(nextPrice - product.getStartPrice()) / previousPrice) * 100;
         }

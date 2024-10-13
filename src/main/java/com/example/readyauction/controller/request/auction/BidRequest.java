@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TenderRequest {
+public class BidRequest {
     private int biddingPrice; // 하나밖에 없는데 그냥 FormData로 받는게 나을듯..?
 }
