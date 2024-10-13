@@ -14,11 +14,11 @@ public class RedisConfig {
     private String likeRedisHost;
 
     @Value("${spring.data.redis.like.port}")
-    private int LikeRedisPort;
+    private int likeRedisPort;
 
     @Bean
     public RedisConnectionFactory likeRedisConnectionFactory() {
-        return new LettuceConnectionFactory(likeRedisHost, LikeRedisPort);
+        return new LettuceConnectionFactory(likeRedisHost, likeRedisPort);
     }
 
     @Bean

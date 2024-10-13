@@ -64,13 +64,14 @@ public class AuctionService {
     @Transactional
     public BidResponse biddingPrice(CustomUserDetails user, BidRequest bidRequest, Long productId) {
         RLock lock = redissonClient.getLock("lock:" + productId);
-        Long currentHighestPrice = null;
+        Long currentHighestPrice;
 
         try {
             if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
                 throw new RedisLockAcquisitionException(productId);
             }
             currentHighestPrice = processBid(user, bidRequest, productId);
+            sendToAllUsers(productId, "최고가가 " + bidRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
         } catch (Exception e) {
             throw new RedisLockOperationException(productId, e);
         } finally {
@@ -84,32 +85,28 @@ public class AuctionService {
     }
 
     private Long processBid(CustomUserDetails user, BidRequest bidRequest, Long productId) {
-        Long currentHighestPrice = 0L;
 
         RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
             String.valueOf(productId));// productId : (userId, bestPrice)
         Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
 
-        if (highestBidMap == null) { // 최초 입찰
-            updateRedisBidData(user, highestBidMap, bidRequest, productId);
-            return Long.valueOf(bidRequest.getBiddingPrice());
-        } else {
-            currentHighestPrice = userIdAndCurrentPrice.getSecond();
-
-            if (bidRequest.getBiddingPrice() <= currentHighestPrice) {
-                throw new BiddingFailException(productId);
-            }
-
-            updateRedisBidData(user, highestBidMap, bidRequest, productId);
-            sendToAllUsers(productId, "최고가가 " + bidRequest.getBiddingPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
+        if (userIdAndCurrentPrice == null) { // 최초 입찰
+            return updateRedisBidData(user, highestBidMap, bidRequest, productId);
         }
-        return currentHighestPrice;
+
+        if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
+            throw new BiddingFailException(productId);
+        }
+
+        updateRedisBidData(user, highestBidMap, bidRequest, productId);
+        return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 
-    private void updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,
+    private Long updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,
         Long productId) {
         Pair<Long, Long> newPair = Pair.of(user.getUser().getId(), Long.valueOf(bidRequest.getBiddingPrice()));
         bidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
+        return Long.valueOf(bidRequest.getBiddingPrice());
     }
 
     // 해당 경매에 참여한 User들에게 해당 경매 상품의 최고가가 갱신될때마다 SSE 알림.
