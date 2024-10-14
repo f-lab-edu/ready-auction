@@ -63,6 +63,12 @@ public class AuctionService {
 
     @Transactional
     public BidResponse biddingPrice(CustomUserDetails user, BidRequest bidRequest, Long productId) {
+        LocalDateTime biddingRequestTime = LocalDateTime.now();
+        ProductFindResponse product = productFacade.findById(productId);
+        if (biddingRequestTime.isAfter(product.getCloseDate())) {
+            throw new BiddingFailException(productId);
+        }
+
         RLock lock = redissonClient.getLock("lock:" + productId);
         Long currentHighestPrice;
 
