@@ -25,10 +25,10 @@ public class Auction extends BaseEntity { // 경매 엔티티
     @Column(name = "product_Id", nullable = false, updatable = false)
     private Long productId; // 상품 ID
 
-    @Column(name = "user_Id", nullable = false, updatable = false)
+    @Column(name = "user_Id", nullable = false)
     private String userId; // 현재 최고가를 부른 유저 Id
 
-    @Column(name = "user_Id", nullable = false, updatable = false)
+    @Column(name = "best_price", nullable = false)
     private int bestPrice; // 최고가를 부른 유저가 부른 최고가
 
     @Builder
