@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.example.readyauction.controller.apiException.error.ErrorResponse;
 import com.example.readyauction.exception.auction.BiddingFailException;
 import com.example.readyauction.exception.auction.RedisLockAcquisitionException;
-import com.example.readyauction.exception.auction.RedisLockOperationException;
+import com.example.readyauction.exception.auction.RedisLockInterruptedException;
 import com.example.readyauction.exception.file.CreateDirectoryFailException;
 import com.example.readyauction.exception.file.DeleteImageFailException;
 import com.example.readyauction.exception.file.ImageFileUploadFailException;
@@ -95,9 +95,9 @@ public class ApiExceptionController {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler(RedisLockOperationException.class)
+    @ExceptionHandler(RedisLockInterruptedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse redisLockOperationException(RedisLockOperationException e) {
+    public ErrorResponse redisLockOperationException(RedisLockInterruptedException e) {
         return new ErrorResponse(e.getMessage());
     }
 }

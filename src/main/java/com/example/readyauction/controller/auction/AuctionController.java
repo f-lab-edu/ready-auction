@@ -14,27 +14,31 @@ import com.example.readyauction.controller.request.auction.BidRequest;
 import com.example.readyauction.controller.response.auction.BidResponse;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.auction.AuctionService;
+import com.example.readyauction.service.auction.HighestBidSseNotificationService;
 
 @RestController
 @RequestMapping("/api/v1/auctions")
 public class AuctionController {
 
     private final AuctionService auctionService;
+    private final HighestBidSseNotificationService bidSseNotificationService;
 
-    public AuctionController(AuctionService auctionService) {
+    public AuctionController(AuctionService auctionService,
+        HighestBidSseNotificationService bidSseNotificationService) {
         this.auctionService = auctionService;
+        this.bidSseNotificationService = bidSseNotificationService;
     }
 
     // 경매 참여 API - SSE 구독 API
     @GetMapping(value = "/product/{productId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId) {
-        return auctionService.subscribe(user, productId);
+        return bidSseNotificationService.subscribe(user, productId);
     }
 
     // 경매 참여 취소 API - SSE 구독 해지 API
     @GetMapping(value = "/{productId}/subscribe/cancel")
     public void subscribeCancel(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId) {
-        auctionService.subscribeCancel(user, productId);
+        bidSseNotificationService.subscribeCancel(user, productId);
     }
 
     // 가격 입찰 API
