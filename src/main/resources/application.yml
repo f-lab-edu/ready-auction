@@ -12,9 +12,12 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 16379
-      password: root
+      like:
+        host: localhost
+        port: 16379
+      auction:
+        host: localhost
+        port: 26379
 
   jpa:
     hibernate:

@@ -10,38 +10,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.example.readyauction.controller.request.auction.TenderRequest;
-import com.example.readyauction.controller.response.auction.TenderResponse;
+import com.example.readyauction.controller.request.auction.BidRequest;
+import com.example.readyauction.controller.response.auction.BidResponse;
 import com.example.readyauction.domain.user.CustomUserDetails;
 import com.example.readyauction.service.auction.AuctionService;
+import com.example.readyauction.service.auction.HighestBidSseNotificationService;
 
 @RestController
 @RequestMapping("/api/v1/auctions")
 public class AuctionController {
 
     private final AuctionService auctionService;
+    private final HighestBidSseNotificationService bidSseNotificationService;
 
-    public AuctionController(AuctionService auctionService) {
+    public AuctionController(AuctionService auctionService,
+        HighestBidSseNotificationService bidSseNotificationService) {
         this.auctionService = auctionService;
+        this.bidSseNotificationService = bidSseNotificationService;
     }
 
     // 경매 참여 API - SSE 구독 API
     @GetMapping(value = "/product/{productId}/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId) {
-        return auctionService.subscribe(user, productId);
+        return bidSseNotificationService.subscribe(user, productId);
     }
 
     // 경매 참여 취소 API - SSE 구독 해지 API
     @GetMapping(value = "/{productId}/subscribe/cancel")
     public void subscribeCancel(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId) {
-        auctionService.subscribeCancel(user, productId);
+        bidSseNotificationService.subscribeCancel(user, productId);
     }
 
     // 가격 입찰 API
     @PostMapping(value = "/{productId}")
-    public TenderResponse tender(@AuthenticationPrincipal CustomUserDetails user,
-        @RequestBody TenderRequest tenderRequest,
+    public BidResponse tender(@AuthenticationPrincipal CustomUserDetails user,
+        @RequestBody BidRequest bidRequest,
         @PathVariable Long productId) {
-        return auctionService.tenderPrice(user, tenderRequest, productId);
+        return auctionService.biddingPrice(user, bidRequest, productId);
     }
 }

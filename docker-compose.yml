@@ -16,10 +16,22 @@ services:
     volumes:
       - ./data/:/var/lib/mysql
 
-  redis:
+  redis1:
     image: redis:latest
+    container_name: "likeRedis"
+    volumes:
+      - ./redis/redis1-data:/data
     ports:
       - "16379:6379"
+    restart: always
+
+  redis2:
+    image: redis:latest
+    container_name: "AuctionRedis"
+    volumes:
+      - ./redis/redis2-data:/data
+    ports:
+      - "26379:6379"
     restart: always
 
   prometheus:
