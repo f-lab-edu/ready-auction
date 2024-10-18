@@ -6,8 +6,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.example.readyauction.domain.product.Product;
@@ -15,9 +15,11 @@ import com.example.readyauction.repository.product.ProductRepository;
 
 @Component
 public class ProductReader implements ItemReader<List<Product>> {
-    private static final int PAGE_SIZE = 500;  // 한번에 읽을 데이터 개수 (청크 사이즈)
+    @Value("${ready.auction.spring.batch.chunkSize}")
+    private int PAGE_SIZE;  // 한번에 읽을 데이터 개수 (청크 사이즈)
+
     private final ProductRepository productRepository;
-    private int currentPage = 0;
+    private Long lastReadProductId = 1L;
 
     public ProductReader(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -29,14 +31,14 @@ public class ProductReader implements ItemReader<List<Product>> {
         UnexpectedInputException,
         ParseException,
         NonTransientResourceException {
-        Pageable pageable = PageRequest.of(currentPage, PAGE_SIZE);
-        List<Product> products = productRepository.findAll(pageable).getContent();
+        List<Product> products = productRepository.findByIdGreaterThanOrderByIdAsc(lastReadProductId,
+            PageRequest.of(0, PAGE_SIZE));
 
         if (products.isEmpty()) {
-            currentPage = 0;
+            lastReadProductId = 1L;
             return null;
         }
-        currentPage++;
+        lastReadProductId = products.get(products.size() - 1).getId();
         return products;
     }
 }
