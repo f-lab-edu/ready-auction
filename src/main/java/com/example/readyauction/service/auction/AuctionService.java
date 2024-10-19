@@ -79,7 +79,7 @@ public class AuctionService {
 
     private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
         LocalDateTime biddingRequestTime = LocalDateTime.now();
-        ProductFindResponse product = productFacade.findById(productId);
+        ProductFindResponse product = productFacade.findById(productId, biddingRequestTime);
         if (biddingRequestTime.isAfter(product.getCloseDate())) {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
@@ -94,7 +94,7 @@ public class AuctionService {
 
     private double calculateIncreaseRate(Long productId, Long previousPrice, int nextPrice) {
         if (previousPrice == nextPrice) { // 최초 입찰
-            ProductFindResponse product = productFacade.findById(productId);
+            ProductFindResponse product = productFacade.findById(productId, LocalDateTime.now());
             return ((double)(nextPrice - product.getStartPrice()) / previousPrice) * 100;
         }
         return ((double)(nextPrice - previousPrice) / previousPrice) * 100;

@@ -22,7 +22,7 @@ public class ProductImageService {
         productImageRepository.saveAll(productImages);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProductImage> getImage(Long productId) {
         List<ProductImage> productImages = productImageRepository.findByProductId(productId);
         return productImages;

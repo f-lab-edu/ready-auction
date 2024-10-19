@@ -33,7 +33,7 @@ public class ProductService {
         return saved;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Product findById(Long id, LocalDateTime requestTime) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new NotFoundProductException(id));
@@ -46,7 +46,7 @@ public class ProductService {
         return product;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Product> findProductWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
         int pageSize,
         OrderBy order) {

@@ -28,7 +28,7 @@ public class HighestBidSseNotificationService {
     // SSE 구독
     @Transactional
     public SseEmitter subscribe(CustomUserDetails user, Long productId) {
-        ProductFindResponse product = productFacade.findById(productId);
+        ProductFindResponse product = productFacade.findById(productId, LocalDateTime.now());
         LocalDateTime closeDate = product.getCloseDate();
         SseEmitter emitter = createEmitter(user.getUser(), productId, closeDate);
 

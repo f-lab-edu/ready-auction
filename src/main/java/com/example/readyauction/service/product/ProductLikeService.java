@@ -35,12 +35,12 @@ public class ProductLikeService {
         return countProductLikesByProductId(productId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getProductLikesByProductId(Long productId) {
         return countProductLikesByProductId(productId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Long> getUsersByProductId(Long productId) {
         Set<Long> userIds = redisTemplate.opsForSet().members(productId);
         // null이 아닌 빈 Set을 반환

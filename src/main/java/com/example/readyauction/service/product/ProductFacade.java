@@ -50,7 +50,7 @@ public class ProductFacade {
         return ProductResponse.from(product.getId());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ProductFindResponse findById(Long productId, LocalDateTime request) {
         Product product = productService.findById(productId, request);
         List<ProductImage> productImages = productImageService.getImage(productId);
@@ -58,20 +58,8 @@ public class ProductFacade {
         return ProductFindResponse.from(product, imageResponses);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse<ProductFindResponse> findAll(String keyword, ProductCondition productCondition, int pageNo,
-        int pageSize,
-        OrderBy order) {
-        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
-            order);
-        List<ProductFindResponse> productFindResponses = products.stream()
-            .map(this::convertToProductFindResponse)
-            .collect(Collectors.toList());
-        return PagingResponse.from(productFindResponses, pageNo);
-    }
-
-    @Transactional
-    public PagingResponse<ProductFindResponse> findAll2(String keyword, ProductCondition productCondition, int pageNo,
         int pageSize,
         OrderBy order) {
         List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
@@ -118,7 +106,7 @@ public class ProductFacade {
         return productLikeService.deleteLike(user, productId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getProductLikes(Long productId) {
         return productLikeService.getProductLikesByProductId(productId);
     }
