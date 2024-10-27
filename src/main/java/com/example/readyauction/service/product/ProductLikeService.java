@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.readyauction.controller.response.product.ProductLikeResponse;
 import com.example.readyauction.domain.user.User;
 
 @Service
@@ -22,22 +23,22 @@ public class ProductLikeService {
     }
 
     @Transactional
-    public int addLike(User user, Long productId) {
+    public ProductLikeResponse addLike(User user, Long productId) {
         SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
         setOperations.add(productId, user.getId());
-        return countProductLikesByProductId(productId);
+        return new ProductLikeResponse(countProductLikesByProductId(productId));
     }
 
     @Transactional
-    public int deleteLike(User user, Long productId) {
+    public ProductLikeResponse deleteLike(User user, Long productId) {
         SetOperations<Long, Long> setOperations = redisTemplate.opsForSet();
         setOperations.remove(productId, user.getId());
-        return countProductLikesByProductId(productId);
+        return new ProductLikeResponse(countProductLikesByProductId(productId));
     }
 
     @Transactional(readOnly = true)
-    public int getProductLikesByProductId(Long productId) {
-        return countProductLikesByProductId(productId);
+    public ProductLikeResponse getProductLikesByProductId(Long productId) {
+        return new ProductLikeResponse(countProductLikesByProductId(productId));
     }
 
     @Transactional(readOnly = true)

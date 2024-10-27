@@ -23,6 +23,7 @@ public class WebSecurityConfig {
 
         http.authorizeHttpRequests(authorize -> authorize
             .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll() // 관리자만
+            .requestMatchers(new AntPathRequestMatcher("/docs/*")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/api/v1/logout")).permitAll()

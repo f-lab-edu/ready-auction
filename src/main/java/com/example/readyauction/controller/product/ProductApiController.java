@@ -18,6 +18,7 @@ import com.example.readyauction.controller.request.product.ProductSaveRequest;
 import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
+import com.example.readyauction.controller.response.product.ProductLikeResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.ProductCondition;
@@ -74,17 +75,18 @@ public class ProductApiController {
     }
 
     @PostMapping("/{id}/likes")
-    public int productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+    public ProductLikeResponse productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
         return productFacade.addLike(user.getUser(), id);
     }
 
     @DeleteMapping("/{id}/likes")
-    public int productLikeDelete(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+    public ProductLikeResponse productLikeDelete(@AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable Long id) {
         return productFacade.productLikeDelete(user.getUser(), id);
     }
 
     @GetMapping("{id}/likes")
-    public int getProductLike(@PathVariable Long id) {
+    public ProductLikeResponse getProductLike(@PathVariable Long id) {
         return productFacade.getProductLikes(id);
     }
 }

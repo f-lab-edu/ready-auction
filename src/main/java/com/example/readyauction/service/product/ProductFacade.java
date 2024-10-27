@@ -13,6 +13,7 @@ import com.example.readyauction.controller.request.product.ProductUpdateRequest;
 import com.example.readyauction.controller.response.ImageResponse;
 import com.example.readyauction.controller.response.PagingResponse;
 import com.example.readyauction.controller.response.product.ProductFindResponse;
+import com.example.readyauction.controller.response.product.ProductLikeResponse;
 import com.example.readyauction.controller.response.product.ProductResponse;
 import com.example.readyauction.domain.product.OrderBy;
 import com.example.readyauction.domain.product.Product;
@@ -97,17 +98,17 @@ public class ProductFacade {
     }
 
     @Transactional
-    public int addLike(User user, Long productId) {
+    public ProductLikeResponse addLike(User user, Long productId) {
         return productLikeService.addLike(user, productId);
     }
 
     @Transactional
-    public int productLikeDelete(User user, Long productId) {
+    public ProductLikeResponse productLikeDelete(User user, Long productId) {
         return productLikeService.deleteLike(user, productId);
     }
 
     @Transactional(readOnly = true)
-    public int getProductLikes(Long productId) {
+    public ProductLikeResponse getProductLikes(Long productId) {
         return productLikeService.getProductLikesByProductId(productId);
     }
 

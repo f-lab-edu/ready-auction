@@ -23,6 +23,12 @@ import com.example.readyauction.exception.user.NotFoundUserException;
 @RestControllerAdvice
 public class ApiExceptionController {
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse illegalArgumentException(IllegalArgumentException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler(NotFoundUserException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFoundUser(NotFoundUserException e) {
