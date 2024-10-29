@@ -80,7 +80,7 @@ public class UserService {
         // 정규 표현식으로 비밀번호 검증 (하드코딩된 비밀번호 아님)
         String regex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
         Preconditions.checkArgument(userSaveRequest.getPassword().matches(regex),
-            "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다.");
+            "비밀번호는 8~15자 길이여야 하며, 최소 1개의 영문 대소문자, 숫자, 그리고 특수문자를 포함해야 합니다.");
     }
 
     private void validUpdatePasswordRequest(PasswordUpdateRequest passwordUpdateRequest) {
@@ -93,7 +93,7 @@ public class UserService {
         // 정규 표현식으로 비밀번호 검증
         String regex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
         Preconditions.checkArgument(passwordUpdateRequest.getPassword().matches(regex),
-            "영문 대소문자와 숫자, 특수기호가 1개씩 포함되어있는 8~15자 비밀번호입니다.");
+            "비밀번호는 8~15자 길이여야 하며, 최소 1개의 영문 대소문자, 숫자, 그리고 특수문자를 포함해야 합니다.");
     }
 
     private String encryptPassword(String password) {

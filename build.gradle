@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
+    // .adoc 문서를 해석하기 위한 테스트 프로세스
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 
 }
 apply plugin: 'groovy' // groovy 지원
@@ -19,6 +21,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt // asciidoctorExt 종속성 추가
 }
 
 repositories {
@@ -33,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
     implementation group: 'com.google.guava', name: 'guava', version: '33.2.0-jre'
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.0' // ⭐ Redisson
@@ -52,6 +56,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    // rest-docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -65,6 +73,40 @@ dependencies {
 clean {
     delete file('src/main/generated')
 }
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
 tasks.named('test') {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+tasks.named('asciidoctor') {
+    configurations 'asciidoctorExt'
+    inputs.dir snippetsDir
+    dependsOn test
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
+}
+
+bootJar {
+    dependsOn copyDocument
+    doFirst {
+        delete file('static/docs')
+    }
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }

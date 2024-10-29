@@ -1,0 +1,629 @@
+= READY-AUCTUON API 문서
+:date: 2024-10-26
+:toc: left
+:toclevels: 3
+
+== 소개
+
+이 문서는 READY-AUCTION API에 대한 정보를 제공합니다.
+API의 요청 및 응답 형식, 예제, 에러 코드 등을 포함합니다.
+
+== 회원가입 요청
+
+회원 가입을 위한 요청 형식입니다.
+
+=== HTTP 요청 형식
+
+include::{snippets}/회원가입/http-request.adoc[]
+
+=== 요청 본문
+
+include::{snippets}/회원가입/request-body.adoc[]
+include::{snippets}/회원가입/request-fields.adoc[]
+
+== 회원가입 응답
+
+사용자 가입 API의 응답 형식입니다.
+
+=== HTTP 응답 형식
+
+include::{snippets}/회원가입/http-response.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/회원가입/response-body.adoc[]
+include::{snippets}/회원가입/response-fields.adoc[]
+
+== 회원가입 요청 유효성 검증 실패
+
+== 중복 유저 아이디
+
+include::{snippets}/회원가입 실패 - 중복 유저 아이디/request-body.adoc[]
+
+=== 이름 누락
+
+include::{snippets}/회원가입 실패-이름 누락/request-body.adoc[]
+
+=== 아이디 누락
+
+include::{snippets}/회원가입 실패 - 아이디 누락/request-body.adoc[]
+
+=== 아아디 길이 문제
+
+include::{snippets}/회원가입 실패 - 아이디 길이/request-body.adoc[]
+
+=== 비밀번호 누락
+
+include::{snippets}/회원가입 실패 - 비밀번호 누락/request-body.adoc[]
+
+=== 비밀번호 길이 문제
+
+include::{snippets}/회원가입 실패-비밀번호 길이/request-body.adoc[]
+
+=== 비밀번호 정규식 불일치
+
+include::{snippets}/회원가입 실패 - 비밀번호 정규식 불일치/request-body.adoc[]
+
+== 회원가입 요청 유효성 검증 실패 응답
+
+=== 중복 유저 아이디
+
+include::{snippets}/회원가입 실패 - 중복 유저 아이디/response-body.adoc[]
+
+=== 이름 누락
+
+include::{snippets}/회원가입 실패-이름 누락/response-body.adoc[]
+
+=== 아이디 누락
+
+include::{snippets}/회원가입 실패 - 아이디 누락/response-body.adoc[]
+
+=== 아아디 길이 문제
+
+include::{snippets}/회원가입 실패 - 아이디 길이/response-body.adoc[]
+
+=== 비밀번호 누락
+
+include::{snippets}/회원가입 실패 - 비밀번호 누락/response-body.adoc[]
+
+=== 비밀번호 길이 문제
+
+include::{snippets}/회원가입 실패-비밀번호 길이/response-body.adoc[]
+
+=== 비밀번호 정규식 불일치
+
+include::{snippets}/회원가입 실패 - 비밀번호 정규식 불일치/response-body.adoc[]
+
+== 에러 코드
+
+회원 가입 API에서 발생할 수 있는 에러 코드 및 설명입니다.
+
+[options="header"]
+|===
+| 코드 | 설명
+| 400  | 잘못된 요청 (유효성 검증 실패)
+| 409  | 중복된 사용자 ID
+|===
+
+== 상품 API
+
+여기부터는 상품 관련 API 정리한 부분입니다.
+
+== 상품 등록 요청
+
+이 API는 두 가지 형식의 데이터를 전송합니다.
+
+상품 등록 API에서 @RequestPart를 사용하여 multipart/form-data 형식으로 요청을 처리하는 방법은 다음과 같습니다.
+
+* 상품 정보 (product): JSON 형식으로 요청 본문에 포함됩니다.
+** Content-Type: application/json
+** 요소 이름: product
+
+* 상품 이미지들 (images): multipart/form-data 형식으로 전송됩니다.
+** Content-Type: multipart/form-data
+** 요소 이름: images
+
+=== HTTP 요청 본문
+
+----
+POST /api/v1/products/1
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="product"
+{
+"userId": "testUser",
+"productName": "테스트 상품",
+"description": "상품 설명",
+"startDate": "2024-10-26T00:00:00",
+"closeDate": "2024-10-27T00:00:00",
+"startPrice": 1000
+}
+--boundary
+Content-Disposition: form-data; name="images"; filename="image1.jpg"
+Content-Type: image/jpeg
+
+<image binary data>
+--boundary
+Content-Disposition: form-data; name="images"; filename="image2.jpg"
+Content-Type: image/jpeg
+
+<image binary data>
+--boundary--
+----
+
+=== 예제
+
+include::{snippets}/상품 등록 성공/http-request.adoc[]
+
+=== 요청 본문
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "This is a sample product description.",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+include::{snippets}/상품 등록 성공/request-parts.adoc[]
+
+== 상품 등록 응답
+
+상품 등록 응답
+
+=== HTTP 응답 본문
+
+include::{snippets}/상품 등록 성공/http-response.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/상품 등록 성공/response-body.adoc[]
+include::{snippets}/상품 등록 성공/response-fields.adoc[]
+
+== 상품 등록 유효성 검증 실패
+
+=== 상품명 누락
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "",
+    "description": "This is a sample product description.",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 상품 설명 누락
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 상품 이미지 누락
+
+상품 이미지 누락된 상태로 요청하면 예외 메시지를 반환합니다.
+
+=== 경매 시작일 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "현재시간보다 이전인 시간",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 경매 종료일 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "현재시간보다 이전이거나 시작일보다 이전인 경우",
+    "startPrice": 6000
+}
+----
+
+=== 경매 시작가격 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 500
+}
+----
+
+== 상품 등록 유효성 검증 실패 응답
+
+=== 상품명 누락
+
+include::{snippets}/상품 등록 실패 - 상품명 누락/response-body.adoc[]
+
+=== 상품 설명 누락
+
+include::{snippets}/상품 등록 실패 - 상품 설명 누락/response-body.adoc[]
+
+=== 상품 이미지 누락
+
+include::{snippets}/상품 등록 실패 - 이미지 누락/response-body.adoc[]
+
+=== 경매 시작일 문제
+
+include::{snippets}/상품 등록 실패 - 시작일 문제/response-body.adoc[]
+
+=== 경매 종료일 문제
+
+include::{snippets}/상품 등록 실패 - 종료일 문제/response-body.adoc[]
+
+=== 경매 시작가격 문제
+
+include::{snippets}/상품 등록 실패 - 시작가 문제/response-body.adoc[]
+
+== 상품 수정 요청
+
+상품 등록 API에서 @RequestPart를 사용하여 multipart/form-data 형식으로 요청을 처리하는 방법은 다음과 같습니다.
+
+수정시 이미지는 필수는 아닙니다.
+
+* 상품 정보 (product): JSON 형식으로 요청 본문에 포함됩니다.
+** Content-Type: application/json
+** 요소 이름: product
+
+* 상품 이미지들 (images): multipart/form-data 형식으로 전송됩니다.
+** Content-Type: multipart/form-data
+** 요소 이름: images
+
+=== HTTP 요청 본문
+
+----
+PUT /api/v1/products/1
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="product"
+{
+"userId": "testUser",
+"productName": "테스트 상품",
+"description": "상품 설명",
+"startDate": "2024-10-26T00:00:00",
+"closeDate": "2024-10-27T00:00:00",
+"startPrice": 1000
+}
+--boundary
+Content-Disposition: form-data; name="images"; filename="image1.jpg"
+Content-Type: image/jpeg
+
+<image binary data>
+--boundary
+Content-Disposition: form-data; name="images"; filename="image2.jpg"
+Content-Type: image/jpeg
+
+<image binary data>
+--boundary--
+----
+
+=== 예제
+
+include::{snippets}/상품 수정 성공/http-request.adoc[]
+
+=== 요청 본문
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "This is a sample product description.",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+include::{snippets}/상품 수정 성공/request-parts.adoc[]
+
+== 상품 수정 응답
+
+상품 수정 응답
+
+=== HTTP 응답 본문
+
+include::{snippets}/상품 수정 성공/http-response.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/상품 수정 성공/response-body.adoc[]
+include::{snippets}/상품 수정 성공/response-fields.adoc[]
+
+== 상품 수정 유효성 검증 실패
+
+=== 상품명 누락
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "",
+    "description": "This is a sample product description.",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 상품 설명 누락
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 경매 시작일 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "현재시간보다 이전인 시간",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 6000
+}
+----
+
+=== 경매 종료일 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "현재시간보다 이전이거나 시작일보다 이전인 경우",
+    "startPrice": 6000
+}
+----
+
+=== 경매 시작가격 문제
+
+[source,json]
+----
+{
+    "userId": "testId123",
+    "productName": "Sample Product",
+    "description": "",
+    "startDate": "2024-10-03T07:51:00",
+    "closeDate": "2024-10-20T14:30:00",
+    "startPrice": 500
+}
+----
+
+== 상품 수정 유효성 검증 실패 응답
+
+=== 상품명 누락
+
+include::{snippets}/상품 수정 실패 - 상품명 누락/response-body.adoc[]
+
+=== 상품 설명 누락
+
+include::{snippets}/상품 수정 실패 - 상품 설명 누락/response-body.adoc[]
+
+=== 경매 시작일 문제
+
+include::{snippets}/상품 수정 실패 - 시작일 문제/response-body.adoc[]
+
+=== 경매 종료일 문제
+
+include::{snippets}/상품 수정 실패 - 종료일 문제/response-body.adoc[]
+
+=== 경매 시작가격 문제
+
+include::{snippets}/상품 수정 실패 - 시작가 문제/response-body.adoc[]
+
+=== 경매 진행중
+
+include::{snippets}/상품 수정 실패 - 경매 진행중/response-body.adoc[]
+
+== 상품 조회
+
+=== 상품 단건 조회
+
+==== HTTP 요청
+
+include::{snippets}/상품 단건 조회/path-parameters.adoc[]
+
+=== 상품 단건 조회 응답
+
+==== 응답 본문
+
+include::{snippets}/상품 단건 조회/response-body.adoc[]
+include::{snippets}/상품 단건 조회/response-fields.adoc[]
+
+=== 상품 단건 조회 실패
+
+존재하지 않는 상품 조회
+
+include::{snippets}/상품 단건 조회 실패 - 존재하지 않는 상품/response-body.adoc[]
+
+=== 상품 리스트 조회
+
+상품 리스트 조회
+
+==== 상품 리스트 조회 응답
+
+include::{snippets}/상품 리스트 조회/response-body.adoc[]
+include::{snippets}/상품 리스트 조회/response-fields.adoc[]
+
+== 상품 좋아요
+
+include::{snippets}/상품 좋아요/http-request.adoc[]
+=== 상품 좋아요 응답
+
+include::{snippets}/상품 좋아요/http-response.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/상품 좋아요/response-body.adoc[]
+include::{snippets}/상품 좋아요/response-fields.adoc[]
+
+== 상품 좋아요 삭제
+
+include::{snippets}/상품 좋아요 삭제/http-request.adoc[]
+=== 상품 좋아요 삭제 응답
+
+include::{snippets}/상품 좋아요 삭제/http-response.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/상품 좋아요 삭제/response-body.adoc[]
+include::{snippets}/상품 좋아요 삭제/response-fields.adoc[]
+
+== 상품 삭제
+
+=== HTTP 요청
+
+include::{snippets}/상품 삭제 성공/http-request.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/상품 삭제 성공/response-body.adoc[]
+include::{snippets}/상품 삭제 성공/response-fields.adoc[]
+
+== 상품 삭제 실패
+
+=== 경매 진행중
+
+=== 응답 본문
+
+include::{snippets}/상품 삭제 실패 - 경매 진행중/response-body.adoc[]
+
+== 경매 가격 제안
+
+=== HTTP 요청
+
+include::{snippets}/경매 가격 제안/http-request.adoc[]
+
+=== 요청 본문
+
+include::{snippets}/경매 가격 제안/request-body.adoc[]
+include::{snippets}/경매 가격 제안/request-fields.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/경매 가격 제안/response-body.adoc[]
+include::{snippets}/경매 가격 제안/response-fields.adoc[]
+
+== 경매 가격 제안 실패
+
+=== HTTP 요청
+
+include::{snippets}/경매 가격 제안 입찰 실패/http-request.adoc[]
+
+=== 요청 본문
+
+include::{snippets}/경매 가격 제안 입찰 실패/request-body.adoc[]
+include::{snippets}/경매 가격 제안 입찰 실패/request-fields.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/경매 가격 제안 입찰 실패/response-body.adoc[]
+include::{snippets}/경매 가격 제안 입찰 실패/response-fields.adoc[]
+
+== 에러 코드
+
+|===
+| 예외 | HTTP 상태 코드 | 설명
+
+| IllegalArgumentException
+| 400
+| 잘못된 요청으로 유효성 검증 실패
+
+| NotFoundUserException
+| 404
+| 요청한 사용자를 찾을 수 없음
+
+| DuplicatedUserIdException
+| 409
+| 중복된 사용자 ID
+
+| LoginFailException
+| 400
+| 로그인 실패 (잘못된 자격 증명)
+
+| NotFoundProductException
+| 404
+| 요청한 상품을 찾을 수 없음
+
+| UnauthorizedEnrollException
+| 401
+| 상품 등록 권한 없음
+
+| UnauthorizedProductAccessException
+| 401
+| 상품 접근 권한 없음
+
+| ProductNotPendingException
+| 400
+| 상품의 상태가 진행 중이지 않음
+
+| CreateDirectoryFailException
+| 500
+| 디렉터리 생성 실패
+
+| DeleteImageFailException
+| 500
+| 이미지 삭제 실패
+
+| ImageFileUploadFailException
+| 500
+| 이미지 파일 업로드 실패
+
+| BiddingFailException
+| 400
+| 경매 참여 실패
+
+| RedisLockAcquisitionException
+| 500
+| Redis 잠금 획득 실패
+
+| RedisLockInterruptedException
+| 500
+| Redis 잠금 작업 중단
+|===
