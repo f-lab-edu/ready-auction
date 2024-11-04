@@ -1,0 +1,9 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+    implementation project(':module-domain')
+    implementation project(':module-api')
+}

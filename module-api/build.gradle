@@ -1,0 +1,74 @@
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'     // .adoc 문서를 해석하기 위한 테스트 프로세스
+}
+
+configurations {
+    asciidoctorExt // asciidoctorExt 종속성 추가
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.0' // Redisson
+    implementation group: 'com.google.guava', name: 'guava', version: '33.2.0-jre' // guava
+
+    // rest-docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    // Prometheus & Grafana
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // spock
+    testImplementation('org.spockframework:spock-core:2.3-groovy-3.0')
+    testImplementation('org.spockframework:spock-spring:2.3-groovy-3.0')
+
+    // 모듈 의존성
+    implementation project(':module-domain')
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// rest docs 관련 설정
+clean {
+    delete file('src/main/generated')
+}
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+tasks.named('test') {
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+tasks.named('asciidoctor') {
+    configurations 'asciidoctorExt'
+    inputs.dir snippetsDir
+    dependsOn test
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+}
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+build {
+    dependsOn copyDocument
+}
+bootJar {
+    dependsOn copyDocument
+    doFirst {
+        delete file('static/docs')
+    }
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+}

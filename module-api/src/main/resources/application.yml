@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: module-api
+
+  datasource:
+    url: jdbc:mysql://localhost:33306/ready-auction
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      like:
+        host: localhost
+        port: 16379
+      auction:
+        host: localhost
+        port: 26379
+
+  profiles:
+    active: dev
+
+  logging:
+    level:
+      root: TRACE
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "prometheus"

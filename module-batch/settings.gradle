@@ -1,0 +1,2 @@
+rootProject.name = 'ready-auction'
+include 'module-batch', 'module-api', 'module-domain'
