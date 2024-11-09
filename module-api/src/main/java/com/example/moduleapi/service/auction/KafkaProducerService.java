@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class KafkaProducerService {
-    private final KafkaTemplate<String, com.example.moduleapi.service.dto.AuctionPriceChangeNotification> kafkaTemplate;
+    private final KafkaTemplate<String, AuctionPriceChangeNotification> kafkaTemplate;
 
     public KafkaProducerService(KafkaTemplate<String, AuctionPriceChangeNotification> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
