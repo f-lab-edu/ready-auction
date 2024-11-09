@@ -46,10 +46,33 @@ services:
     restart: always
 
   grafana:
-    image: "grafana/grafana"
+    image: grafana/grafana
     ports:
       - "13000:3000"
     restart: always
     depends_on:
       - prometheus
     privileged: true
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"  # 외부 포트
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092  # EXTERNAL만 사용
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092  # 외부 접근을 위한 주소
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT  # 외부만 PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: EXTERNAL  # 브로커 간 통신도 EXTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
