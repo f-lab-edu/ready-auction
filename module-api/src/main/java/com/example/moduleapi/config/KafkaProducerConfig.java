@@ -25,7 +25,6 @@ public class KafkaProducerConfig {
         // Key와 Value의 직렬화 방식 설정
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
         return config;
     }
 

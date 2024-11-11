@@ -1,4 +1,4 @@
-package com.example.moduledomain.repository.kafka;
+package com.example.moduleworker.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

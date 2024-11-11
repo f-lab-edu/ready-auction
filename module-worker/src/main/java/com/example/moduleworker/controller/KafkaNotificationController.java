@@ -1,6 +1,6 @@
 package com.example.moduleworker.controller;
 
-import com.example.moduleworker.Service.KafkaEmitterService;
+import com.example.moduleworker.service.EmitterService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,14 +8,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 public class KafkaNotificationController {
-    private final KafkaEmitterService kafkaEmitterService;
+    private final EmitterService emitterService;
 
-    public KafkaNotificationController(KafkaEmitterService kafkaEmitterService) {
-        this.kafkaEmitterService = kafkaEmitterService;
+    public KafkaNotificationController(EmitterService emitterService) {
+        this.emitterService = emitterService;
     }
 
-    @GetMapping(value = "/auction/kafkaEvent/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/auction/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeKafkaEvent() {
-        return kafkaEmitterService.addEmitter("admin");
+        return emitterService.addEmitter("admin");
     }
 }
