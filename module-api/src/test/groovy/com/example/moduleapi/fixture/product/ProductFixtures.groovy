@@ -1,6 +1,7 @@
 package com.example.moduleapi.fixture.product
 
 import com.example.moduleapi.controller.response.ImageResponse
+import com.example.moduleapi.controller.response.product.ProductFindResponse
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.product.ProductImage
@@ -27,6 +28,18 @@ class ProductFixtures {
                 .closeDate(map.getOrDefault("closeDate", 종료일) as LocalDateTime)
                 .startPrice(map.getOrDefault("startPrice", 1000) as int)
                 .productCondition(map.getOrDefault("productCondition", READY) as ProductCondition)
+                .build()
+    }
+
+    static ProductFindResponse createProductFindResponse(Map map = [:]) {
+        return ProductFindResponse.builder()
+                .userId(map.getOrDefault("userId", "test") as String)
+                .productName(map.getOrDefault("productName", "test") as String)
+                .description(map.getOrDefault("description", "test") as String)
+                .startDate(map.getOrDefault("startDate", 시작일) as LocalDateTime)
+                .closeDate(map.getOrDefault("closeDate", 종료일) as LocalDateTime)
+                .startPrice(map.getOrDefault("startPrice", 1000) as int)
+                .imageResponses([ProductFixtures.createImageResponse()])
                 .build()
     }
 
