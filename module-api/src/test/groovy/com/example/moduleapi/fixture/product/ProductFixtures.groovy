@@ -57,7 +57,7 @@ class ProductFixtures {
                 .productId(map.getOrDefault("productId", 1L) as Long)
                 .originalName(map.getOrDefault("originalName", "originalName") as String)
                 .savedName(map.getOrDefault("savedName", "savedName") as String)
-                .imageFullPath(map.getOrDefault("imageFullPath", "/test/image/url") as String)
+                .imageFullPath(map.getOrDefault("imageFullPath", "fileTest/base/path") as String)
                 .build()
 
     }
@@ -65,7 +65,7 @@ class ProductFixtures {
     static ImageResponse createImageResponse(Map map = [:]) {
         return ImageResponse.builder()
                 .originalName(map.getOrDefault("originalName", "originalName") as String)
-                .imagePath(map.getOrDefault("imagePath", "/test/image/url") as String)
+                .imagePath(map.getOrDefault("imagePath", "fileTest/base/path") as String)
                 .build()
     }
 }
