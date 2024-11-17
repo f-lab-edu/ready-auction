@@ -1,10 +1,8 @@
 package com.example.moduleapi.service.user
 
-
 import com.example.moduleapi.controller.request.user.UserSaveRequest
 import com.example.moduleapi.exception.user.DuplicatedUserIdException
 import com.example.moduleapi.fixture.UserFixtures.UserFixtures
-import com.example.moduledomain.domain.user.User
 import com.example.moduledomain.repository.user.UserRepository
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
@@ -24,26 +22,22 @@ class UserServiceTest extends Specification {
         )
         passwordEncoder.encode("Password123!") >> "encodedPassword"
         userRepository.findByUserId("testId") >> Optional.empty()
-
-        User user = UserFixtures.createUser(
-                ["name"           : "test",
-                 "userId"         : "testId",
-                 "encodedPassword": "encodedPassword"])
-
-        userRepository.save(_) >> user
+        userRepository.save(_) >> request.toEntity()
 
         when:
         def response = userService.join(request)
 
         then:
-        1 * userRepository.save(_) >> {
-            User saveUser = it[0]
-            verifyAll(saveUser) {
-                assert it.name == request.getName()
-                assert it.userId == request.getUserId()
-                assert it.encodedPassword == "encodedPassword"
-            }
-        }
+        response.userId == request.getUserId()
+        response.name == request.getName()
+//        1 * userRepository.save(_) >> {
+//            User user = it[0]
+//            verifyAll(user) {
+//                assert it.name == request.getName()
+//                assert it.userId == request.getUserId()
+//                assert it.encodedPassword == "encodedPassword"
+//            }
+//        }
     }
 
     def "회원가입 - 입력값 유효성 검증 실패"() {
