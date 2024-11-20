@@ -22,7 +22,8 @@ public class WebSecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll() // 관리자만
+                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/auction/subscribe")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/docs/*")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()

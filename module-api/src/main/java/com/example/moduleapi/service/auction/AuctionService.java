@@ -24,12 +24,13 @@ public class AuctionService {
     private final ProductFacade productFacade;
     private final HighestBidSseNotificationService bidSseNotificationService;
     private final RedissonClient redissonClient;
+    private final KafkaProducerService kafkaProducerService;
 
-    public AuctionService(ProductFacade productFacade, HighestBidSseNotificationService bidSseNotificationService,
-                          RedissonClient redissonClient) {
+    public AuctionService(ProductFacade productFacade, HighestBidSseNotificationService bidSseNotificationService, RedissonClient redissonClient, KafkaProducerService kafkaProducerService) {
         this.productFacade = productFacade;
         this.bidSseNotificationService = bidSseNotificationService;
         this.redissonClient = redissonClient;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @Transactional
@@ -44,6 +45,7 @@ public class AuctionService {
                 throw new RedisLockAcquisitionException(productId);
             }
             currentHighestPrice = processBid(user, bidRequest, productId);
+            kafkaProducerService.publishAuctionPriceChangeNotification(productId, currentHighestPrice);
             bidSseNotificationService.sendToAllUsers(productId, "최고가가 " + currentHighestPrice + "원으로 올랐습니다.",
                     "최고가 수정 알림");
         } catch (InterruptedException e) {
@@ -67,7 +69,6 @@ public class AuctionService {
         if (userIdAndCurrentPrice == null) { // 최초 입찰
             return updateRedisBidData(user, highestBidMap, bidRequest, productId);
         }
-
         if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
