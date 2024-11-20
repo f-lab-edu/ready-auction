@@ -68,9 +68,9 @@ public class LocalFileService implements FileService {
 
     @Override
     public void deleteImages(List<ProductImage> productImages) {
-        List<ImageResponse> imageResponses = this.loadImages(productImages);
-        for (ImageResponse imageResponse : imageResponses) {
-            Path path = Path.of(imageResponse.getImagePath());
+        //List<ImageResponse> imageResponses = this.loadImages(productImages);
+        for (ProductImage productImage : productImages) {
+            Path path = Path.of(productImage.getImageFullPath());
             try {
                 Files.delete(path);
             } catch (IOException e) {

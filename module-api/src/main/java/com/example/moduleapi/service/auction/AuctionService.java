@@ -73,7 +73,7 @@ public class AuctionService {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
 
-        updateRedisBidData(user, highestBidMap, bidRequest, productId);
+        //updateRedisBidData(user, highestBidMap, bidRequest, productId);
         return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 
