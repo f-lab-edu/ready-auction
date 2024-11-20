@@ -51,8 +51,6 @@ class ProductImageServiceTest extends Specification {
         productImageService.updateImage(1L, productImages)
 
         then:
-        //1 * productImageService.deleteImage(_)
-        //1 * productImageService.saveImage(_)
         3 * productImageRepository.deleteById(_)
         1 * productImageRepository.saveAll(_)
     }

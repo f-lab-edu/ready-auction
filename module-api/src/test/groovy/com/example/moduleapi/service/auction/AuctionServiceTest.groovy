@@ -57,6 +57,8 @@ class AuctionServiceTest extends Specification {
     }
 
     def "경매 입찰 실패"() {
-
+        //
     }
+
+
 }

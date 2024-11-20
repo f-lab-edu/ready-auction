@@ -41,6 +41,7 @@ class ProductServiceTest extends Specification {
                 assert it.startPrice == 1000
                 assert it.productCondition == ProductFixtures.READY
             }
+            return product
         }
     }
 

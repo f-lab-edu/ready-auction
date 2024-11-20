@@ -67,7 +67,6 @@ class LocalFileServiceTest extends Specification {
         response.get(0).imagePath == productImages.get(0).imageFullPath
     }
 
-    // 고민중..
     def "로컬 파일 수정"() {
         given:
         User user = UserFixtures.createUser()
@@ -84,21 +83,36 @@ class LocalFileServiceTest extends Specification {
         def response = localFileService.updateImages(user, product, productImages, images)
 
         then:
-        // 1 * localFileService.deleteImages(_) 이게 왜 호출이 안되는거지
         response.size() == 2
     }
 
-    // 고민중..
     def "로컬 파일 삭제"() {
         given:
-        def productImages = [ProductFixtures.createProductImage()]
-        def imagesResponse = [ProductFixtures.createImageResponse()]
+        def productImages = [
+                ProductFixtures.createProductImage(imageFullPath: "fileTest/base/path/test-image.jpg")
+        ]
+        def imagesResponse = [ProductFixtures.createImageResponse(
+                imagePath: "fileTest/base/path/test-image.jpg"
+        )]
         localFileService.loadImages(productImages) >> imagesResponse
+        // 테스트 전에 파일을 실제로 생성
+        def testFile = FileBaseUrl.resolve("test-image.jpg")
+        println(testFile)
+        if (!Files.exists(FileBaseUrl)) {
+            Files.createDirectories(FileBaseUrl)  // 디렉토리가 없으면 생성
+        }
+        if (!Files.exists(testFile)) {
+            Files.createFile(testFile)  // 더미 파일 생성
+        }
 
         when:
         localFileService.deleteImages(productImages)
 
         then:
-        1 * Files.delete(_) // 0번 호출되었다고 뜸..
+        !Files.exists(testFile)
+        def remainingFiles = Files.walk(FileBaseUrl)
+                .filter(Files::isRegularFile)
+                .collect(Collectors.toList())
+        remainingFiles.size() == 0
     }
 }
