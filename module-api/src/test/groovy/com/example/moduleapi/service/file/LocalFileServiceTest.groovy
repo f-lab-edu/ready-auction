@@ -1,7 +1,7 @@
 package com.example.moduleapi.service.file
 
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
 import com.example.moduleapi.fixture.product.ProductFixtures
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.user.User
 import spock.lang.Specification

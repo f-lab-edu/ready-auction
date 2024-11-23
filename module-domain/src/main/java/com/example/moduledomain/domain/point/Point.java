@@ -1,7 +1,8 @@
-package com.example.moduledomain.domain.user;
+package com.example.moduledomain.domain.point;
 
 import com.example.moduledomain.domain.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,13 +19,19 @@ public class Point extends BaseEntity {
     private Long userId;
 
     @Column(name = "point")
-    private int point;
+    private int amount;
 
-    public void plus(int plusPoint) {
-        this.point += plusPoint;
+    public void plus(int plusAmount) {
+        this.amount += plusAmount;
     }
 
-    public void minus(int minusPoint) {
-        this.point -= minusPoint;
+    public void minus(int minusAmount) {
+        this.amount -= minusAmount;
+    }
+
+    @Builder
+    public Point(Long userId, int amount) {
+        this.userId = userId;
+        this.amount = amount;
     }
 }

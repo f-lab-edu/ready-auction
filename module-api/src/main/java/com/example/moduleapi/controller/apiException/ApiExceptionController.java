@@ -7,6 +7,7 @@ import com.example.moduleapi.exception.auction.RedisLockInterruptedException;
 import com.example.moduleapi.exception.file.CreateDirectoryFailException;
 import com.example.moduleapi.exception.file.DeleteImageFailException;
 import com.example.moduleapi.exception.file.ImageFileUploadFailException;
+import com.example.moduleapi.exception.point.PointDeductionFailedException;
 import com.example.moduleapi.exception.product.NotFoundProductException;
 import com.example.moduleapi.exception.product.ProductNotPendingException;
 import com.example.moduleapi.exception.product.UnauthorizedEnrollException;
@@ -103,6 +104,12 @@ public class ApiExceptionController {
     @ExceptionHandler(RedisLockInterruptedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse redisLockOperationException(RedisLockInterruptedException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(PointDeductionFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse pointDeductionFailedException(PointDeductionFailedException e) {
         return new ErrorResponse(e.getMessage());
     }
 }

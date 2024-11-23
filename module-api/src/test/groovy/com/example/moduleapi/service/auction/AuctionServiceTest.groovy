@@ -4,8 +4,8 @@ import com.example.moduleapi.controller.request.auction.BidRequest
 import com.example.moduleapi.controller.response.product.ProductFindResponse
 import com.example.moduleapi.exception.auction.BiddingFailException
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
 import com.example.moduleapi.fixture.product.ProductFixtures
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.product.ProductFacade
 import com.example.moduledomain.domain.user.CustomUserDetails
 import com.example.moduledomain.domain.user.User
