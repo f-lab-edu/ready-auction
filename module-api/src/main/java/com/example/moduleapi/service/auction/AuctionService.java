@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -61,10 +62,11 @@ public class AuctionService {
     }
 
     @Transactional
-    public Pair<Long, Long> getAuctionUserInfoByProductId(Long productId) {
+    public Optional<Pair<Long, Long>> getAuctionUserInfoByProductId(Long productId) {
         RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
                 String.valueOf(productId)); // productId : (userId, bestPrice)
-        return highestBidMap.get(productId); // (userId, 최고가) 가져오기
+        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+        return Optional.ofNullable(userIdAndCurrentPrice); // (userId, 최고가) 가져오기
     }
 
     private Long processBid(CustomUserDetails user, BidRequest bidRequest, Long productId) {
