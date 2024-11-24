@@ -60,6 +60,13 @@ public class AuctionService {
                 calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
     }
 
+    @Transactional
+    public Pair<Long, Long> getAuctionUserInfoByProductId(Long productId) {
+        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
+                String.valueOf(productId)); // productId : (userId, bestPrice)
+        return highestBidMap.get(productId); // (userId, 최고가) 가져오기
+    }
+
     private Long processBid(CustomUserDetails user, BidRequest bidRequest, Long productId) {
 
         RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
