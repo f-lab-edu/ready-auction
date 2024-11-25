@@ -7,6 +7,7 @@ import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.repository.user.PointRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PointService {
@@ -17,6 +18,7 @@ public class PointService {
     }
 
     // 포인트 충전
+    @Transactional
     public int chargePoint(CustomUserDetails userDetails, PointAmount pointAmount) {
         User user = userDetails.getUser();
         Point point = pointRepository.findByUserId(user.getId());
@@ -25,6 +27,7 @@ public class PointService {
     }
 
     // 포인트 차감
+    @Transactional
     public int deductPoint(CustomUserDetails userDetails, PointAmount pointAmount) {
         User user = userDetails.getUser();
         Point point = pointRepository.findByUserId(user.getId());

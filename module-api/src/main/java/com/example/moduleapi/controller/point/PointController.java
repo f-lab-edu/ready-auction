@@ -32,18 +32,4 @@ public class PointController {
                 .build();
         return pointResponse;
     }
-
-    // 포인트 사용
-    @PostMapping("/deduct")
-    public PointResponse deductPoint(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody PointAmount pointAmount) {
-        int totalPoint = pointService.deductPoint(customUserDetails, pointAmount);
-        PointResponse pointResponse = PointResponse.builder()
-                .currentPoint(totalPoint)
-                .message("포인트가 성공적으로 차감되었습니다.")
-                .build();
-        return pointResponse;
-    }
-
 }
