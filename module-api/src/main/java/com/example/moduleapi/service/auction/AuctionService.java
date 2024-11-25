@@ -77,8 +77,7 @@ public class AuctionService {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
         // 포인트 돌려주기
-        PointAmount pointAmount = new PointAmount(userIdAndCurrentPrice.getSecond().intValue());
-        pointService.chargePoint(user, pointAmount);
+        pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond().intValue());
         return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 

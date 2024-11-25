@@ -36,7 +36,13 @@ public class PointService {
 
         point.minus(pointAmount.getAmount());
         return point.getAmount();
+    }
 
+    // 포인트 롤백
+    @Transactional
+    public void rollbackPoint(Long userId, int plusAmount) {
+        Point point = pointRepository.findByUserId(userId);
+        point.plus(plusAmount);
     }
 
     private static void validateDeductPoint(PointAmount pointAmount, User user, Point point) {
