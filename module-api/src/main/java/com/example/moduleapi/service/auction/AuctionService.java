@@ -74,9 +74,10 @@ public class AuctionService {
             return updateRedisBidData(user, highestBidMap, bidRequest, productId);
         }
         if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
+            pointService.rollbackPoint(user.getUser().getId(), bidRequest.getBiddingPrice());
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
-        // 포인트 돌려주기
+
         pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond().intValue());
         return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
