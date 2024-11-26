@@ -76,6 +76,9 @@ public class UserService {
                 userSaveRequest.getPassword().length() >= 8 && userSaveRequest.getPassword().length() <= 15,
                 "비밀번호는 8자 이상 15자 이하로 입력해주세요.");
 
+        Preconditions.checkArgument(!ObjectUtils.isEmpty(userSaveRequest.getBirthDate()), "생년월일을 입력해주세요.");
+        Preconditions.checkArgument(!ObjectUtils.isEmpty(userSaveRequest.getGender()), "성별을 입력해주세요.");
+
         // 정규 표현식으로 비밀번호 검증 (하드코딩된 비밀번호 아님)
         String regex = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,15}";
         Preconditions.checkArgument(userSaveRequest.getPassword().matches(regex),
