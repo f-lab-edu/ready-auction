@@ -36,7 +36,6 @@ public class BidLogging extends BaseEntity {
     private boolean isAuctionSuccessful;
 
     @Builder
-
     public BidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
         this.userId = userId;
         this.productId = productId;
