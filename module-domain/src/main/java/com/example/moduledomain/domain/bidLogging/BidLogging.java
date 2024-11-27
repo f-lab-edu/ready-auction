@@ -17,6 +17,12 @@ public class BidLogging extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "product_id")
+    private Long productId;
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -30,7 +36,10 @@ public class BidLogging extends BaseEntity {
     private boolean isAuctionSuccessful;
 
     @Builder
-    public BidLogging(Gender gender, int age, int price, boolean isAuctionSuccessful) {
+
+    public BidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
+        this.userId = userId;
+        this.productId = productId;
         this.gender = gender;
         this.age = age;
         this.price = price;
