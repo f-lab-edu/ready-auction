@@ -2,6 +2,7 @@ package com.example.moduleapi.fixture.product
 
 import com.example.moduleapi.controller.response.ImageResponse
 import com.example.moduleapi.controller.response.product.ProductFindResponse
+import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.product.ProductImage
@@ -15,6 +16,8 @@ class ProductFixtures {
     public static LocalDateTime 과거일 = LocalDateTime.now().minusDays(1)
     public static LocalDateTime 미래일 = 시작일.plusYears(1)
 
+    public static Category 카테고리 = Category.ELECTRONICS;
+
     public static READY = ProductCondition.READY
     public static ACTIVE = ProductCondition.ACTIVE
     public static DONE = ProductCondition.DONE
@@ -24,6 +27,7 @@ class ProductFixtures {
                 .userId(map.getOrDefault("userId", "test") as String)
                 .productName(map.getOrDefault("productName", "test") as String)
                 .description(map.getOrDefault("description", "test") as String)
+                .category(map.getOrDefault("category", Category.ELECTRONICS) as Category)
                 .startDate(map.getOrDefault("startDate", 시작일) as LocalDateTime)
                 .closeDate(map.getOrDefault("closeDate", 종료일) as LocalDateTime)
                 .startPrice(map.getOrDefault("startPrice", 1000) as int)
@@ -36,6 +40,7 @@ class ProductFixtures {
                 .userId(map.getOrDefault("userId", "test") as String)
                 .productName(map.getOrDefault("productName", "test") as String)
                 .description(map.getOrDefault("description", "test") as String)
+                .category(map.getOrDefault("category", Category.ELECTRONICS) as Category)
                 .startDate(map.getOrDefault("startDate", 시작일) as LocalDateTime)
                 .closeDate(map.getOrDefault("closeDate", 종료일) as LocalDateTime)
                 .startPrice(map.getOrDefault("startPrice", 1000) as int)

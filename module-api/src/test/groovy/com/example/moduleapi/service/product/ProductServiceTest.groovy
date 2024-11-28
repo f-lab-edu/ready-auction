@@ -5,6 +5,7 @@ import com.example.moduleapi.controller.request.product.ProductUpdateRequest
 import com.example.moduleapi.exception.product.ProductNotPendingException
 import com.example.moduleapi.fixture.UserFixtures.UserFixtures
 import com.example.moduleapi.fixture.product.ProductFixtures
+import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.OrderBy
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
@@ -23,6 +24,7 @@ class ProductServiceTest extends Specification {
                 userId: "test",
                 productName: "test",
                 description: "test",
+                category: ProductFixtures.카테고리,
                 startDate: ProductFixtures.시작일,
                 closeDate: ProductFixtures.종료일,
                 startPrice: 1000
@@ -56,6 +58,7 @@ class ProductServiceTest extends Specification {
         response.userId == "test"
         response.productName == "test"
         response.description == "test"
+        response.category == Category.ELECTRONICS
         response.startPrice == 1000
         response.productCondition == ProductFixtures.READY
     }
@@ -103,8 +106,6 @@ class ProductServiceTest extends Specification {
         def response = productService.update(user, 1L, request)
 
         then:
-        // 이거 product 추적(?)을 못하는거같음.
-        //1 * product.updateProductInfo(request.getProductName(), request.getDescription(), request.getStartPrice(), request.getCloseDate(), request.getStartPrice())
         response.productName == request.getProductName()
         response.description == request.getDescription()
         response.startDate == request.getStartDate()
