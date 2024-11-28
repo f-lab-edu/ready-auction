@@ -111,9 +111,11 @@ public class AuctionService {
     }
 
     private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
+        ProductFindResponse product = productFacade.findById(productId);
         return BidLogging.builder()
                 .userId(userId)
                 .productId(productId)
+                .category(product.getCategory())
                 .age(age)
                 .gender(gender)
                 .price(price)
