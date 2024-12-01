@@ -1,10 +1,10 @@
 package com.example.moduledomain.domain.product;
 
-import static com.example.moduledomain.domain.product.QProduct.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 import java.time.LocalDateTime;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import static com.example.moduledomain.domain.product.QProduct.product;
 
 public enum ProductCondition {
     READY("준비중") {
@@ -18,7 +18,7 @@ public enum ProductCondition {
         @Override
         public BooleanExpression checkCondition(LocalDateTime requestTime) {
             return product.startDate.loe(requestTime)
-                .and(product.closeDate.after(requestTime));
+                    .and(product.closeDate.after(requestTime));
         }
     },
     DONE("종료") {
@@ -40,4 +40,14 @@ public enum ProductCondition {
 
     public abstract BooleanExpression checkCondition(LocalDateTime requestTime);
 
+    public static ProductCondition from(LocalDateTime now, Product product) {
+        if (now.isBefore(product.getStartDate())) {
+            return ProductCondition.READY;
+        }
+
+        if (now.isAfter(product.getCloseDate())) {
+            return ProductCondition.DONE;
+        }
+        return ProductCondition.ACTIVE;
+    }
 }
