@@ -141,7 +141,7 @@ public class AuctionService {
                 .build();
     }
 
-    private boolean IsAuctionSuccessful(Pair<Long, Long> userIdAndCurrentPrice, BidRequest bidRequest) {
+    private boolean isAuctionSuccessful(Pair<Long, Long> userIdAndCurrentPrice, BidRequest bidRequest) {
         if (userIdAndCurrentPrice == null) {
             return true;
         }
