@@ -1,4 +1,4 @@
-package com.example.moduleapi.fixture.UserFixtures
+package com.example.moduleapi.fixture.user
 
 import com.example.moduledomain.domain.user.User
 

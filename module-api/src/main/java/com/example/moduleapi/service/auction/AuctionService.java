@@ -1,12 +1,14 @@
 package com.example.moduleapi.service.auction;
 
 import com.example.moduleapi.controller.request.auction.BidRequest;
+import com.example.moduleapi.controller.request.point.PointAmount;
 import com.example.moduleapi.controller.response.auction.BidResponse;
 import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.exception.auction.BiddingFailException;
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException;
 import com.example.moduleapi.exception.auction.RedisLockInterruptedException;
 import com.example.moduleapi.service.logging.BidLoggingService;
+import com.example.moduleapi.service.point.PointService;
 import com.example.moduleapi.service.product.ProductFacade;
 import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.domain.user.CustomUserDetails;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -30,13 +33,15 @@ public class AuctionService {
     private final RedissonClient redissonClient;
     private final KafkaProducerService kafkaProducerService;
     private final BidLoggingService bidLoggingService;
+    private final PointService pointService;
 
-    public AuctionService(ProductFacade productFacade, HighestBidSseNotificationService bidSseNotificationService, RedissonClient redissonClient, KafkaProducerService kafkaProducerService, BidLoggingService bidLoggingService) {
+    public AuctionService(ProductFacade productFacade, HighestBidSseNotificationService bidSseNotificationService, RedissonClient redissonClient, KafkaProducerService kafkaProducerService, BidLoggingService bidLoggingService, PointService pointService) {
         this.productFacade = productFacade;
         this.bidSseNotificationService = bidSseNotificationService;
         this.redissonClient = redissonClient;
         this.kafkaProducerService = kafkaProducerService;
         this.bidLoggingService = bidLoggingService;
+        this.pointService = pointService;
     }
 
     @Transactional
@@ -66,6 +71,14 @@ public class AuctionService {
                 calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
     }
 
+    @Transactional
+    public Optional<Pair<Long, Long>> getAuctionUserInfoByProductId(Long productId) {
+        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
+                String.valueOf(productId)); // productId : (userId, bestPrice)
+        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+        return Optional.ofNullable(userIdAndCurrentPrice); // (userId, 최고가) 가져오기
+    }
+
     private Long processBid(CustomUserDetails customUserDetails, BidRequest bidRequest, Long productId) {
 
         RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
@@ -81,10 +94,12 @@ public class AuctionService {
             return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
         }
         if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
-            throw new BiddingFailException(user.getUserId(), bidRequest.getBiddingPrice(), productId);
+            pointService.rollbackPoint(user.getUser().getId(), bidRequest.getBiddingPrice());
+            throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
 
-        return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
+        pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond().intValue());
+        return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 
     private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
@@ -93,6 +108,9 @@ public class AuctionService {
         if (biddingRequestTime.isAfter(product.getCloseDate())) {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
+
+        PointAmount pointAmount = new PointAmount(bidRequest.getBiddingPrice());
+        pointService.deductPoint(user, pointAmount);
     }
 
     private Long updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,

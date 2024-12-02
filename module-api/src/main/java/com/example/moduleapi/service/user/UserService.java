@@ -7,7 +7,9 @@ import com.example.moduleapi.controller.response.user.UserResponse;
 import com.example.moduleapi.exception.user.DuplicatedUserIdException;
 import com.example.moduleapi.exception.user.NotFoundUserException;
 import com.example.moduleapi.exception.user.UnauthorizedUserException;
+import com.example.moduledomain.domain.point.Point;
 import com.example.moduledomain.domain.user.User;
+import com.example.moduledomain.repository.user.PointRepository;
 import com.example.moduledomain.repository.user.UserRepository;
 import com.google.common.base.Preconditions;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,10 +22,12 @@ import org.springframework.util.ObjectUtils;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PointRepository pointRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, PointRepository pointRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.pointRepository = pointRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -37,6 +41,11 @@ public class UserService {
         user.updateEncodedPassword(encodedPassword);
 
         User savedUser = userRepository.save(user);
+        Point point = Point.builder()
+                .userId(user.getId())
+                .amount(0)
+                .build();
+        pointRepository.save(point);
         return UserResponse.from(savedUser);
     }
 

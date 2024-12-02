@@ -1,6 +1,6 @@
 package com.example.moduleapi.service.product
 
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduledomain.domain.user.User
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.SetOperations

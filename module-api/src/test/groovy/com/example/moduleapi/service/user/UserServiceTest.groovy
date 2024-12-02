@@ -2,9 +2,10 @@ package com.example.moduleapi.service.user
 
 import com.example.moduleapi.controller.request.user.UserSaveRequest
 import com.example.moduleapi.exception.user.DuplicatedUserIdException
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduledomain.domain.user.Gender
 import com.example.moduledomain.domain.user.User
+import com.example.moduledomain.repository.user.PointRepository
 import com.example.moduledomain.repository.user.UserRepository
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import spock.lang.Specification
@@ -13,9 +14,10 @@ import java.time.LocalDate
 
 class UserServiceTest extends Specification {
     UserRepository userRepository = Mock()
+    PointRepository pointRepository = Mock()
     BCryptPasswordEncoder passwordEncoder = Mock()
 
-    UserService userService = new UserService(userRepository, passwordEncoder)
+    UserService userService = new UserService(userRepository, pointRepository, passwordEncoder)
 
     def "회원가입 성공"() {
         given:

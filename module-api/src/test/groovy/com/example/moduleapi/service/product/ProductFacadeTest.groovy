@@ -4,8 +4,8 @@ import com.example.moduleapi.controller.request.product.ProductSaveRequest
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest
 import com.example.moduleapi.controller.response.ImageResponse
 import com.example.moduleapi.exception.product.NotFoundProductException
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
 import com.example.moduleapi.fixture.product.ProductFixtures
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.file.FileService
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.OrderBy

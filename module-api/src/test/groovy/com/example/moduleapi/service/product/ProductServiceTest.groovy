@@ -3,9 +3,9 @@ package com.example.moduleapi.service.product
 import com.example.moduleapi.controller.request.product.ProductSaveRequest
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest
 import com.example.moduleapi.exception.product.ProductNotPendingException
-import com.example.moduleapi.fixture.UserFixtures.UserFixtures
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduledomain.domain.product.Category
+import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduledomain.domain.product.OrderBy
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
