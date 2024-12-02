@@ -94,12 +94,12 @@ public class AuctionService {
             return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
         }
         if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
-            pointService.rollbackPoint(user.getUser().getId(), bidRequest.getBiddingPrice());
-            throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
+            pointService.rollbackPoint(user.getId(), bidRequest.getBiddingPrice());
+            throw new BiddingFailException(user.getUserId(), bidRequest.getBiddingPrice(), productId);
         }
 
         pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond().intValue());
-        return updateRedisBidData(user, highestBidMap, bidRequest, productId);
+        return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
     }
 
     private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
