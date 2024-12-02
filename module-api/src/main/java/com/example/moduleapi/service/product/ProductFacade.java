@@ -17,6 +17,7 @@ import com.example.moduledomain.domain.user.User;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -124,6 +125,7 @@ public class ProductFacade {
                 "상품명은 필수 값입니다.");
         Preconditions.checkArgument(!productSaveRequest.getDescription().isBlank(),
                 "상품 설명은 필수 값입니다.");
+        Preconditions.checkArgument(!ObjectUtils.isEmpty(productSaveRequest.getCategory()), "카테고리를 설정해주세요.");
         Preconditions.checkArgument(!productSaveRequest.getStartDate().isBefore(LocalDateTime.now()),
                 "경매 시작일이 현재 시각보다 이전일 수 없습니다.");
         Preconditions.checkArgument(!productSaveRequest.getCloseDate().isBefore(productSaveRequest.getStartDate()),

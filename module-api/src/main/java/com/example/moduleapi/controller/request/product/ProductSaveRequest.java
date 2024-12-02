@@ -1,5 +1,6 @@
 package com.example.moduleapi.controller.request.product;
 
+import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import lombok.Builder;
@@ -13,20 +14,17 @@ import java.time.LocalDateTime;
 public class ProductSaveRequest {
     private String userId;
     private String productName;
+    private Category category;
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
     private int startPrice;
 
     @Builder
-    public ProductSaveRequest(String userId,
-                              String productName,
-                              String description,
-                              LocalDateTime startDate,
-                              LocalDateTime closeDate,
-                              int startPrice) {
+    public ProductSaveRequest(String userId, String productName, Category category, String description, LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
         this.userId = userId;
         this.productName = productName;
+        this.category = category;
         this.description = description;
         this.startDate = startDate;
         this.closeDate = closeDate;
@@ -38,6 +36,7 @@ public class ProductSaveRequest {
                 .userId(userId)
                 .productName(productName)
                 .description(description)
+                .category(category)
                 .startDate(startDate)
                 .closeDate(closeDate)
                 .startPrice(startPrice)

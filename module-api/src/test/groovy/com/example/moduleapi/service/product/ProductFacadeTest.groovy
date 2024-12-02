@@ -7,6 +7,7 @@ import com.example.moduleapi.exception.product.NotFoundProductException
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.file.FileService
+import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.OrderBy
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductImage
@@ -29,6 +30,7 @@ class ProductFacadeTest extends Specification {
                 userId: "test",
                 productName: "test",
                 description: "test",
+                category: Category.ELECTRONICS,
                 startDate: ProductFixtures.시작일,
                 closeDate: ProductFixtures.종료일,
                 startPrice: 1000
@@ -55,6 +57,7 @@ class ProductFacadeTest extends Specification {
                 userId: "test",
                 productName: productName,
                 description: description,
+                category: categoty,
                 startDate: startDate,
                 closeDate: closeDate,
                 startPrice: startPrice
@@ -70,14 +73,16 @@ class ProductFacadeTest extends Specification {
         e.message == expected
 
         where:
-        productName | description | startDate           | closeDate           | startPrice || images        || expected
-        ""          | "test"      | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       || ["image.jpg"] || "상품명은 필수 값입니다."
-        "product"   | ""          | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       || ["image.jpg"] || "상품 설명은 필수 값입니다."
-        "product"   | "test"      | ProductFixtures.과거일 | ProductFixtures.종료일 | 1000       || ["image.jpg"] || "경매 시작일이 현재 시각보다 이전일 수 없습니다."
-        "product"   | "test"      | ProductFixtures.시작일 | ProductFixtures.과거일 | 1000       || ["image.jpg"] || "경매 종료일이 경매 시작일보다 이전일 수 없습니다."
-        "product"   | "test"      | ProductFixtures.시작일 | ProductFixtures.종료일 | 999        || ["image.jpg"] || "시작 가격은 최소 1000원입니다."
-        "product"   | "test"      | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       || null          || "경매 상품에 대한 이미지는 필수 값입니다."
-        "product"   | "test"      | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       || []            || "경매 상품에 대한 이미지는 필수 값입니다."
+        productName | description | categoty             | startDate           | closeDate           | startPrice | images        || expected
+        ""          | "test"      | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       | ["image.jpg"] || "상품명은 필수 값입니다."
+        "product"   | ""          | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       | ["image.jpg"] || "상품 설명은 필수 값입니다."
+        "product"   | "test"      | Category.ELECTRONICS | ProductFixtures.과거일 | ProductFixtures.종료일 | 1000       | ["image.jpg"] || "경매 시작일이 현재 시각보다 이전일 수 없습니다."
+        "product"   | "test"      | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.과거일 | 1000       | ["image.jpg"] || "경매 종료일이 경매 시작일보다 이전일 수 없습니다."
+        "product"   | "test"      | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.종료일 | 999        | ["image.jpg"] || "시작 가격은 최소 1000원입니다."
+        "product"   | "test"      | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       | null          || "경매 상품에 대한 이미지는 필수 값입니다."
+        "product"   | "test"      | Category.ELECTRONICS | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       | []            || "경매 상품에 대한 이미지는 필수 값입니다."
+        "product"   | "test"      | null                 | ProductFixtures.시작일 | ProductFixtures.종료일 | 1000       | ["image.jpg"] || "카테고리를 설정해주세요."
+
     }
 
     def "상품 조회 성공"() {
@@ -99,6 +104,7 @@ class ProductFacadeTest extends Specification {
         response.description == product.description
         response.startDate == product.startDate
         response.closeDate == product.closeDate
+        response.category == product.category
         response.startPrice == product.startPrice
         response.imageResponses.size() == 1
         response.imageResponses[0].originalName == productImage.originalName

@@ -1,19 +1,14 @@
 package com.example.moduledomain.domain.user;
 
-import java.util.Objects;
-
 import com.example.moduledomain.domain.BaseEntity;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -27,14 +22,27 @@ public class User extends BaseEntity {
     private String userId;
     private String name;
     private String encodedPassword;
+    private LocalDate birthDate;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
     @Enumerated(EnumType.STRING)
     private Role role = Role.ROLE_USER;
 
     @Builder
-    public User(String userId, String name, String encodedPassword) {
+    public User(String userId, String name, String encodedPassword, LocalDate birthDate, Gender gender, Role role) {
         this.userId = userId;
         this.name = name;
         this.encodedPassword = encodedPassword;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.role = role;
+    }
+
+    public int getAge() {
+        if (birthDate == null) {
+            return 0;
+        }
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 
     public void updateEncodedPassword(String encodedPassword) {
@@ -47,7 +55,7 @@ public class User extends BaseEntity {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        User user = (User)o;
+        User user = (User) o;
         return Objects.equals(getId(), user.getId());
     }
 

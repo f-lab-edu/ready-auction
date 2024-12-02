@@ -1,20 +1,12 @@
 package com.example.moduledomain.domain.product;
 
-import java.time.LocalDateTime;
-
 import com.example.moduledomain.domain.BaseEntity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -46,23 +38,27 @@ public class Product extends BaseEntity {
     private int startPrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private Category category;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ProductCondition productCondition;
 
     @Builder
-    public Product(String userId, String productName, String description, LocalDateTime startDate,
-        LocalDateTime closeDate, int startPrice, ProductCondition productCondition) {
+    public Product(String userId, String productName, String description, LocalDateTime startDate, LocalDateTime closeDate, int startPrice, Category category, ProductCondition productCondition) {
         this.userId = userId;
         this.productName = productName;
         this.description = description;
         this.startDate = startDate;
         this.closeDate = closeDate;
         this.startPrice = startPrice;
+        this.category = category;
         this.productCondition = productCondition;
     }
 
     public void updateProductInfo(String productName, String description, LocalDateTime startDate,
-        LocalDateTime closeDate, int startPrice) {
+                                  LocalDateTime closeDate, int startPrice) {
         this.productName = productName;
         this.description = description;
         this.startDate = startDate;
