@@ -86,7 +86,7 @@ public class AuctionService {
         Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
         User user = customUserDetails.getUser();
 
-        boolean isAuctionSuccessful = IsAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
+        boolean isAuctionSuccessful = isAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
         BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(), bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
         bidLoggingService.logging(bidLogging);
 
