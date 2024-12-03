@@ -7,6 +7,7 @@ import com.example.moduleapi.exception.auction.RedisLockAcquisitionException
 import com.example.moduleapi.exception.point.PointDeductionFailedException
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
+import com.example.moduleapi.service.logging.BidLoggingService
 import com.example.moduleapi.service.point.PointService
 import com.example.moduleapi.service.product.ProductFacade
 import com.example.moduledomain.domain.user.CustomUserDetails
@@ -21,13 +22,15 @@ import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 class AuctionServiceTest extends Specification {
-    RedissonClient redissonClient = Mock()
 
+    RedissonClient redissonClient = Mock()
     ProductFacade productFacade = Mock()
     HighestBidSseNotificationService bidSseNotificationService = Mock()
     KafkaProducerService kafkaProducerService = Mock()
+    BidLoggingService bidLoggingService = Mock()
     PointService pointService = Mock()
-    AuctionService auctionService = new AuctionService(productFacade, bidSseNotificationService, redissonClient, kafkaProducerService, pointService)
+
+    AuctionService auctionService = new AuctionService(productFacade, bidSseNotificationService, redissonClient, kafkaProducerService, bidLoggingService, pointService)
 
     def "경매 입찰 성공"() {
         given:
