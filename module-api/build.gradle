@@ -33,6 +33,7 @@ dependencies {
 
     // 모듈 의존성
     implementation project(':module-domain')
+    implementation project(':module-recommendation')
 }
 
 tasks.named('test') {

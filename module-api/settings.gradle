@@ -1,2 +1,2 @@
 rootProject.name = 'ready-auction'
-include 'module-api', 'module-domain'
+include 'module-api', 'module-domain', 'module-recommendation'
