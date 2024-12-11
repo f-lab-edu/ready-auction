@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/products")
 public class ProductApiController {
     private final ProductFacade productFacade;
-    private static final String DEFAULT_SIZE = "9";
+    private static final String DEFAULT_SIZE = "6";
 
     public ProductApiController(ProductFacade productFacade) {
         this.productFacade = productFacade;
@@ -37,6 +37,14 @@ public class ProductApiController {
     @GetMapping("/{id}")
     public ProductFindResponse findById(@PathVariable Long id) {
         return productFacade.findById(id);
+    }
+
+    @GetMapping("/recommendation")
+    public PagingResponse<ProductFindResponse> findRecommendationProducts(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize) {
+        return productFacade.findRecommendationProducts(customUserDetails, pageNo, pageSize);
     }
 
     @GetMapping
