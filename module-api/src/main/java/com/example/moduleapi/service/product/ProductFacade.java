@@ -13,7 +13,9 @@ import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.product.ProductImage;
+import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.User;
+import com.example.modulerecommendation.service.ProductRecommendationService;
 import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +32,14 @@ public class ProductFacade {
     private final ProductImageService productImageService;
     private final ProductService productService;
     private final ProductLikeService productLikeService;
+    private final ProductRecommendationService productRecommendationService;
 
-    public ProductFacade(FileService fileService, ProductImageService productImageService,
-                         ProductService productService,
-                         ProductLikeService productLikeService) {
+    public ProductFacade(FileService fileService, ProductImageService productImageService, ProductService productService, ProductLikeService productLikeService, ProductRecommendationService productRecommendationService) {
         this.fileService = fileService;
         this.productImageService = productImageService;
         this.productService = productService;
         this.productLikeService = productLikeService;
+        this.productRecommendationService = productRecommendationService;
     }
 
     @Transactional
@@ -57,6 +59,17 @@ public class ProductFacade {
         List<ProductImage> productImages = productImageService.getImage(productId);
         List<ImageResponse> imageResponses = fileService.loadImages(productImages);
         return ProductFindResponse.from(product, imageResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public PagingResponse<ProductFindResponse> findRecommendationProducts(CustomUserDetails customUserDetails,
+                                                                          int pageNo, int pageSize) {
+        User user = customUserDetails.getUser();
+        List<Long> recommendationProducts = productRecommendationService.getRecommendationProducts(user, pageNo, pageSize);
+        List<ProductFindResponse> recommendation = recommendationProducts.stream()
+                .map(id -> findById(id))
+                .collect(Collectors.toList());
+        return PagingResponse.from(recommendation, pageNo);
     }
 
     @Transactional(readOnly = true)
