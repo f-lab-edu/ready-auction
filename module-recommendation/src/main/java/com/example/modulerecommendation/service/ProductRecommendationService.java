@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 public class ProductRecommendationService {
     private final BidLoggingService bidLoggingService;
     private final ProductRepository productRepository;
-    private static final List<String> GENDERS = Arrays.asList("남성", "여성");
+    private static final List<Gender> GENDERS = Arrays.asList(Gender.MALE, Gender.FEMALE);
     private static final List<String> AGE_RANGES = Arrays.asList("10", "20", "30", "40", "50", "60");
     // 성별 -> 나이대 -> 상품ID 목록(나이대별 Top2 카테고리의 상품리스트)
-    private final Map<String, Map<String, List<Long>>> recommendationProductStore = new HashMap<>();
+    private final Map<Gender, Map<String, List<Long>>> recommendationProductStore = new HashMap<>();
 
     public ProductRecommendationService(BidLoggingService bidLoggingService, ProductRepository productRepository) {
         this.bidLoggingService = bidLoggingService;
@@ -30,7 +30,7 @@ public class ProductRecommendationService {
 
     // HashMap 초기화 메서드
     private void initializeRecommendationProductStore() {
-        for (String genderType : GENDERS) {
+        for (Gender genderType : GENDERS) {
             recommendationProductStore.put(genderType, new HashMap<>());
             for (String ageRangeKey : AGE_RANGES) {
                 recommendationProductStore.get(genderType).put(ageRangeKey, new ArrayList<>());
@@ -43,7 +43,7 @@ public class ProductRecommendationService {
     public List<Long> getRecommendationProducts(User user, int pageNo, int pageSize) {
         Gender gender = user.getGender();
         String age = String.valueOf((user.getAge() / 10) * 10);
-        List<Long> recommendationProducts = recommendationProductStore.get(gender.getDescription()).get(age);
+        List<Long> recommendationProducts = recommendationProductStore.get(gender).get(age);
         Collections.shuffle(recommendationProducts);
 
         int totalSize = recommendationProducts.size();
@@ -67,8 +67,6 @@ public class ProductRecommendationService {
     }
 
     private void saveInRecommendationProductStore(Gender gender, Map<Integer, List<Category>> genderCategories) {
-        String genderType = gender.getDescription();
-
         for (Map.Entry<Integer, List<Category>> entry : genderCategories.entrySet()) {
             Integer ageRange = entry.getKey();
             List<Category> categories = entry.getValue();
@@ -78,7 +76,7 @@ public class ProductRecommendationService {
                 List<Long> categoryProductIds = products.stream().map(Product::getId).collect(Collectors.toList());
                 productIds.addAll(categoryProductIds);
             }
-            recommendationProductStore.get(genderType).get(ageRange.toString()).addAll(productIds);
+            recommendationProductStore.get(gender).get(ageRange.toString()).addAll(productIds);
         }
     }
 }
