@@ -56,7 +56,7 @@ public class ProductRecommendationService {
         return recommendationProducts.subList(startIndex, endIndex);
     }
 
-    @Scheduled(cron = "0 27 3 * * THU")
+    @Scheduled(cron = "0 0 3 * * THU")
     // 스케줄러로 실행될때 HashMap에 접근하는 경우 동시성 이슈가 생길 수 있는가..?
     public void updateRecommendationProductStore() {
         Map<Integer, List<Category>> maleCategoryTop2 = bidLoggingService.getCategoryTop2(Gender.MALE);
