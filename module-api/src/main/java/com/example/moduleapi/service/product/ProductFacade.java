@@ -65,9 +65,11 @@ public class ProductFacade {
     public PagingResponse<ProductFindResponse> findRecommendationProducts(CustomUserDetails customUserDetails,
                                                                           int pageNo, int pageSize) {
         User user = customUserDetails.getUser();
-        List<Long> recommendationProducts = productRecommendationService.getRecommendationProducts(user, pageNo, pageSize);
+        List<Long> recommendationProductIds = productRecommendationService.getRecommendationProducts(user, pageNo, pageSize);
+        List<Product> recommendationProducts = productService.findByIdIn(recommendationProductIds);
+
         List<ProductFindResponse> recommendation = recommendationProducts.stream()
-                .map(id -> findById(id))
+                .map(this::convertToProductFindResponse)
                 .collect(Collectors.toList());
         return PagingResponse.from(recommendation, pageNo);
     }
