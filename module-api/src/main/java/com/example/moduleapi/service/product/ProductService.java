@@ -39,6 +39,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public List<Product> findByIdIn(List<Long> productIds) {
+        return productRepository.findByIdIn(productIds);
+    }
+
+    @Transactional(readOnly = true)
     public List<Product> findProductWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
                                                  int pageSize,
                                                  OrderBy order) {

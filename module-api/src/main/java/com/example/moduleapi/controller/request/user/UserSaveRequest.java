@@ -1,6 +1,7 @@
 package com.example.moduleapi.controller.request.user;
 
 import com.example.moduledomain.domain.user.Gender;
+import com.example.moduledomain.domain.user.Role;
 import com.example.moduledomain.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class UserSaveRequest {
         return User.builder()
                 .userId(userId)
                 .name(name)
+                .role(Role.ROLE_USER)
                 .birthDate(birthDate)
                 .gender(gender)
                 .build();
