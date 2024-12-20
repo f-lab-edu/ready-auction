@@ -11,7 +11,6 @@ import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.repository.product.ProductImageRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
 import com.example.modulerecommendation.controller.response.ImageResponse;
-import com.example.modulerecommendation.controller.response.PagingResponse;
 import com.example.modulerecommendation.controller.response.ProductFindResponse;
 
 @Service
@@ -26,12 +25,12 @@ public class ProductListingService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findRecommendationProducts(List<Long> productIds, int pageNo) {
+    public List<ProductFindResponse> findRecommendationProducts(List<Long> productIds) {
         List<Product> products = findByIdIn(productIds);
         List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-        return PagingResponse.from(productFindResponses, pageNo);
+        return productFindResponses;
 
     }
 

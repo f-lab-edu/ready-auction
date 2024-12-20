@@ -2,12 +2,12 @@ package com.example.moduleapi.service.product;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -68,14 +68,30 @@ public class ProductFacade {
         return ProductFindResponse.from(product, imageResponses);
     }
 
+    @Transactional(readOnly = true)
+    public PagingResponse<ProductFindResponse> findAll(CustomUserDetails customUserDetails, String keyword,
+        ProductCondition productCondition, int pageNo, int pageSize, OrderBy order) {
+        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
+            order);
+        List<ProductFindResponse> productFindResponses = products.stream()
+            .map(this::convertToProductFindResponse)
+            .collect(Collectors.toList());
+
+        if (keyword == null && productCondition == null && order == null) {
+            List<ProductFindResponse> recommendationProducts = findRecommendationProducts(customUserDetails.getUser(),
+                pageNo, pageSize);
+            List<ProductFindResponse> result = combineAndGetProducts(productFindResponses,
+                recommendationProducts);
+            return PagingResponse.from(result, pageNo);
+        }
+
+        return PagingResponse.from(productFindResponses, pageNo);
+    }
+
     @Value("${ready.auction.recommendation.server.base.url}")
     private String productRecommendationServerBaseUrl;
 
-    @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findRecommendationProducts(CustomUserDetails customUserDetails,
-        int pageNo, int pageSize) {
-
-        User user = customUserDetails.getUser();
+    private List<ProductFindResponse> findRecommendationProducts(User user, int pageNo, int pageSize) {
         String payload = user.getUserId() + ":" + user.getEncodedPassword();
         String token = Base64.getEncoder().encodeToString(payload.getBytes());
         String BaseUrl = productRecommendationServerBaseUrl + "/products/recommendations";
@@ -87,25 +103,23 @@ public class ProductFacade {
             .queryParam("pageSize", pageSize);
 
         RestClient client = RestClient.create();
-        ResponseEntity<PagingResponse> entity = client.get()
+        List<ProductFindResponse> entity = client.get()
             .uri(uriBuilder.toUriString())
             .header("Authorization", "Bearer " + token)
             .retrieve()
-            .toEntity(PagingResponse.class);
+            .body(List.class);
 
-        return entity.getBody();
+        return entity;
     }
 
-    @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findAll(String keyword, ProductCondition productCondition, int pageNo,
-        int pageSize,
-        OrderBy order) {
-        List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
-            order);
-        List<ProductFindResponse> productFindResponses = products.stream()
-            .map(this::convertToProductFindResponse)
+    private List<ProductFindResponse> combineAndGetProducts(List<ProductFindResponse> original,
+        List<ProductFindResponse> recommendations) {
+        original.addAll(recommendations);
+        Collections.shuffle(original);
+
+        return original.stream()
+            .limit(6)
             .collect(Collectors.toList());
-        return PagingResponse.from(productFindResponses, pageNo);
     }
 
     private ProductFindResponse convertToProductFindResponse(Product product) {

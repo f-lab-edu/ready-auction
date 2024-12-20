@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.domain.product.Category;
@@ -18,7 +17,6 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.user.Gender;
 import com.example.moduledomain.repository.bidLogging.BidLoggingRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
-import com.example.modulerecommendation.controller.response.PagingResponse;
 import com.example.modulerecommendation.controller.response.ProductFindResponse;
 
 @Service
@@ -39,8 +37,7 @@ public class ProductRecommendationService {
         initializeRecommendationProductStore();
     }
 
-    @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> getRecommendationProducts(Gender gender, int age, int pageNo,
+    public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, int pageNo,
         int pageSize) {
         String ageGroup = getAgeGroup(age);
         List<Long> recommendationProducts = recommendationProductStore.get(gender).get(ageGroup);
@@ -50,11 +47,10 @@ public class ProductRecommendationService {
         int endIndex = Math.min(startIndex + pageSize, totalSize);
 
         if (startIndex >= totalSize) {
-            return PagingResponse.from(Collections.emptyList(), pageNo);
+            return Collections.emptyList();
         }
 
-        return productListingService.findRecommendationProducts(recommendationProducts.subList(startIndex, endIndex),
-            pageNo);
+        return productListingService.findRecommendationProducts(recommendationProducts.subList(startIndex, endIndex));
     }
 
     @Scheduled(cron = "0 0 3 * * THU")

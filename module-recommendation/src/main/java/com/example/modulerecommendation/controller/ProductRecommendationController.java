@@ -1,12 +1,13 @@
 package com.example.modulerecommendation.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.moduledomain.domain.user.Gender;
-import com.example.modulerecommendation.controller.response.PagingResponse;
 import com.example.modulerecommendation.controller.response.ProductFindResponse;
 import com.example.modulerecommendation.service.ProductRecommendationService;
 
@@ -20,7 +21,7 @@ public class ProductRecommendationController {
     }
 
     @GetMapping("/recommendations")
-    public PagingResponse<ProductFindResponse> findRecommendationProducts(
+    public List<ProductFindResponse> findRecommendationProducts(
         @RequestParam Gender gender,
         @RequestParam int age,
         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
