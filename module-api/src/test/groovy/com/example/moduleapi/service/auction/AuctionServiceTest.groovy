@@ -7,7 +7,6 @@ import com.example.moduleapi.exception.auction.RedisLockAcquisitionException
 import com.example.moduleapi.exception.point.PointDeductionFailedException
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
-import com.example.moduleapi.service.logging.BidLoggingService
 import com.example.moduleapi.service.point.PointService
 import com.example.moduleapi.service.product.ProductFacade
 import com.example.moduledomain.domain.user.CustomUserDetails
