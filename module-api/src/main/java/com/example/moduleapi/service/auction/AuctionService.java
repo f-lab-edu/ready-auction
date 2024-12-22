@@ -126,8 +126,12 @@ public class AuctionService {
     private double calculateIncreaseRate(Long productId, Long previousPrice, int nextPrice) {
         if (previousPrice == nextPrice) { // 최초 입찰
             ProductFindResponse product = productFacade.findById(productId);
-            return ((double)(nextPrice - product.getStartPrice()) / previousPrice) * 100;
+            return increaseRate(Long.valueOf(product.getStartPrice()), nextPrice);
         }
+        return increaseRate(previousPrice, nextPrice);
+    }
+
+    private double increaseRate(Long previousPrice, int nextPrice) {
         return ((double)(nextPrice - previousPrice) / previousPrice) * 100;
     }
 

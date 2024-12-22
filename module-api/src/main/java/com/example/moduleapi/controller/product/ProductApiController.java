@@ -49,14 +49,15 @@ public class ProductApiController {
     }
 
     @GetMapping
-    public PagingResponse<ProductFindResponse> findAll(
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
         @RequestParam(value = "keyword", required = false) String keyword,
         @RequestParam(value = "productCondition", required = false) ProductCondition productCondition,
         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
         @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize,
         @RequestParam(value = "orderBy", required = false) OrderBy order) {
-        return productFacade.findAll(customUserDetails, keyword, productCondition, pageNo, pageSize, order);
+        return productFacade.findProductsByCriteriaWithRecommendations(customUserDetails, keyword, productCondition,
+            pageNo, pageSize, order);
     }
 
     @PutMapping("/{id}")

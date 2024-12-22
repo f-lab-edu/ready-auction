@@ -429,7 +429,7 @@ class ProductApiControllerTest {
     @WithMockCustomUser
     public void findAll() throws Exception {
         // 작성 예정
-        when(productFacade.findAll(
+        when(productFacade.findProductsByCriteriaWithRecommendations(
             any(),
             anyString(),
             any(),
