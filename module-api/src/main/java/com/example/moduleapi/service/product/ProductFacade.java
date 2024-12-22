@@ -1,19 +1,14 @@
 package com.example.moduleapi.service.product;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
@@ -23,6 +18,7 @@ import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.UnauthorizedEnrollException;
+import com.example.moduleapi.service.HttpClient.RestHttpClient;
 import com.example.moduleapi.service.file.FileService;
 import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
@@ -33,20 +29,21 @@ import com.example.moduledomain.domain.user.User;
 import com.google.common.base.Preconditions;
 
 @Service
-@Profile("dev")
 public class ProductFacade {
     private final FileService fileService;
     private final ProductImageService productImageService;
     private final ProductService productService;
     private final ProductLikeService productLikeService;
+    private final RestHttpClient restHttpClient;
 
     public ProductFacade(FileService fileService, ProductImageService productImageService,
         ProductService productService,
-        ProductLikeService productLikeService) {
+        ProductLikeService productLikeService, RestHttpClient restHttpClient) {
         this.fileService = fileService;
         this.productImageService = productImageService;
         this.productService = productService;
         this.productLikeService = productLikeService;
+        this.restHttpClient = restHttpClient;
     }
 
     @Transactional
@@ -69,7 +66,8 @@ public class ProductFacade {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findAll(CustomUserDetails customUserDetails, String keyword,
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
+        CustomUserDetails customUserDetails, String keyword,
         ProductCondition productCondition, int pageNo, int pageSize, OrderBy order) {
         List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
             order);
@@ -88,28 +86,8 @@ public class ProductFacade {
         return PagingResponse.from(productFindResponses, pageNo);
     }
 
-    @Value("${ready.auction.recommendation.server.base.url}")
-    private String productRecommendationServerBaseUrl;
-
     private List<ProductFindResponse> findRecommendationProducts(User user, int pageNo, int pageSize) {
-        String payload = user.getUserId() + ":" + user.getEncodedPassword();
-        String token = Base64.getEncoder().encodeToString(payload.getBytes());
-        String BaseUrl = productRecommendationServerBaseUrl + "/products/recommendations";
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(BaseUrl)
-            .queryParam("gender", user.getGender())
-            .queryParam("age", user.getAge())
-            .queryParam("pageNo", pageNo)
-            .queryParam("pageSize", pageSize);
-
-        RestClient client = RestClient.create();
-        List<ProductFindResponse> entity = client.get()
-            .uri(uriBuilder.toUriString())
-            .header("Authorization", "Bearer " + token)
-            .retrieve()
-            .body(List.class);
-
-        return entity;
+        return restHttpClient.findRecommendationProducts(user, pageNo, pageSize);
     }
 
     private List<ProductFindResponse> combineAndGetProducts(List<ProductFindResponse> original,
