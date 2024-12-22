@@ -34,7 +34,6 @@ public class ProductRecommendationService {
 
     public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, int pageNo,
         int pageSize) {
-        updateRecommendationProductStore();
         String ageGroup = AgeGroup.fromAge(age);
         List<Long> recommendationProducts = recommendationProductStore.get(gender).get(ageGroup);
 
