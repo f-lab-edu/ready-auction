@@ -1,7 +1,6 @@
 package com.example.modulerecommendation.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,22 +23,19 @@ public class ProductRecommendationService {
     private final ProductListingService productListingService;
     private final BidLoggingRepository bidLoggingRepository;
     private final ProductRepository productRepository;
-
     private final Map<Gender, Map<String, List<Long>>> recommendationProductStore = new HashMap<>();
-    private static final List<Gender> GENDERS = Arrays.asList(Gender.MALE, Gender.FEMALE);
-    private static final List<String> AGE_RANGES = Arrays.asList("10", "20", "30", "40", "50", "60");
 
     public ProductRecommendationService(ProductListingService productListingService,
         BidLoggingRepository bidLoggingRepository, ProductRepository productRepository) {
         this.productListingService = productListingService;
         this.bidLoggingRepository = bidLoggingRepository;
         this.productRepository = productRepository;
-        initializeRecommendationProductStore();
     }
 
     public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, int pageNo,
         int pageSize) {
-        String ageGroup = getAgeGroup(age);
+        updateRecommendationProductStore();
+        String ageGroup = AgeGroup.fromAge(age);
         List<Long> recommendationProducts = recommendationProductStore.get(gender).get(ageGroup);
 
         int totalSize = recommendationProducts.size();
@@ -65,7 +61,7 @@ public class ProductRecommendationService {
 
         Map<String, Map<Category, Long>> result = loggings.stream()
             .collect(
-                Collectors.groupingBy(bidLogging -> getAgeGroup(bidLogging.getAge()),
+                Collectors.groupingBy(bidLogging -> AgeGroup.fromAge(bidLogging.getAge()),
                     Collectors.groupingBy(bidLogging -> bidLogging.getCategory(), Collectors.counting())
                 ));
 
@@ -95,16 +91,6 @@ public class ProductRecommendationService {
         return topCategoriesByAgeGroup;
     }
 
-    private void initializeRecommendationProductStore() {
-        for (Gender genderType : GENDERS) {
-            recommendationProductStore.put(genderType, new HashMap<>());
-            for (String ageRangeKey : AGE_RANGES) {
-                recommendationProductStore.get(genderType).put(ageRangeKey, new ArrayList<>());
-            }
-        }
-        updateRecommendationProductStore();
-    }
-
     private void saveInRecommendationProductStore(Gender gender, Map<String, List<Category>> genderCategories) {
         for (Map.Entry<String, List<Category>> entry : genderCategories.entrySet()) {
             String ageGroup = entry.getKey();
@@ -115,23 +101,10 @@ public class ProductRecommendationService {
                 List<Long> categoryProductIds = products.stream().map(Product::getId).collect(Collectors.toList());
                 productIds.addAll(categoryProductIds);
             }
-            recommendationProductStore.get(gender).get(ageGroup).addAll(productIds);
-        }
-    }
-
-    private String getAgeGroup(int age) {
-        if (age >= 10 && age <= 19) {
-            return "10";
-        } else if (age >= 20 && age <= 29) {
-            return "20";
-        } else if (age >= 30 && age <= 39) {
-            return "30";
-        } else if (age >= 40 && age <= 49) {
-            return "40";
-        } else if (age >= 50 && age <= 59) {
-            return "50";
-        } else {
-            return "60";
+            recommendationProductStore
+                .computeIfAbsent(gender, g -> new HashMap<>())
+                .computeIfAbsent(ageGroup, a -> new ArrayList<>())
+                .addAll(productIds);
         }
     }
 }
