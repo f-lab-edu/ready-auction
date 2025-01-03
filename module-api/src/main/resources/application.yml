@@ -29,3 +29,22 @@ spring:
       web:
         exposure:
           include: "prometheus"
+
+  #Fegin에 서킷 브레이커 적용 활성화
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        waitDurationInOpenState: 30s
+        slowCallRateThreshold: 80
+        slowCallDurationThreshold: 5s
+        registerHealthIndicator: true
+        recordFailurePredicate: com.example.moduleapi.service.httpClient.circuitBreaker.DefaultExceptionRecordFailurePredicate
+    instances:
+      recommendationServer:
+        baseConfig: default
