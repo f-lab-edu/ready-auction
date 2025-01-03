@@ -1,9 +1,10 @@
-package com.example.moduleapi.service.logging;
+package com.example.moduleapi.service.auction;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.repository.bidLogging.BidLoggingRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BidLoggingService {
