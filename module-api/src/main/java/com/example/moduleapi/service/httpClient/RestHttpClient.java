@@ -1,4 +1,4 @@
-package com.example.moduleapi.service.HttpClient;
+package com.example.moduleapi.service.httpClient;
 
 import java.util.Base64;
 import java.util.List;
