@@ -20,7 +20,10 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
 
     //feginClient
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    //Circuit Breaker
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 
     // rest-docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
@@ -36,6 +39,12 @@ dependencies {
 
     // 모듈 의존성
     implementation project(':module-domain')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.0"
+    }
 }
 
 tasks.named('test') {
