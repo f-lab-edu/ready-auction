@@ -25,13 +25,21 @@ public class ProductListingService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductFindResponse> findRecommendationProducts(List<Long> productIds) {
+    public List<ProductFindResponse> findRecommendationProducts(List<Long> productIds, String keyword) {
         List<Product> products = findByIdIn(productIds);
+
+        // keyword 필터링
+        if (keyword != null && !keyword.isEmpty()) {
+            products = products.stream()
+                .filter(
+                    product -> product.getProductName().contains(keyword) || product.getDescription().contains(keyword))
+                .collect(Collectors.toList());
+        }
+
         List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
         return productFindResponses;
-
     }
 
     @Transactional(readOnly = true)
