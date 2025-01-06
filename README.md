@@ -6,7 +6,7 @@
 
 ### 시스템 아키텍처
 
-![ready-auction 시스템 아키텍처](ready-auction 시스템 아키텍처.png)
+![ready-auction 시스템 아키텍처](ready_auction_architecture.png)
 
 ### DB
 
