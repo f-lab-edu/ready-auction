@@ -20,6 +20,7 @@ import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.UnauthorizedEnrollException;
 import com.example.moduleapi.service.file.FileService;
 import com.example.moduleapi.service.httpClient.RestHttpClient;
+import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
@@ -37,8 +38,8 @@ public class ProductFacade {
     private final RestHttpClient restHttpClient;
 
     public ProductFacade(FileService fileService, ProductImageService productImageService,
-        ProductService productService,
-        ProductLikeService productLikeService, RestHttpClient restHttpClient) {
+                         ProductService productService,
+                         ProductLikeService productLikeService, RestHttpClient restHttpClient) {
         this.fileService = fileService;
         this.productImageService = productImageService;
         this.productService = productService;
@@ -66,32 +67,40 @@ public class ProductFacade {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
-        CustomUserDetails customUserDetails, String keyword,
-        ProductCondition productCondition, int pageNo, int pageSize, OrderBy order) {
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(CustomUserDetails customUserDetails,
+                                                                                         String keyword,
+                                                                                         ProductCondition productCondition,
+                                                                                         int pageNo,
+                                                                                         int pageSize,
+                                                                                         OrderBy order) {
         List<Product> products = productService.findProductWithCriteria(keyword, productCondition, pageNo, pageSize,
             order);
         List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-
+        /*
+        * 이 부분이 정렬/필터링하면서 함께 수정해야하는 부분
+        *
         if (keyword == null && productCondition == null && order == null) {
             List<ProductFindResponse> recommendationProducts = findRecommendationProducts(customUserDetails.getUser(),
-                pageNo, pageSize);
+                null, null, null);
             List<ProductFindResponse> result = combineAndGetProducts(productFindResponses,
                 recommendationProducts);
             return PagingResponse.from(result, pageNo);
         }
+         */
 
         return PagingResponse.from(productFindResponses, pageNo);
     }
 
-    private List<ProductFindResponse> findRecommendationProducts(User user, int pageNo, int pageSize) {
-        return restHttpClient.findRecommendationProducts(user, pageNo, pageSize);
+    private List<ProductFindResponse> findRecommendationProducts(User user, String keyword,
+                                                                 List<Category> categories,
+                                                                 List<ProductCondition> productConditions) {
+        return restHttpClient.findRecommendationProducts(user, keyword, categories, productConditions);
     }
 
     private List<ProductFindResponse> combineAndGetProducts(List<ProductFindResponse> original,
-        List<ProductFindResponse> recommendations) {
+                                                            List<ProductFindResponse> recommendations) {
         original.addAll(recommendations);
         Collections.shuffle(original);
 
@@ -108,7 +117,7 @@ public class ProductFacade {
 
     @Transactional
     public ProductResponse update(User user, Long productId, ProductUpdateRequest productUpdateRequest,
-        List<MultipartFile> images) {
+                                  List<MultipartFile> images) {
         validUpdateRequest(productUpdateRequest);
         Product product = productService.update(user, productId, productUpdateRequest);
         List<ProductImage> productImages = productImageService.getImage(productId);
