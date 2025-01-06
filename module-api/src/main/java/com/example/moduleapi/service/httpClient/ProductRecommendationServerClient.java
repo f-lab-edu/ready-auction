@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.service.httpClient.circuitBreaker.RecommendationFallBackMethod;
+import com.example.moduledomain.domain.product.Category;
+import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -22,7 +24,8 @@ public interface ProductRecommendationServerClient {
         @RequestHeader("Authorization") String authorizationHeader,
         @RequestParam("gender") Gender gender,
         @RequestParam("age") int age,
-        @RequestParam("pageNo") int pageNo,
-        @RequestParam("pageSize") int pageSize
+        @RequestParam String keyword,
+        @RequestParam List<Category> categories,
+        @RequestParam List<ProductCondition> productConditions
     );
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.moduleapi.controller.response.product.ProductFindResponse;
+import com.example.moduledomain.domain.product.Category;
+import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.User;
 
 @Service
@@ -17,15 +19,18 @@ public class RestHttpClient {
     }
 
     // 추천 상품 을 조회하는 메서드
-    public List<ProductFindResponse> findRecommendationProducts(User user, int pageNo, int pageSize) {
+    public List<ProductFindResponse> findRecommendationProducts(User user,
+                                                                String keyword,
+                                                                List<Category> categories,
+                                                                List<ProductCondition> productConditions) {
         String authorizationHeader = generateAuthorizationHeader(user);
-
         return productRecommendationClient.getRecommendationProduct(
             authorizationHeader,
             user.getGender(),
             user.getAge(),
-            pageNo,
-            pageSize
+            keyword,
+            categories,
+            productConditions
         );
     }
 

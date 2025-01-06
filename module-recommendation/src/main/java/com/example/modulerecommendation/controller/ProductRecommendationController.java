@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.moduledomain.domain.product.Category;
+import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
 import com.example.modulerecommendation.controller.response.ProductFindResponse;
 import com.example.modulerecommendation.service.ProductRecommendationService;
@@ -24,8 +26,10 @@ public class ProductRecommendationController {
     public List<ProductFindResponse> findRecommendationProducts(
         @RequestParam Gender gender,
         @RequestParam int age,
-        @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-        @RequestParam(value = "pageSize", defaultValue = "6", required = false) int pageSize) {
-        return productRecommendationService.getRecommendationProducts(gender, age, pageNo, pageSize);
+        @RequestParam String keyword,
+        @RequestParam List<Category> categories,
+        @RequestParam List<ProductCondition> productConditions) {
+        return productRecommendationService.getRecommendationProducts(gender, age, keyword, categories,
+            productConditions);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
+import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
 import com.example.moduledomain.repository.bidLogging.BidLoggingRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
@@ -23,29 +24,62 @@ public class ProductRecommendationService {
     private final ProductListingService productListingService;
     private final BidLoggingRepository bidLoggingRepository;
     private final ProductRepository productRepository;
-    private final Map<Gender, Map<String, List<Long>>> recommendationProductStore = new HashMap<>();
+    /*
+     * 성별 -> 나이대별 -> 카테고리별 -> 경매 상태 -> productId
+     * */
+    private final Map<Gender, Map<String, Map<Category, Map<ProductCondition, List<Long>>>>> recommendationProductStore = new HashMap<>();
 
     public ProductRecommendationService(ProductListingService productListingService,
-        BidLoggingRepository bidLoggingRepository, ProductRepository productRepository) {
+                                        BidLoggingRepository bidLoggingRepository,
+                                        ProductRepository productRepository) {
         this.productListingService = productListingService;
         this.bidLoggingRepository = bidLoggingRepository;
         this.productRepository = productRepository;
     }
 
-    public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, int pageNo,
-        int pageSize) {
+    public List<ProductFindResponse> getRecommendationProducts(Gender gender,
+                                                               int age,
+                                                               String keyword,
+                                                               List<Category> categories,
+                                                               List<ProductCondition> productConditions) {
+        /*
+         * 1. 카테고리별 필터
+         * 1.1 필터링한 카테고리 상품이 추천 상품 카테고리에 없으면 빈 리스트 반환
+         * 2. productCondition 필터
+         * 2.1 ProductConditon 필터링시 상품이 없으면 빈 리스트 반환
+         * 3. keyword 필터링은 ProductListingService에서 진행
+         * 3. 최종적인 ProductIds 조회 후 반환.
+         * */
         String ageGroup = AgeGroup.fromAge(age);
-        List<Long> recommendationProducts = recommendationProductStore.get(gender).get(ageGroup);
+        List<Long> recommendationProductIds = new ArrayList<>(); // 최종 추천 상품 ID 리스트
 
-        int totalSize = recommendationProducts.size();
-        int startIndex = pageNo * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalSize);
+        for (Category category : categories) {
+            Map<Category, Map<ProductCondition, List<Long>>> categoryMap = recommendationProductStore.
+                get(gender).
+                get(ageGroup);
 
-        if (startIndex >= totalSize) {
-            return Collections.emptyList();
+            if (categoryMap == null || categoryMap.isEmpty()) {
+                // 해당 성별과 나이대에 카테고리 상품이 없다면 빈 리스트 반환
+                return Collections.emptyList();
+            }
+
+            // 카테고리별 상품 상태
+            Map<ProductCondition, List<Long>> productConditionListMap = categoryMap.get(category);
+            if (productConditionListMap == null || productConditionListMap.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            for (ProductCondition productCondition : productConditions) {
+                List<Long> productIds = productConditionListMap.get(productCondition);
+                recommendationProductIds.addAll(productIds);
+            }
         }
 
-        return productListingService.findRecommendationProducts(recommendationProducts.subList(startIndex, endIndex));
+        // 최종적으로 추천된 상품이 없다면 빈 리스트 반환
+        if (recommendationProductIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return productListingService.findRecommendationProducts(recommendationProductIds, keyword);
     }
 
     @Scheduled(cron = "0 0 3 * * THU")
@@ -94,16 +128,19 @@ public class ProductRecommendationService {
         for (Map.Entry<String, List<Category>> entry : genderCategories.entrySet()) {
             String ageGroup = entry.getKey();
             List<Category> categories = entry.getValue();
-            List<Long> productIds = new ArrayList<>();
+
             for (Category category : categories) {
                 List<Product> products = productRepository.findByCategory(category);
-                List<Long> categoryProductIds = products.stream().map(Product::getId).collect(Collectors.toList());
-                productIds.addAll(categoryProductIds);
+
+                for (Product product : products) {
+                    recommendationProductStore
+                        .computeIfAbsent(gender, g -> new HashMap<>()) // 성별 키가 없으면 새로 생성
+                        .computeIfAbsent(ageGroup, a -> new HashMap<>()) // 나이대별 키가 없으면 새로 생성
+                        .computeIfAbsent(category, c -> new HashMap<>()) // 카테고리별 키가 없으면 새로 생성
+                        .computeIfAbsent(product.getProductCondition(), c -> new ArrayList<>()) // 카테고리별 키가 없으면 새로 생성
+                        .add(product.getId()); // 해당 카테고리의 productId 리스트에 추가
+                }
             }
-            recommendationProductStore
-                .computeIfAbsent(gender, g -> new HashMap<>())
-                .computeIfAbsent(ageGroup, a -> new ArrayList<>())
-                .addAll(productIds);
         }
     }
 }
