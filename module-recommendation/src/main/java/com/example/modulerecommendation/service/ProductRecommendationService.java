@@ -93,6 +93,15 @@ public class ProductRecommendationService {
                         }
                     }
                 }
+            }  // 카테고리가 비어있고 상품 상태만 필터링하려면 여기서 처리
+            else if (!productConditions.isEmpty()) {
+                // 카테고리 필터링이 없고, 경매 상품 상태만 필터링하는 경우
+                for (Map<ProductCondition, List<Long>> productConditionListMap : categoryMap.values()) {
+                    for (ProductCondition productCondition : productConditions) {
+                        List<Long> productIds = productConditionListMap.getOrDefault(productCondition, Collections.emptyList());
+                        recommendationProductIds.addAll(productIds);
+                    }
+                }
             }
         }
 
