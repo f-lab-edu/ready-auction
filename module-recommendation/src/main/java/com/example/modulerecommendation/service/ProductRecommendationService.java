@@ -53,25 +53,55 @@ public class ProductRecommendationService {
         String ageGroup = AgeGroup.fromAge(age);
         List<Long> recommendationProductIds = new ArrayList<>(); // 최종 추천 상품 ID 리스트
 
-        for (Category category : categories) {
-            Map<Category, Map<ProductCondition, List<Long>>> categoryMap = recommendationProductStore.
-                get(gender).
-                get(ageGroup);
+        Map<Category, Map<ProductCondition, List<Long>>> categoryMap = recommendationProductStore.
+            getOrDefault(gender, Collections.emptyMap()).
+            getOrDefault(ageGroup, Collections.emptyMap());
 
-            if (categoryMap == null || categoryMap.isEmpty()) {
-                // 해당 성별과 나이대에 카테고리 상품이 없다면 빈 리스트 반환
-                return Collections.emptyList();
+        // 해당 성별과 나이대에 카테고리 상품이 없다면 빈 리스트 반환
+        if (categoryMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 카테고리와 상품 상태 모두 필터링이 없다면 모든 추천 상품을 반환
+        if (categories.isEmpty() && productConditions.isEmpty()) {
+            for (Map<ProductCondition, List<Long>> conditionMap : categoryMap.values()) {
+                for (List<Long> productIds : conditionMap.values()) {
+                    recommendationProductIds.addAll(productIds);
+                }
             }
+        } else {
+            // 카테고리만 필터링된 경우
+            if (!categories.isEmpty()) {
+                for (Category category : categories) {
+                    Map<ProductCondition, List<Long>> productConditionListMap = categoryMap.getOrDefault(category, Collections.emptyMap());
 
-            // 카테고리별 상품 상태
-            Map<ProductCondition, List<Long>> productConditionListMap = categoryMap.get(category);
-            if (productConditionListMap == null || productConditionListMap.isEmpty()) {
-                return Collections.emptyList();
-            }
+                    if (productConditionListMap.isEmpty()) {
+                        continue;  // 해당 카테고리의 상품이 없다면 무시
+                    }
 
-            for (ProductCondition productCondition : productConditions) {
-                List<Long> productIds = productConditionListMap.get(productCondition);
-                recommendationProductIds.addAll(productIds);
+                    // 상품 상태만 필터링된 경우
+                    if (productConditions.isEmpty()) {
+                        // 상품 상태 필터링이 없으면, 해당 카테고리의 모든 상품을 추가
+                        for (List<Long> productIds : productConditionListMap.values()) {
+                            recommendationProductIds.addAll(productIds);
+                        }
+                    } else {
+                        // 카테고리와 상품 상태 둘 다 필터링된 경우
+                        for (ProductCondition productCondition : productConditions) {
+                            List<Long> productIds = productConditionListMap.getOrDefault(productCondition, Collections.emptyList());
+                            recommendationProductIds.addAll(productIds);
+                        }
+                    }
+                }
+            }  // 카테고리가 비어있고 상품 상태만 필터링하려면 여기서 처리
+            else if (!productConditions.isEmpty()) {
+                // 카테고리 필터링이 없고, 경매 상품 상태만 필터링하는 경우
+                for (Map<ProductCondition, List<Long>> productConditionListMap : categoryMap.values()) {
+                    for (ProductCondition productCondition : productConditions) {
+                        List<Long> productIds = productConditionListMap.getOrDefault(productCondition, Collections.emptyList());
+                        recommendationProductIds.addAll(productIds);
+                    }
+                }
             }
         }
 
@@ -95,7 +125,7 @@ public class ProductRecommendationService {
         Map<String, Map<Category, Long>> result = loggings.stream()
             .collect(
                 Collectors.groupingBy(bidLogging -> AgeGroup.fromAge(bidLogging.getAge()),
-                    Collectors.groupingBy(bidLogging -> bidLogging.getCategory(), Collectors.counting())
+                                      Collectors.groupingBy(bidLogging -> bidLogging.getCategory(), Collectors.counting())
                 ));
 
         return result;
