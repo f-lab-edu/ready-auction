@@ -1,12 +1,13 @@
 package com.example.moduleapi.service.file;
 
-import com.example.moduleapi.controller.response.ImageResponse;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.domain.user.User;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
+import com.example.moduledomain.response.ImageResponse;
 
 public interface FileService {
     List<ProductImage> uploadImages(User user, Product product, List<MultipartFile> images);
