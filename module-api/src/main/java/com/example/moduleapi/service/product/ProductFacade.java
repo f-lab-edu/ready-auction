@@ -20,7 +20,6 @@ import com.example.moduleapi.service.file.FileService;
 import com.example.moduleapi.service.httpClient.RestHttpClient;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
-import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.request.ProductFilter;
 import com.example.moduledomain.request.ProductFilterRequest;
@@ -66,7 +65,7 @@ public class ProductFacade {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(CustomUserDetails customUserDetails,
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(User user,
                                                                                          ProductFilterRequest productFilterRequest) {
         // 1. 일반 상품 조회
         List<Product> products = productService.findProductWithCriteria(productFilterRequest);
@@ -77,7 +76,7 @@ public class ProductFacade {
 
         // 2. 추천 상품 조회
         ProductFilter productFilter = productFilterRequest.getProductFilter();
-        List<ProductFindResponse> recommendationProducts = findRecommendationProducts(customUserDetails.getUser(), productFilter);
+        List<ProductFindResponse> recommendationProducts = findRecommendationProducts(user, productFilter);
 
         // 3. 일반 상품 + 추천 상품 combine
         List<ProductFindResponse> resultProductResponse = combineAndGetProducts(defaultProductFindResponses, recommendationProducts);
