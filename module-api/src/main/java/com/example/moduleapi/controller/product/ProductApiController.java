@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,13 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
-import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.service.product.ProductFacade;
-import com.example.moduledomain.domain.product.OrderBy;
-import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.CustomUserDetails;
+import com.example.moduledomain.request.ProductFilterRequest;
+import com.example.moduledomain.response.ProductFindResponse;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -48,16 +47,11 @@ public class ProductApiController {
         return productFacade.findById(id);
     }
 
-    @GetMapping
+    @PostMapping("/_search")
     public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
-        @RequestParam(value = "keyword", required = false) String keyword,
-        @RequestParam(value = "productCondition", required = false) ProductCondition productCondition,
-        @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
-        @RequestParam(value = "pageSize", defaultValue = DEFAULT_SIZE, required = false) int pageSize,
-        @RequestParam(value = "orderBy", required = false) OrderBy order) {
-        return productFacade.findProductsByCriteriaWithRecommendations(customUserDetails, keyword, productCondition,
-            pageNo, pageSize, order);
+        @RequestBody ProductFilterRequest productFilterRequest) {
+        return productFacade.findProductsByCriteriaWithRecommendations(customUserDetails, productFilterRequest);
     }
 
     @PutMapping("/{id}")
@@ -83,7 +77,7 @@ public class ProductApiController {
 
     @DeleteMapping("/{id}/likes")
     public ProductLikeResponse productLikeDelete(@AuthenticationPrincipal CustomUserDetails user,
-        @PathVariable Long id) {
+                                                 @PathVariable Long id) {
         return productFacade.productLikeDelete(user.getUser(), id);
     }
 
