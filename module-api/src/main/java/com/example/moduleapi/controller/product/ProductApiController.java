@@ -49,9 +49,9 @@ public class ProductApiController {
 
     @PostMapping("/_search")
     public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
-        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @AuthenticationPrincipal CustomUserDetails user,
         @RequestBody ProductFilterRequest productFilterRequest) {
-        return productFacade.findProductsByCriteriaWithRecommendations(customUserDetails, productFilterRequest);
+        return productFacade.findProductsByCriteriaWithRecommendations(user.getUser(), productFilterRequest);
     }
 
     @PutMapping("/{id}")
