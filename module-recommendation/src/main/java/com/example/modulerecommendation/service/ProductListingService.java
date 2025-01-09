@@ -10,8 +10,8 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.repository.product.ProductImageRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
-import com.example.modulerecommendation.controller.response.ImageResponse;
-import com.example.modulerecommendation.controller.response.ProductFindResponse;
+import com.example.moduledomain.response.ImageResponse;
+import com.example.moduledomain.response.ProductFindResponse;
 
 @Service
 public class ProductListingService {
@@ -58,6 +58,6 @@ public class ProductListingService {
         List<ImageResponse> imageResponses = productImages.stream()
             .map(ImageResponse::from)
             .collect(Collectors.toList());
-        return ProductFindResponse.from(product, imageResponses);
+        return ProductFindResponse.from(product, imageResponses, true);
     }
 }
