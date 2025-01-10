@@ -3,15 +3,15 @@ package com.example.moduleapi.service.httpClient;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.service.httpClient.circuitBreaker.RecommendationFallBackMethod;
-import com.example.moduledomain.domain.product.Category;
-import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
+import com.example.moduledomain.request.ProductFilter;
+import com.example.moduledomain.response.ProductFindResponse;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -19,13 +19,11 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @CircuitBreaker(name = "recommendationServer")
 public interface ProductRecommendationServerClient {
 
-    @GetMapping("/recommendations")
+    @PostMapping("/_recommendations")
     List<ProductFindResponse> getRecommendationProduct(
         @RequestHeader("Authorization") String authorizationHeader,
         @RequestParam("gender") Gender gender,
         @RequestParam("age") int age,
-        @RequestParam String keyword,
-        @RequestParam List<Category> categories,
-        @RequestParam List<ProductCondition> productConditions
+        @RequestBody ProductFilter productFilter
     );
 }

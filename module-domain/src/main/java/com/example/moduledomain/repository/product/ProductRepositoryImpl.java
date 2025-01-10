@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
+import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.repository.utils.QueryHelperUtils;
+import com.example.moduledomain.request.ProductFilterRequest;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -30,11 +32,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<Product> findProductsWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
-        int pageSize,
-        OrderBy order) {
-        // 정렬 조건 설정
+    public List<Product> findProductsWithCriteria(ProductFilterRequest productFilterRequest) {
+
+        String keyword = productFilterRequest.getProductFilter().getKeyword();
+        List<Category> categories = productFilterRequest.getProductFilter().getCategory();
+        List<ProductCondition> productConditions = productFilterRequest.getProductFilter().getProductCondition();
+        OrderBy order = productFilterRequest.getOrderBy();
+        int pageNo = productFilterRequest.getPageNo();
+        int pageSize = productFilterRequest.getPageSize();
+
         OrderSpecifier<?> orderSpecifier = order.toOrderSpecifier();
+
         if (order == OrderBy.LIKE) {
             NumberPath<Long> like = Expressions.numberPath(Long.class, "like");
             List<Tuple> result = jpaQueryFactory
@@ -42,7 +50,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .from(product)
                 .leftJoin(productLike).on(product.id.eq(productLike.productId))
                 .where(containsKeyword(keyword),
-                    filterProductCondition(productCondition))
+                       filterProductCondition(productConditions),
+                       filterCategories(categories))
                 .groupBy(product.id)
                 .orderBy(like.desc())
                 .offset(pageNo * pageSize)
@@ -57,7 +66,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return jpaQueryFactory
             .selectFrom(product)
             .where(containsKeyword(keyword),
-                filterProductCondition(productCondition))
+                   filterProductCondition(productConditions),
+                   filterCategories(categories))
             .orderBy(orderSpecifier)
             .offset(pageNo * pageSize)
             .limit(pageSize)
@@ -66,17 +76,23 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     public BooleanExpression containsKeyword(String keyword) {
         return QueryHelperUtils.ifNotNull(keyword,
-            () -> product.productName.containsIgnoreCase(keyword)
-                .or(product.description.containsIgnoreCase(keyword)));
+                                          () -> product.productName.containsIgnoreCase(keyword)
+                                              .or(product.description.containsIgnoreCase(keyword)));
     }
 
-    public BooleanExpression filterProductCondition(ProductCondition productCondition) {
-        LocalDateTime requestTime = LocalDateTime.now();
-        if (productCondition != null) {
-            return productCondition.checkCondition(requestTime);
+    public BooleanExpression filterProductCondition(List<ProductCondition> productConditions) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        product.startDate.after(currentTime).or(product.startDate.loe(currentTime)
+                                                    .and(product.closeDate.after(currentTime)));
+        if (!productConditions.isEmpty()) {
+            return product.productCondition.in(productConditions);
         }
         //상태가 null인 경우 기본적으로 READY와 ACTIVE 상태 필터링
-        return product.startDate.after(requestTime).or(product.startDate.loe(requestTime)
-            .and(product.closeDate.after(requestTime)));
+        return product.startDate.after(currentTime).or(product.startDate.loe(currentTime)
+                                                           .and(product.closeDate.after(currentTime)));
+    }
+
+    public BooleanExpression filterCategories(List<Category> categories) {
+        return QueryHelperUtils.ifNotEmpty(categories, () -> product.category.in(categories));
     }
 }

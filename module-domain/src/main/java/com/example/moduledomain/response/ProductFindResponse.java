@@ -1,4 +1,4 @@
-package com.example.modulerecommendation.controller.response;
+package com.example.moduledomain.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +21,18 @@ public class ProductFindResponse {
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
     private int startPrice;
+    private boolean recommended;
 
     @Builder
-    public ProductFindResponse(String userId, List<ImageResponse> imageResponses, String productName,
-        String description, Category category, LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
+    public ProductFindResponse(String userId,
+                               List<ImageResponse> imageResponses,
+                               String productName,
+                               String description,
+                               Category category,
+                               LocalDateTime startDate,
+                               LocalDateTime closeDate,
+                               int startPrice,
+                               boolean recommended) {
         this.userId = userId;
         this.imageResponses = imageResponses;
         this.productName = productName;
@@ -33,9 +41,12 @@ public class ProductFindResponse {
         this.startDate = startDate;
         this.closeDate = closeDate;
         this.startPrice = startPrice;
+        this.recommended = recommended;
     }
 
-    public static ProductFindResponse from(Product product, List<ImageResponse> imageResponses) {
+    public static ProductFindResponse from(Product product,
+                                           List<ImageResponse> imageResponses,
+                                           boolean recommended) {
         return ProductFindResponse.builder()
             .userId(product.getUserId())
             .imageResponses(imageResponses)
@@ -45,6 +56,7 @@ public class ProductFindResponse {
             .startDate(product.getStartDate())
             .closeDate(product.getCloseDate())
             .startPrice(product.getStartPrice())
+            .recommended(recommended)
             .build();
 
     }

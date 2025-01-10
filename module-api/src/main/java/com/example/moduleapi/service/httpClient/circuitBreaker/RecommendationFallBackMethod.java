@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.service.httpClient.ProductRecommendationServerClient;
-import com.example.moduledomain.domain.product.Category;
-import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
+import com.example.moduledomain.request.ProductFilter;
+import com.example.moduledomain.response.ProductFindResponse;
 
 @Component
 public class RecommendationFallBackMethod implements ProductRecommendationServerClient {
@@ -20,9 +19,7 @@ public class RecommendationFallBackMethod implements ProductRecommendationServer
     public List<ProductFindResponse> getRecommendationProduct(String authorizationHeader,
                                                               Gender gender,
                                                               int age,
-                                                              String keyword,
-                                                              List<Category> categories,
-                                                              List<ProductCondition> productConditions) {
+                                                              ProductFilter productFilter) {
         return new ArrayList<>();
     }
 }

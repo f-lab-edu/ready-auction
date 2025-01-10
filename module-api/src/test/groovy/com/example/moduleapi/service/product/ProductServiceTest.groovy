@@ -4,13 +4,14 @@ import com.example.moduleapi.controller.request.product.ProductSaveRequest
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest
 import com.example.moduleapi.exception.product.ProductNotPendingException
 import com.example.moduleapi.fixture.product.ProductFixtures
-import com.example.moduledomain.domain.product.Category
 import com.example.moduleapi.fixture.user.UserFixtures
-import com.example.moduledomain.domain.product.OrderBy
+import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.user.User
 import com.example.moduledomain.repository.product.ProductRepository
+import com.example.moduledomain.request.ProductFilter
+import com.example.moduledomain.request.ProductFilterRequest
 import spock.lang.Specification
 
 class ProductServiceTest extends Specification {
@@ -66,10 +67,18 @@ class ProductServiceTest extends Specification {
 
     def "상품 목록 조회"() {
         given:
-        String keyword = ""
-        int pageNo = 1
-        int pageSize = 3
-        OrderBy orderBy = OrderBy.LATEST
+        ProductFilter productFilter = new ProductFilter(
+                keyword: null,
+                productCondition: [],
+                category: []
+        )
+
+        ProductFilterRequest productFilterRequest = new ProductFilterRequest(
+                orderBy: null,
+                productFilter: productFilter,
+                pageNo: 0,
+                pageSize: 9
+        )
 
         List<Product> mockProducts = [
                 ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
@@ -77,10 +86,10 @@ class ProductServiceTest extends Specification {
                 ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE])
         ]
 
-        productRepository.findProductsWithCriteria(keyword, ProductFixtures.ACTIVE, pageNo, pageSize, orderBy) >> mockProducts
+        productRepository.findProductsWithCriteria(productFilterRequest) >> mockProducts
 
         when:
-        List<Product> result = productService.findProductWithCriteria(keyword, ProductFixtures.ACTIVE, pageNo, pageSize, orderBy)
+        List<Product> result = productService.findProductWithCriteria(productFilterRequest)
 
         then:
         result.size() == 3

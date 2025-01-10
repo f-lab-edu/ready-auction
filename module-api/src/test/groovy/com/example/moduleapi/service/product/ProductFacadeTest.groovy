@@ -2,16 +2,18 @@ package com.example.moduleapi.service.product
 
 import com.example.moduleapi.controller.request.product.ProductSaveRequest
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest
-import com.example.moduleapi.controller.response.ImageResponse
 import com.example.moduleapi.exception.product.NotFoundProductException
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.file.FileService
+import com.example.moduleapi.service.httpClient.RestHttpClient
 import com.example.moduledomain.domain.product.Category
-import com.example.moduledomain.domain.product.OrderBy
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductImage
 import com.example.moduledomain.domain.user.User
+import com.example.moduledomain.request.ProductFilter
+import com.example.moduledomain.request.ProductFilterRequest
+import com.example.moduledomain.response.ImageResponse
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
@@ -21,7 +23,8 @@ class ProductFacadeTest extends Specification {
     ProductImageService productImageService = Mock()
     ProductService productService = Mock()
     ProductLikeService productLikeService = Mock()
-    def productFacade = new ProductFacade(fileService, productImageService, productService, productLikeService)
+    RestHttpClient restHttpClient = Mock()
+    def productFacade = new ProductFacade(fileService, productImageService, productService, productLikeService, restHttpClient)
 
     def "상품 등록 성공"() {
         given:
@@ -129,10 +132,21 @@ class ProductFacadeTest extends Specification {
 
     def "상품 목록 조회"() {
         given:
-        String keyword = "test"
-        int pageNo = 1
-        int pageSize = 10
-        OrderBy orderBy = OrderBy.LATEST
+        ProductFilter productFilter = new ProductFilter(
+                keyword: null,
+                productCondition: [],
+                category: []
+        )
+
+        ProductFilterRequest productFilterRequest = new ProductFilterRequest(
+                orderBy: null,
+                productFilter: productFilter,
+                pageNo: 0,
+                pageSize: 9
+        )
+
+        User user = UserFixtures.createUser()
+
         List<Product> products = [
                 ProductFixtures.createProduct(["productName": "productName1"]),
                 ProductFixtures.createProduct(["productName": "productName2"]),
@@ -140,17 +154,13 @@ class ProductFacadeTest extends Specification {
         ]
 
         when:
-        def response = productFacade.findAll(keyword, ProductFixtures.READY, pageNo, pageSize, orderBy)
+        def response = productFacade.findProductsByCriteriaWithRecommendations(user, productFilterRequest)
 
         then:
-        1 * productService.findProductWithCriteria(keyword, ProductFixtures.READY, pageNo, pageSize, orderBy) >> products
-        response.pageNo == pageNo
+        1 * restHttpClient.findRecommendationProducts(_, _) >> []
+        1 * productService.findProductWithCriteria(productFilterRequest) >> products
+        response.pageNo == productFilterRequest.pageNo
         response.items.size() == 3
-
-        response.items[0].productName == "productName1"
-        response.items[1].productName == "productName2"
-        response.items[2].productName == "productName3"
-
     }
 
     def "상품 수정 성공"() {

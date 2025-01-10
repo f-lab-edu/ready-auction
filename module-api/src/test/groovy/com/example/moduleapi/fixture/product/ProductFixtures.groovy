@@ -1,11 +1,12 @@
 package com.example.moduleapi.fixture.product
 
-import com.example.moduleapi.controller.response.ImageResponse
-import com.example.moduleapi.controller.response.product.ProductFindResponse
+
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.product.ProductImage
+import com.example.moduledomain.response.ImageResponse
+import com.example.moduledomain.response.ProductFindResponse
 import org.springframework.mock.web.MockMultipartFile
 
 import java.time.LocalDateTime
@@ -44,6 +45,7 @@ class ProductFixtures {
                 .startDate(map.getOrDefault("startDate", 시작일) as LocalDateTime)
                 .closeDate(map.getOrDefault("closeDate", 종료일) as LocalDateTime)
                 .startPrice(map.getOrDefault("startPrice", 1000) as int)
+                .recommended(map.getOrDefault("recommended", false) as boolean)
                 .imageResponses([ProductFixtures.createImageResponse()])
                 .build()
     }

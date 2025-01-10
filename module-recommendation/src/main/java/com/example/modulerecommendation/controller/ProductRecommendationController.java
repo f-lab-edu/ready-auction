@@ -2,15 +2,15 @@ package com.example.modulerecommendation.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.moduledomain.domain.product.Category;
-import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
-import com.example.modulerecommendation.controller.response.ProductFindResponse;
+import com.example.moduledomain.request.ProductFilter;
+import com.example.moduledomain.response.ProductFindResponse;
 import com.example.modulerecommendation.service.ProductRecommendationService;
 
 @RestController
@@ -22,14 +22,11 @@ public class ProductRecommendationController {
         this.productRecommendationService = productRecommendationService;
     }
 
-    @GetMapping("/recommendations")
+    @PostMapping("/_recommendations")
     public List<ProductFindResponse> findRecommendationProducts(
         @RequestParam Gender gender,
         @RequestParam int age,
-        @RequestParam String keyword,
-        @RequestParam List<Category> categories,
-        @RequestParam List<ProductCondition> productConditions) {
-        return productRecommendationService.getRecommendationProducts(gender, age, keyword, categories,
-            productConditions);
+        @RequestBody ProductFilter productFilter) {
+        return productRecommendationService.getRecommendationProducts(gender, age, productFilter);
     }
 }

@@ -1,19 +1,20 @@
 package com.example.moduleapi.service.product;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.exception.product.NotFoundProductException;
 import com.example.moduleapi.exception.product.ProductNotPendingException;
 import com.example.moduleapi.exception.product.UnauthorizedProductAccessException;
-import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.repository.product.ProductRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import com.example.moduledomain.request.ProductFilterRequest;
 
 @Service
 public class ProductService {
@@ -34,7 +35,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Product findById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundProductException(id));
+            .orElseThrow(() -> new NotFoundProductException(id));
         return product;
     }
 
@@ -44,28 +45,23 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<Product> findProductWithCriteria(String keyword, ProductCondition productCondition, int pageNo,
-                                                 int pageSize,
-                                                 OrderBy order) {
-        if (order == null)
-            order = OrderBy.LATEST;
-        List<Product> products = productRepository.findProductsWithCriteria(keyword, productCondition, pageNo, pageSize,
-                order);
+    public List<Product> findProductWithCriteria(ProductFilterRequest productFilterRequest) {
+        List<Product> products = productRepository.findProductsWithCriteria(productFilterRequest);
         return products;
     }
 
     @Transactional
     public Product update(User user, Long productId, ProductUpdateRequest productUpdateRequest) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProductException(productId));
+            .orElseThrow(() -> new NotFoundProductException(productId));
         checkProductAccessPermission(product, user.getUserId());
 
         product.updateProductInfo(
-                productUpdateRequest.getProductName(),
-                productUpdateRequest.getDescription(),
-                productUpdateRequest.getStartDate(),
-                productUpdateRequest.getCloseDate(),
-                productUpdateRequest.getStartPrice()
+            productUpdateRequest.getProductName(),
+            productUpdateRequest.getDescription(),
+            productUpdateRequest.getStartDate(),
+            productUpdateRequest.getCloseDate(),
+            productUpdateRequest.getStartPrice()
         );
 
         return product;
@@ -74,7 +70,7 @@ public class ProductService {
     @Transactional
     public Long delete(User user, Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProductException(productId));
+            .orElseThrow(() -> new NotFoundProductException(productId));
 
         checkProductAccessPermission(product, user.getUserId());
         productRepository.deleteById(product.getId());

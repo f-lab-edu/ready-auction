@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.moduleapi.controller.request.auction.BidRequest;
 import com.example.moduleapi.controller.request.point.PointAmount;
 import com.example.moduleapi.controller.response.auction.BidResponse;
-import com.example.moduleapi.controller.response.product.ProductFindResponse;
 import com.example.moduleapi.exception.auction.BiddingFailException;
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException;
 import com.example.moduleapi.exception.auction.RedisLockInterruptedException;
@@ -24,6 +23,7 @@ import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.Gender;
 import com.example.moduledomain.domain.user.User;
+import com.example.moduledomain.response.ProductFindResponse;
 
 @Service
 public class AuctionService {
@@ -35,9 +35,12 @@ public class AuctionService {
     private final BidLoggingService bidLoggingService;
     private final PointService pointService;
 
-    public AuctionService(ProductFacade productFacade, HighestBidSseNotificationService bidSseNotificationService,
-        RedissonClient redissonClient, KafkaProducerService kafkaProducerService, BidLoggingService bidLoggingService,
-        PointService pointService) {
+    public AuctionService(ProductFacade productFacade,
+                          HighestBidSseNotificationService bidSseNotificationService,
+                          RedissonClient redissonClient,
+                          KafkaProducerService kafkaProducerService,
+                          BidLoggingService bidLoggingService,
+                          PointService pointService) {
         this.productFacade = productFacade;
         this.bidSseNotificationService = bidSseNotificationService;
         this.redissonClient = redissonClient;
@@ -60,7 +63,7 @@ public class AuctionService {
             currentHighestPrice = processBid(user, bidRequest, productId);
             kafkaProducerService.publishAuctionPriceChangeNotification(productId, currentHighestPrice);
             bidSseNotificationService.sendToAllUsers(productId, "최고가가 " + currentHighestPrice + "원으로 올랐습니다.",
-                "최고가 수정 알림");
+                                                     "최고가 수정 알림");
         } catch (InterruptedException e) {
             throw new RedisLockInterruptedException(productId, e);
         } finally {
@@ -70,7 +73,7 @@ public class AuctionService {
         }
 
         return BidResponse.from(productId,
-            calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
+                                calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
     }
 
     @Transactional
@@ -90,7 +93,7 @@ public class AuctionService {
 
         boolean isAuctionSuccessful = isAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
         BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(),
-            bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
+                                                 bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
         bidLoggingService.logging(bidLogging);
 
         if (userIdAndCurrentPrice == null) { // 최초 입찰
@@ -117,7 +120,7 @@ public class AuctionService {
     }
 
     private Long updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,
-        Long productId) {
+                                    Long productId) {
         Pair<Long, Long> newPair = Pair.of(user.getUser().getId(), Long.valueOf(bidRequest.getBiddingPrice()));
         bidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
         return Long.valueOf(bidRequest.getBiddingPrice());
@@ -136,7 +139,7 @@ public class AuctionService {
     }
 
     private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price,
-        boolean isAuctionSuccessful) {
+                                        boolean isAuctionSuccessful) {
         ProductFindResponse product = productFacade.findById(productId);
         return BidLogging.builder()
             .userId(userId)
