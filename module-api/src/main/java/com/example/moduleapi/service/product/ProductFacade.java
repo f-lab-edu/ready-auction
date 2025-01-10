@@ -1,7 +1,6 @@
 package com.example.moduleapi.service.product;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,24 +78,13 @@ public class ProductFacade {
         List<ProductFindResponse> recommendationProducts = findRecommendationProducts(user, productFilter);
 
         // 3. 일반 상품 + 추천 상품 combine
-        List<ProductFindResponse> resultProductResponse = combineAndGetProducts(defaultProductFindResponses, recommendationProducts);
+        defaultProductFindResponses.addAll(recommendationProducts);
 
-        return PagingResponse.from(resultProductResponse, productFilterRequest.getPageNo());
+        return PagingResponse.from(defaultProductFindResponses, productFilterRequest.getPageNo());
     }
 
     private List<ProductFindResponse> findRecommendationProducts(User user, ProductFilter productFilter) {
         return restHttpClient.findRecommendationProducts(user, productFilter);
-    }
-
-    private List<ProductFindResponse> combineAndGetProducts(List<ProductFindResponse> original,
-                                                            List<ProductFindResponse> recommendations) {
-        // 여기 추천 상품 개수 조절 해야할듯?
-        original.addAll(recommendations);
-        Collections.shuffle(original);
-
-        return original.stream()
-            .limit(6)
-            .collect(Collectors.toList());
     }
 
     private ProductFindResponse convertToProductFindResponse(Product product) {

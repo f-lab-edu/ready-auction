@@ -1,5 +1,6 @@
 package com.example.modulerecommendation.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,9 @@ public class ProductListingService {
         List<ProductFindResponse> productFindResponses = products.stream()
             .map(this::convertToProductFindResponse)
             .collect(Collectors.toList());
-        return productFindResponses;
+
+        Collections.shuffle(productFindResponses);
+        return productFindResponses.subList(0, Math.min(productFindResponses.size(), 3));
     }
 
     @Transactional(readOnly = true)
