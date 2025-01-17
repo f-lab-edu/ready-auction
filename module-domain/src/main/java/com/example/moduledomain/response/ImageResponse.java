@@ -1,4 +1,4 @@
-package com.example.modulerecommendation.controller.response;
+package com.example.moduledomain.response;
 
 import com.example.moduledomain.domain.product.ProductImage;
 
