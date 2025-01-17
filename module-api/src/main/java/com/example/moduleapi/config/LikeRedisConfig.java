@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 
 @Configuration
-public class RedisConfig {
+public class LikeRedisConfig {
     @Value("${spring.data.redis.like.host}")
     private String likeRedisHost;
 

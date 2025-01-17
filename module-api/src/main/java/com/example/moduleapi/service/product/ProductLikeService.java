@@ -1,23 +1,25 @@
 package com.example.moduleapi.service.product;
 
-import com.example.moduleapi.controller.response.product.ProductLikeResponse;
-import com.example.moduledomain.domain.user.User;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import com.example.moduleapi.controller.response.product.ProductLikeResponse;
+import com.example.moduledomain.domain.user.User;
 
 @Service
 public class ProductLikeService {
 
     private final RedisTemplate<Long, Long> redisTemplate;
 
-    public ProductLikeService(RedisTemplate<Long, Long> redisTemplate) {
+    public ProductLikeService(@Qualifier("likeRedisTemplate") RedisTemplate<Long, Long> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

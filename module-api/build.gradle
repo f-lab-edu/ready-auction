@@ -15,6 +15,7 @@ dependencies {
 
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.0' // Redisson
     implementation group: 'com.google.guava', name: 'guava', version: '33.2.0-jre' // guava
+    implementation 'org.springframework.session:spring-session-data-redis'
 
     //kafka
     implementation 'org.springframework.kafka:spring-kafka'
@@ -31,7 +32,7 @@ dependencies {
 
     // Prometheus & Grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // spock
     testImplementation('org.spockframework:spock-core:2.3-groovy-3.0')

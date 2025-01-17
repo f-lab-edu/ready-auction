@@ -16,9 +16,12 @@ spring:
       auction:
         host: localhost
         port: 26379
+      session:
+        host: localhost
+        port: 36379
 
   profiles:
     active: dev
-    
+
 server:
   port: 8083
