@@ -16,6 +16,9 @@ spring:
       auction:
         host: localhost
         port: 26379
+      session:
+        host: localhost
+        port: 36379
 
   profiles:
     active: dev
@@ -24,11 +27,11 @@ spring:
     level:
       root: TRACE
 
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: "prometheus"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
 
   #Fegin에 서킷 브레이커 적용 활성화
   cloud:
