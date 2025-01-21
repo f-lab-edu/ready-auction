@@ -22,13 +22,20 @@ public class WebSecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/auction/subscribe")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/docs/*")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/logout")).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers(new AntPathRequestMatcher("/actuator/**"))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/auction/subscribe"))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/docs/*"))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/users"))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/login"))
+                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/logout"))
+                .permitAll()
+                .anyRequest()
+                .authenticated()
         );
 
         http.sessionManagement(session -> session
@@ -37,7 +44,7 @@ public class WebSecurityConfig {
                 .maxSessionsPreventsLogin(true)); // 설정한 다중 로그인 허용 갯수를 초과하였을 시 처리 방법 true(초과시 새로운 로그인 차단)
 
         http.logout(logout -> logout
-                .logoutUrl("/api/v1/logout")
+                .logoutUrl("/api/v1/users/logout")
                 .logoutSuccessUrl("/api/v1/login")
                 .invalidateHttpSession(true)
         );
