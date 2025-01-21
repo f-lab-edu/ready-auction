@@ -1,6 +1,7 @@
 package com.example.moduleapi.service.point;
 
 import com.example.moduleapi.controller.request.point.PointAmount;
+import com.example.moduleapi.controller.response.point.PointResponse;
 import com.example.moduleapi.exception.point.PointDeductionFailedException;
 import com.example.moduledomain.domain.point.Point;
 import com.example.moduledomain.domain.user.CustomUserDetails;
@@ -17,16 +18,15 @@ public class PointService {
         this.pointRepository = pointRepository;
     }
 
-    // 포인트 충전
     @Transactional
-    public int chargePoint(CustomUserDetails userDetails, PointAmount pointAmount) {
+    public PointResponse chargePoint(CustomUserDetails userDetails, PointAmount pointAmount) {
         User user = userDetails.getUser();
         Point point = pointRepository.findByUserId(user.getId());
         point.plus(pointAmount.getAmount());
-        return point.getAmount();
+        int currentPoint = point.getAmount();
+        return PointResponse.from(currentPoint, String.format("포인트 %d원 충전 완료. [현재 포인트 잔액 : %d원]", pointAmount.getAmount(), currentPoint));
     }
 
-    // 포인트 차감
     @Transactional
     public int deductPoint(CustomUserDetails userDetails, PointAmount pointAmount) {
         User user = userDetails.getUser();
@@ -38,7 +38,6 @@ public class PointService {
         return point.getAmount();
     }
 
-    // 포인트 롤백
     @Transactional
     public void rollbackPoint(Long userId, int plusAmount) {
         Point point = pointRepository.findByUserId(userId);

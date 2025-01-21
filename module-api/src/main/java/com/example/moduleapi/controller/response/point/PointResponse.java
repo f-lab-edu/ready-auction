@@ -15,4 +15,11 @@ public class PointResponse {
         this.currentPoint = currentPoint;
         this.message = message;
     }
+
+    public static PointResponse from(int currentPoint, String message) {
+        return PointResponse.builder()
+                            .currentPoint(currentPoint)
+                            .message(message)
+                            .build();
+    }
 }
