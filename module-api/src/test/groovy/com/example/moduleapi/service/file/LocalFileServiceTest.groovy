@@ -28,7 +28,7 @@ class LocalFileServiceTest extends Specification {
         }
 
         Files.walk(Paths.get("fileTest"))
-                .filter(Files::isDirectory)  // 디렉토리만 필터링
+                .filter(Files::isDirectory)
                 .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList())
                 .forEach { Path -> Files.deleteIfExists(Path) }
@@ -95,14 +95,13 @@ class LocalFileServiceTest extends Specification {
                 imagePath: "fileTest/base/path/test-image.jpg"
         )]
         localFileService.loadImages(productImages) >> imagesResponse
-        // 테스트 전에 파일을 실제로 생성
         def testFile = FileBaseUrl.resolve("test-image.jpg")
         println(testFile)
         if (!Files.exists(FileBaseUrl)) {
-            Files.createDirectories(FileBaseUrl)  // 디렉토리가 없으면 생성
+            Files.createDirectories(FileBaseUrl)
         }
         if (!Files.exists(testFile)) {
-            Files.createFile(testFile)  // 더미 파일 생성
+            Files.createFile(testFile)
         }
 
         when:

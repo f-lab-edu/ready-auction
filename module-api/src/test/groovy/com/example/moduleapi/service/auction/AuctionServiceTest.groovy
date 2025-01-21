@@ -1,7 +1,6 @@
 package com.example.moduleapi.service.auction
 
 import com.example.moduleapi.controller.request.auction.BidRequest
-import com.example.moduleapi.controller.response.product.ProductFindResponse
 import com.example.moduleapi.exception.auction.BiddingFailException
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException
 import com.example.moduleapi.exception.point.PointDeductionFailedException
@@ -11,6 +10,7 @@ import com.example.moduleapi.service.point.PointService
 import com.example.moduleapi.service.product.ProductFacade
 import com.example.moduledomain.domain.user.CustomUserDetails
 import com.example.moduledomain.domain.user.User
+import com.example.moduledomain.response.ProductFindResponse
 import org.redisson.api.RLock
 import org.redisson.api.RMap
 import org.redisson.api.RedissonClient

@@ -1,6 +1,6 @@
 package com.example.moduleapi.fixture;
 
-import com.example.moduleapi.controller.response.ImageResponse;
+import com.example.moduledomain.response.ImageResponse;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -14,14 +14,11 @@ public class ImagesFixtures {
     public static String 이미지_경로 = "/images/products/test.jpg";
 
     public static List<ImageResponse> 이미지_응답 = Arrays.asList(new ImageResponse(원본_이미지_이름, 이미지_경로));
-    public static MockMultipartFile mockMultipartFile = new MockMultipartFile(이미지_이름, 원본_이미지_이름,
-            MediaType.IMAGE_JPEG_VALUE, 원본_이미지_이름.getBytes());
+    public static MockMultipartFile mockMultipartFile = new MockMultipartFile(이미지_이름, 원본_이미지_이름, MediaType.IMAGE_JPEG_VALUE, 원본_이미지_이름.getBytes());
 
     public static MockMultipartFile 비어있는_이미지 = new MockMultipartFile("images", "", "image/jpeg", new byte[0]);
     public static List<MockMultipartFile> mockMultipartFiles = Arrays.asList(
-            new MockMultipartFile("images", "image1.jpg", MediaType.IMAGE_JPEG_VALUE,
-                    "이미지 데이터 1".getBytes(StandardCharsets.UTF_8)),
-            new MockMultipartFile("images", "image2.jpg", MediaType.IMAGE_JPEG_VALUE,
-                    "이미지 데이터 2".getBytes(StandardCharsets.UTF_8))
+            new MockMultipartFile("images", "image1.jpg", MediaType.IMAGE_JPEG_VALUE, "이미지 데이터 1".getBytes(StandardCharsets.UTF_8)),
+            new MockMultipartFile("images", "image2.jpg", MediaType.IMAGE_JPEG_VALUE, "이미지 데이터 2".getBytes(StandardCharsets.UTF_8))
     );
 }
