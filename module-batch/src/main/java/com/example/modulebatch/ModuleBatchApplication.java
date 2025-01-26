@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ComponentScan(basePackages = {"com.example.modulebatch", "com.example.moduledomain", "com.example.moduleapi.*"})
+@ComponentScan(basePackages = {"com.example.modulebatch", "com.example.moduledomain", "com.example.moduleapi.service", "com.example.moduleapi.config"})
 public class ModuleBatchApplication {
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(ModuleBatchApplication.class);
