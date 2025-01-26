@@ -136,7 +136,7 @@ public class AuctionService {
 
     private double increaseRate(int previousPrice, int nextPrice) {
         double rate = ((double) (nextPrice - previousPrice) / previousPrice) * 100;
-        BigDecimal rateDecimal = new BigDecimal(rate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal rateDecimal = BigDecimal.valueOf(rate).setScale(2, RoundingMode.HALF_UP);
         return rateDecimal.doubleValue();
     }
 
