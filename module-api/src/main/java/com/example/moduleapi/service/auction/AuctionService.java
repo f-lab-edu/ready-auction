@@ -6,6 +6,7 @@ import com.example.moduleapi.controller.response.auction.BidResponse;
 import com.example.moduleapi.exception.auction.BiddingFailException;
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException;
 import com.example.moduleapi.exception.auction.RedisLockInterruptedException;
+import com.example.moduleapi.service.dto.BiddingSuccessfulResult;
 import com.example.moduleapi.service.point.PointService;
 import com.example.moduleapi.service.product.ProductFacade;
 import com.example.moduledomain.domain.bidLogging.BidLogging;
@@ -20,6 +21,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +36,8 @@ public class AuctionService {
     private final KafkaProducerService kafkaProducerService;
     private final BidLoggingService bidLoggingService;
     private final PointService pointService;
+
+    private static final int FIRST_BID = -1;
 
     public AuctionService(ProductFacade productFacade,
                           HighestBidSseNotificationService bidSseNotificationService,
@@ -53,16 +58,15 @@ public class AuctionService {
         isBiddingAvailable(user, bidRequest, productId);
 
         RLock lock = redissonClient.getLock("lock:" + productId);
-        Long currentHighestPrice;
+        BiddingSuccessfulResult bidResult;
 
         try {
             if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
                 throw new RedisLockAcquisitionException(productId);
             }
-            currentHighestPrice = processBid(user, bidRequest, productId);
-            kafkaProducerService.publishAuctionPriceChangeNotification(productId, currentHighestPrice);
-            bidSseNotificationService.sendToAllUsers(productId, "최고가가 " + currentHighestPrice + "원으로 올랐습니다.",
-                    "최고가 수정 알림");
+            bidResult = processBid(user, bidRequest, productId);
+            kafkaProducerService.publishAuctionPriceChangeNotification(productId, bidResult.getCurrentPrice());
+            bidSseNotificationService.sendToAllUsers(productId, "최고가가 " + bidResult.getCurrentPrice() + "원으로 올랐습니다.", "최고가 수정 알림");
         } catch (InterruptedException e) {
             throw new RedisLockInterruptedException(productId, e);
         } finally {
@@ -71,76 +75,72 @@ public class AuctionService {
             }
         }
 
-        return BidResponse.from(productId, calculateIncreaseRate(productId, currentHighestPrice, bidRequest.getBiddingPrice()));
+        return BidResponse.from(productId, bidResult.getRateOfIncrease());
     }
 
     @Transactional
-    public Optional<Pair<Long, Long>> getAuctionUserInfoByProductId(Long productId) {
-        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
-                String.valueOf(productId)); // productId : (userId, bestPrice)
-        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+    public Optional<Pair<Long, Integer>> getAuctionUserInfoByProductId(Long productId) {
+        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId)); // productId : (userId, bestPrice)
+        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
         return Optional.ofNullable(userIdAndCurrentPrice); // (userId, 최고가) 가져오기
     }
 
-    private Long processBid(CustomUserDetails customUserDetails, BidRequest bidRequest, Long productId) {
+    private BiddingSuccessfulResult processBid(CustomUserDetails customUserDetails, BidRequest bidRequest, Long productId) {
 
-        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(
-                String.valueOf(productId));// productId : (userId, bestPrice)
-        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId));// productId : (userId, bestPrice)
+        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가)
         User user = customUserDetails.getUser();
 
         boolean isAuctionSuccessful = isAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
-        BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(),
-                bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
+        BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(), bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
         bidLoggingService.logging(bidLogging);
 
         if (userIdAndCurrentPrice == null) { // 최초 입찰
-            return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
+            return updateRedisBidData(user, highestBidMap, bidRequest, productId);
         }
         if (bidRequest.getBiddingPrice() <= userIdAndCurrentPrice.getSecond()) {
             pointService.rollbackPoint(user.getId(), bidRequest.getBiddingPrice());
             throw new BiddingFailException(user.getUserId(), bidRequest.getBiddingPrice(), productId);
         }
 
-        pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond()
-                                                                                          .intValue());
-        return updateRedisBidData(customUserDetails, highestBidMap, bidRequest, productId);
+        pointService.rollbackPoint(userIdAndCurrentPrice.getFirst(), userIdAndCurrentPrice.getSecond());
+        return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 
-    private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
-        LocalDateTime biddingRequestTime = LocalDateTime.now();
-        ProductFindResponse product = productFacade.findById(productId);
-        if (biddingRequestTime.isAfter(product.getCloseDate())) {
-            throw new BiddingFailException(user.getUser()
-                                               .getUserId(), bidRequest.getBiddingPrice(), productId);
+    private BiddingSuccessfulResult updateRedisBidData(User user, RMap<Long, Pair<Long, Integer>> highestBidMap, BidRequest bidRequest, Long productId) {
+        Pair<Long, Integer> previousMap = highestBidMap.get(productId);
+
+        if (previousMap == null) { // 최초 입찰
+            Pair<Long, Integer> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
+            highestBidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
+            double rateOfIncrease = calculateIncreaseRate(productId, FIRST_BID, bidRequest.getBiddingPrice());
+            return BiddingSuccessfulResult.from(bidRequest.getBiddingPrice(), rateOfIncrease);
         }
 
-        PointAmount pointAmount = new PointAmount(bidRequest.getBiddingPrice());
-        pointService.deductPoint(user, pointAmount);
+        int previousPrice = previousMap.getSecond();
+        double rateOfIncrease = calculateIncreaseRate(productId, previousPrice, bidRequest.getBiddingPrice());
+
+        Pair<Long, Integer> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
+        highestBidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
+
+        return BiddingSuccessfulResult.from(bidRequest.getBiddingPrice(), rateOfIncrease);
     }
 
-    private Long updateRedisBidData(CustomUserDetails user, RMap<Long, Pair<Long, Long>> bidMap, BidRequest bidRequest,
-                                    Long productId) {
-        Pair<Long, Long> newPair = Pair.of(user.getUser()
-                                               .getId(), Long.valueOf(bidRequest.getBiddingPrice()));
-        bidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
-        return Long.valueOf(bidRequest.getBiddingPrice());
-    }
-
-    private double calculateIncreaseRate(Long productId, Long previousPrice, int nextPrice) {
-        if (previousPrice == nextPrice) { // 최초 입찰
+    private double calculateIncreaseRate(Long productId, int previousPrice, int nextPrice) {
+        if (previousPrice == FIRST_BID) { // 최초 입찰
             ProductFindResponse product = productFacade.findById(productId);
-            return increaseRate(Long.valueOf(product.getStartPrice()), nextPrice);
+            return increaseRate(product.getStartPrice(), nextPrice);
         }
         return increaseRate(previousPrice, nextPrice);
     }
 
-    private double increaseRate(Long previousPrice, int nextPrice) {
-        return ((double) (nextPrice - previousPrice) / previousPrice) * 100;
+    private double increaseRate(int previousPrice, int nextPrice) {
+        double rate = ((double) (nextPrice - previousPrice) / previousPrice) * 100;
+        BigDecimal rateDecimal = new BigDecimal(rate).setScale(2, RoundingMode.HALF_UP);
+        return rateDecimal.doubleValue();
     }
 
-    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price,
-                                        boolean isAuctionSuccessful) {
+    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
         ProductFindResponse product = productFacade.findById(productId);
         return BidLogging.builder()
                          .userId(userId)
@@ -153,11 +153,23 @@ public class AuctionService {
                          .build();
     }
 
-    private boolean isAuctionSuccessful(Pair<Long, Long> userIdAndCurrentPrice, BidRequest bidRequest) {
+    private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
+        LocalDateTime biddingRequestTime = LocalDateTime.now();
+        ProductFindResponse product = productFacade.findById(productId);
+        if (biddingRequestTime.isAfter(product.getCloseDate())) {
+            throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
+        }
+
+        PointAmount pointAmount = new PointAmount(bidRequest.getBiddingPrice());
+        pointService.deductPoint(user, pointAmount);
+    }
+
+    private boolean isAuctionSuccessful(Pair<Long, Integer> userIdAndCurrentPrice, BidRequest bidRequest) {
         if (userIdAndCurrentPrice == null) {
             return true;
         }
         return bidRequest.getBiddingPrice() > userIdAndCurrentPrice.getSecond();
     }
+
 
 }

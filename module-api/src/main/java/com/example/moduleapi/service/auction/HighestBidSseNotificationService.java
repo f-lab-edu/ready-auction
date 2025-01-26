@@ -1,24 +1,25 @@
 package com.example.moduleapi.service.auction;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import com.example.moduleapi.service.product.ProductFacade;
 import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.repository.auction.EmitterRepository;
 import com.example.moduledomain.response.ProductFindResponse;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Map;
 
 @Service
 public class HighestBidSseNotificationService {
     private final EmitterRepository emitterRepository;
     private final ProductFacade productFacade;
+
+    private static final String SSE_INIT_MESSAGE = "SSE CONNECT";
 
     public HighestBidSseNotificationService(EmitterRepository emitterRepository, ProductFacade productFacade) {
         this.emitterRepository = emitterRepository;
@@ -34,8 +35,7 @@ public class HighestBidSseNotificationService {
 
         // 503 에러 방지를 위한 데이터 전송
         // Emitter를 생성하고 나서 만료 시간까지 아무런 데이터도 보내지 않으면 재연결 요청시 503 Service Unavailable 에러가 발생할 수 있음.
-        send(emitter, user.getUser(), productId, "SSE Emitter Created. [userId=" + user.getUser().getUserId() + "]",
-             "SSE CONNECT.");
+        send(emitter, user.getUser(), productId, "SSE Emitter Created. [userId=" + user.getUser().getUserId() + "]", SSE_INIT_MESSAGE);
         return emitter;
     }
 
@@ -60,10 +60,10 @@ public class HighestBidSseNotificationService {
     private void send(SseEmitter sseEmitter, User user, Long productId, Object data, String comment) {
         try {
             sseEmitter.send(SseEmitter.event() // SSE 이벤트를 생성하고 해당 Emitter로 전송합.
-                                .id(productId.toString()) // 이벤트의 고유 ID (문자열 형태로 변환)
-                                .name("THE HIGHEST PRICE UPDATE") // 이벤트의 이름을 "THE HIGHEST PRICE UPDATE"로 지정
-                                .data(data) // 전송할 데이터
-                                .comment(comment)); // 이벤트에 대한 코멘트
+                                      .id(productId.toString()) // 이벤트의 고유 ID (문자열 형태로 변환)
+                                      .name("THE HIGHEST PRICE UPDATE") // 이벤트의 이름을 "THE HIGHEST PRICE UPDATE"로 지정
+                                      .data(data) // 전송할 데이터
+                                      .comment(comment)); // 이벤트에 대한 코멘트
         } catch (IOException e) {
             emitterRepository.deleteEmitter(user, productId);
             sseEmitter.completeWithError(e);

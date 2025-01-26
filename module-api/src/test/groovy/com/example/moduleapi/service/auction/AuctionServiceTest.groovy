@@ -31,6 +31,45 @@ class AuctionServiceTest extends Specification {
 
     AuctionService auctionService = new AuctionService(productFacade, bidSseNotificationService, redissonClient, kafkaProducerService, bidLoggingService, pointService)
 
+    def "경매 최초 입찰"() {
+        given:
+        // Redisson Lock 관련
+        RLock lock = Mock()
+        redissonClient.getLock(_) >> lock
+        lock.tryLock(5, 10, TimeUnit.SECONDS) >> true
+        lock.isHeldByCurrentThread() >> true
+
+        // 입찰 제시
+        BidRequest bidRequest = new BidRequest(7000)
+
+        // User 관련
+        User user = UserFixtures.createUser()
+        user.id = 1L
+        CustomUserDetails customUserDetails = Mock()
+        customUserDetails.getUser() >> user
+
+        // Redisson Map 관련
+        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
+        redissonClient.getMap(_) >> highestBidMap
+        Pair<Long, Integer> userIdAndCurrentPrice = null
+        highestBidMap.get(1L) >> userIdAndCurrentPrice
+
+        // Product 관련
+        ProductFindResponse productFindResponse = ProductFixtures.createProductFindResponse(
+                startPrice: 2000
+        )
+        productFacade.findById(1L) >> productFindResponse
+
+        when:
+        def response = auctionService.biddingPrice(customUserDetails, bidRequest, 1L)
+
+        then:
+        1 * lock.unlock()
+        1 * bidSseNotificationService.sendToAllUsers(_, _, _)
+        response.productId == 1L
+        response.rateOfIncrease == 250.0
+    }
+
     def "경매 입찰 성공"() {
         given:
         // Redisson Lock 관련
@@ -49,8 +88,10 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
+        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
         redissonClient.getMap(_) >> highestBidMap
+        Pair<Long, Integer> userIdAndCurrentPrice = Pair.of(user.id, 3000)
+        highestBidMap.get(1L) >> userIdAndCurrentPrice
 
         // Product 관련
         ProductFindResponse productFindResponse = ProductFixtures.createProductFindResponse()
@@ -63,6 +104,7 @@ class AuctionServiceTest extends Specification {
         1 * lock.unlock()
         1 * bidSseNotificationService.sendToAllUsers(_, _, _)
         response.productId == 1L
+        response.rateOfIncrease == 66.67
     }
 
     def "경매 마감으로 인한 입찰 실패"() {
@@ -132,10 +174,10 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
-        Pair<Long, Long> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
+        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
+        Pair<Long, Integer> userIdAndCurrentPrice = new Pair<>(1L, 7000)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
-        userIdAndCurrentPrice.getSecond() >> 7000L
+        userIdAndCurrentPrice.getSecond() >> 7000
         redissonClient.getMap(_) >> highestBidMap
 
         // Product 관련
@@ -168,8 +210,8 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
-        Pair<Long, Long> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
+        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
+        Pair<Long, Integer> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
         userIdAndCurrentPrice.getSecond() >> 7000L
         redissonClient.getMap(_) >> highestBidMap

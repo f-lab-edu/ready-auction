@@ -14,11 +14,11 @@ public class KafkaProducerService {
     }
 
     @Transactional
-    public void publishAuctionPriceChangeNotification(Long productId, Long newPrice) {
+    public void publishAuctionPriceChangeNotification(Long productId, int newPrice) {
         AuctionPriceChangeNotification notification = AuctionPriceChangeNotification.builder()
-                .productId(productId)
-                .newPrice(newPrice)
-                .build();
+                                                                                    .productId(productId)
+                                                                                    .newPrice(newPrice)
+                                                                                    .build();
 
         kafkaTemplate.send("Auction-Price-Change-Notification", notification);
 
