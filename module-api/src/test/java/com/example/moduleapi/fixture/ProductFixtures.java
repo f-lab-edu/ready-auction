@@ -8,13 +8,13 @@ import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.NotFoundProductException;
 import com.example.moduleapi.exception.product.ProductNotPendingException;
 import com.example.moduleapi.exception.product.UnauthorizedProductAccessException;
+import com.example.moduledomain.common.request.ProductFilter;
+import com.example.moduledomain.common.request.ProductFilterRequest;
+import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
-import com.example.moduledomain.request.ProductFilter;
-import com.example.moduledomain.request.ProductFilterRequest;
-import com.example.moduledomain.response.ProductFindResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;

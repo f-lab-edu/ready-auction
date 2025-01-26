@@ -1,6 +1,6 @@
 package com.example.moduleapi.fixture;
 
-import com.example.moduledomain.response.ImageResponse;
+import com.example.moduledomain.common.response.ImageResponse;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 

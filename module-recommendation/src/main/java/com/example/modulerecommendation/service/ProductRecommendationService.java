@@ -1,5 +1,7 @@
 package com.example.modulerecommendation.service;
 
+import com.example.moduledomain.common.request.ProductFilter;
+import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.bidLogging.BidLogging;
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
@@ -7,8 +9,6 @@ import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.Gender;
 import com.example.moduledomain.repository.bidLogging.BidLoggingRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
-import com.example.moduledomain.request.ProductFilter;
-import com.example.moduledomain.response.ProductFindResponse;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

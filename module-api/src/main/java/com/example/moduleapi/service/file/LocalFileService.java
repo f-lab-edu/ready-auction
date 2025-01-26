@@ -1,5 +1,18 @@
 package com.example.moduleapi.service.file;
 
+import com.example.moduleapi.exception.file.CreateDirectoryFailException;
+import com.example.moduleapi.exception.file.DeleteImageFailException;
+import com.example.moduleapi.exception.file.ImageFileUploadFailException;
+import com.example.moduledomain.common.response.ImageResponse;
+import com.example.moduledomain.domain.product.Product;
+import com.example.moduledomain.domain.product.ProductImage;
+import com.example.moduledomain.domain.user.User;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,20 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.example.moduleapi.exception.file.CreateDirectoryFailException;
-import com.example.moduleapi.exception.file.DeleteImageFailException;
-import com.example.moduleapi.exception.file.ImageFileUploadFailException;
-import com.example.moduledomain.domain.product.Product;
-import com.example.moduledomain.domain.product.ProductImage;
-import com.example.moduledomain.domain.user.User;
-import com.example.moduledomain.response.ImageResponse;
 
 @Service
 @Profile("dev")
@@ -52,8 +51,8 @@ public class LocalFileService implements FileService {
     @Override
     public List<ImageResponse> loadImages(List<ProductImage> productImages) {
         return productImages.stream()
-            .map(ImageResponse::from)
-            .collect(Collectors.toList());
+                            .map(ImageResponse::from)
+                            .collect(Collectors.toList());
     }
 
     @Override
@@ -99,19 +98,19 @@ public class LocalFileService implements FileService {
         String uuid = UUID.randomUUID().toString();
         String extension = StringUtils.getFilenameExtension(originalImageFile);
         StringBuilder newName = new StringBuilder()
-            .append(uuid)
-            .append(".")
-            .append(extension);
+                .append(uuid)
+                .append(".")
+                .append(extension);
         return String.valueOf(newName);
     }
 
     private String createSavedImageFullPath(String userId, String savedImageFileName) {
         StringBuilder fullDirectoryPath = new StringBuilder()
-            .append(baseUrl)
-            .append(File.separator)
-            .append(userId)
-            .append(File.separator)
-            .append(savedImageFileName);
+                .append(baseUrl)
+                .append(File.separator)
+                .append(userId)
+                .append(File.separator)
+                .append(savedImageFileName);
         return String.valueOf(fullDirectoryPath);
     }
 

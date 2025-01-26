@@ -8,9 +8,9 @@ import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.point.PointService
 import com.example.moduleapi.service.product.ProductFacade
+import com.example.moduledomain.common.response.ProductFindResponse
 import com.example.moduledomain.domain.user.CustomUserDetails
 import com.example.moduledomain.domain.user.User
-import com.example.moduledomain.response.ProductFindResponse
 import org.redisson.api.RLock
 import org.redisson.api.RMap
 import org.redisson.api.RedissonClient

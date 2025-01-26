@@ -1,12 +1,11 @@
 package com.example.moduleapi.fixture.product
 
-
+import com.example.moduledomain.common.response.ImageResponse
+import com.example.moduledomain.common.response.ProductFindResponse
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.product.ProductImage
-import com.example.moduledomain.response.ImageResponse
-import com.example.moduledomain.response.ProductFindResponse
 import org.springframework.mock.web.MockMultipartFile
 
 import java.time.LocalDateTime

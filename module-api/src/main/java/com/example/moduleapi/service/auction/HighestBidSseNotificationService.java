@@ -1,10 +1,10 @@
 package com.example.moduleapi.service.auction;
 
 import com.example.moduleapi.service.product.ProductFacade;
+import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.user.CustomUserDetails;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.repository.auction.EmitterRepository;
-import com.example.moduledomain.response.ProductFindResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

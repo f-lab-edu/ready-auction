@@ -1,11 +1,11 @@
 package com.example.modulerecommendation.service;
 
+import com.example.moduledomain.common.response.ImageResponse;
+import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.repository.product.ProductImageRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
-import com.example.moduledomain.response.ImageResponse;
-import com.example.moduledomain.response.ProductFindResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

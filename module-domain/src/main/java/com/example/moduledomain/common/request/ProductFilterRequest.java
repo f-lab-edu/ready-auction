@@ -1,7 +1,6 @@
-package com.example.moduledomain.request;
+package com.example.moduledomain.common.request;
 
 import com.example.moduledomain.domain.product.OrderBy;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,14 +1,5 @@
 package com.example.moduleapi.service.product;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
@@ -17,14 +8,22 @@ import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.UnauthorizedEnrollException;
 import com.example.moduleapi.service.file.FileService;
 import com.example.moduleapi.service.httpClient.RestHttpClient;
+import com.example.moduledomain.common.request.ProductFilter;
+import com.example.moduledomain.common.request.ProductFilterRequest;
+import com.example.moduledomain.common.response.ImageResponse;
+import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.domain.user.User;
-import com.example.moduledomain.request.ProductFilter;
-import com.example.moduledomain.request.ProductFilterRequest;
-import com.example.moduledomain.response.ImageResponse;
-import com.example.moduledomain.response.ProductFindResponse;
 import com.google.common.base.Preconditions;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductFacade {
@@ -69,9 +68,9 @@ public class ProductFacade {
         // 1. 일반 상품 조회
         List<Product> products = productService.findProductWithCriteria(productFilterRequest);
         List<ProductFindResponse> defaultProductFindResponses = products
-            .stream()
-            .map(this::convertToProductFindResponse)
-            .collect(Collectors.toList());
+                .stream()
+                .map(this::convertToProductFindResponse)
+                .collect(Collectors.toList());
 
         // 2. 추천 상품 조회
         ProductFilter productFilter = productFilterRequest.getProductFilter();

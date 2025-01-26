@@ -1,9 +1,9 @@
 package com.example.moduledomain.repository.product;
 
-import java.util.List;
-
+import com.example.moduledomain.common.request.ProductFilterRequest;
 import com.example.moduledomain.domain.product.Product;
-import com.example.moduledomain.request.ProductFilterRequest;
+
+import java.util.List;
 
 public interface ProductRepositoryCustom {
 
