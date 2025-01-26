@@ -18,7 +18,6 @@ import java.util.Map;
 public class HighestBidSseNotificationService {
     private final EmitterRepository emitterRepository;
     private final ProductFacade productFacade;
-
     private static final String SSE_INIT_MESSAGE = "SSE CONNECT";
 
     public HighestBidSseNotificationService(EmitterRepository emitterRepository, ProductFacade productFacade) {
@@ -44,7 +43,6 @@ public class HighestBidSseNotificationService {
     public void subscribeCancel(CustomUserDetails user, Long productId) {
         // 특정 USER의 Emitter를 제거
         emitterRepository.deleteEmitter(user.getUser(), productId);
-
     }
 
     // 해당 경매에 참여한 User들에게 해당 경매 상품의 최고가가 갱신될때마다 SSE 알림.

@@ -13,7 +13,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
@@ -22,18 +21,12 @@ public class WebSecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(new AntPathRequestMatcher("/actuator/**"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/auction/subscribe"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/docs/*"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/users"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/login"))
-                .permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/logout"))
-                .permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/auction/subscribe")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/docs/*")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/logout")).permitAll()
                 .anyRequest()
                 .authenticated()
         );
@@ -48,7 +41,6 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/api/v1/login")
                 .invalidateHttpSession(true)
         );
-
         return http.build();
     }
 

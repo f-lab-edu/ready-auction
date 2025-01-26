@@ -56,11 +56,8 @@ public class LocalFileService implements FileService {
     }
 
     @Override
-    public List<ProductImage> updateImages(User user, Product product, List<ProductImage> productImages,
-                                           List<MultipartFile> images) {
-        // 기존 이미지 삭제
+    public List<ProductImage> updateImages(User user, Product product, List<ProductImage> productImages, List<MultipartFile> images) {
         this.deleteImages(productImages);
-        // 새로운 이미지 저장
         List<ProductImage> updateImages = this.uploadImages(user, product, images);
         return updateImages;
 
@@ -68,7 +65,6 @@ public class LocalFileService implements FileService {
 
     @Override
     public void deleteImages(List<ProductImage> productImages) {
-        //List<ImageResponse> imageResponses = this.loadImages(productImages);
         for (ProductImage productImage : productImages) {
             Path path = Path.of(productImage.getImageFullPath());
             try {

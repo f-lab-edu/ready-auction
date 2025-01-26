@@ -33,8 +33,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Product findById(Long id) {
-        Product product = productRepository.findById(id)
-                                           .orElseThrow(() -> new NotFoundProductException(id));
+        Product product = productRepository.findById(id).orElseThrow(() -> new NotFoundProductException(id));
         return product;
     }
 
@@ -51,25 +50,21 @@ public class ProductService {
 
     @Transactional
     public Product update(User user, Long productId, ProductUpdateRequest productUpdateRequest) {
-        Product product = productRepository.findById(productId)
-                                           .orElseThrow(() -> new NotFoundProductException(productId));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundProductException(productId));
         checkProductAccessPermission(product, user.getUserId());
 
-        product.updateProductInfo(
-                productUpdateRequest.getProductName(),
-                productUpdateRequest.getDescription(),
-                productUpdateRequest.getStartDate(),
-                productUpdateRequest.getCloseDate(),
-                productUpdateRequest.getStartPrice()
-        );
+        product.updateProductInfo(productUpdateRequest.getProductName(),
+                                  productUpdateRequest.getDescription(),
+                                  productUpdateRequest.getStartDate(),
+                                  productUpdateRequest.getCloseDate(),
+                                  productUpdateRequest.getStartPrice());
 
         return product;
     }
 
     @Transactional
     public Long delete(User user, Long productId) {
-        Product product = productRepository.findById(productId)
-                                           .orElseThrow(() -> new NotFoundProductException(productId));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundProductException(productId));
 
         checkProductAccessPermission(product, user.getUserId());
         productRepository.deleteById(product.getId());

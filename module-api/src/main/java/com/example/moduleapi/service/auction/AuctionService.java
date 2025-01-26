@@ -87,8 +87,8 @@ public class AuctionService {
 
     private BiddingSuccessfulResult processBid(CustomUserDetails customUserDetails, BidRequest bidRequest, Long productId) {
 
-        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId));// productId : (userId, bestPrice)
-        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가)
+        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId));
+        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId);
         User user = customUserDetails.getUser();
 
         boolean isAuctionSuccessful = isAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
@@ -112,7 +112,7 @@ public class AuctionService {
 
         if (previousMap == null) { // 최초 입찰
             Pair<Long, Integer> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
-            highestBidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
+            highestBidMap.put(productId, newPair);
             double rateOfIncrease = calculateIncreaseRate(productId, FIRST_BID, bidRequest.getBiddingPrice());
             return BiddingSuccessfulResult.from(bidRequest.getBiddingPrice(), rateOfIncrease);
         }
@@ -127,7 +127,7 @@ public class AuctionService {
     }
 
     private double calculateIncreaseRate(Long productId, int previousPrice, int nextPrice) {
-        if (previousPrice == FIRST_BID) { // 최초 입찰
+        if (previousPrice == FIRST_BID) {
             ProductFindResponse product = productFacade.findById(productId);
             return increaseRate(product.getStartPrice(), nextPrice);
         }
@@ -140,22 +140,10 @@ public class AuctionService {
         return rateDecimal.doubleValue();
     }
 
-    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
-        ProductFindResponse product = productFacade.findById(productId);
-        return BidLogging.builder()
-                         .userId(userId)
-                         .productId(productId)
-                         .category(product.getCategory())
-                         .age(age)
-                         .gender(gender)
-                         .price(price)
-                         .isAuctionSuccessful(isAuctionSuccessful)
-                         .build();
-    }
-
     private void isBiddingAvailable(CustomUserDetails user, BidRequest bidRequest, Long productId) {
         LocalDateTime biddingRequestTime = LocalDateTime.now();
         ProductFindResponse product = productFacade.findById(productId);
+
         if (biddingRequestTime.isAfter(product.getCloseDate())) {
             throw new BiddingFailException(user.getUser().getUserId(), bidRequest.getBiddingPrice(), productId);
         }
@@ -171,5 +159,16 @@ public class AuctionService {
         return bidRequest.getBiddingPrice() > userIdAndCurrentPrice.getSecond();
     }
 
-
+    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
+        ProductFindResponse product = productFacade.findById(productId);
+        return BidLogging.builder()
+                         .userId(userId)
+                         .productId(productId)
+                         .category(product.getCategory())
+                         .age(age)
+                         .gender(gender)
+                         .price(price)
+                         .isAuctionSuccessful(isAuctionSuccessful)
+                         .build();
+    }
 }

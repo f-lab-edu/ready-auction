@@ -16,7 +16,6 @@ public class RestHttpClient {
         this.productRecommendationClient = productRecommendationClient;
     }
 
-    // 추천 상품 을 조회하는 메서드
     public List<ProductFindResponse> findRecommendationProducts(User user, ProductFilter productFilter) {
         String authorizationHeader = generateAuthorizationHeader(user);
 

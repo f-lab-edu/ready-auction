@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/point")
 public class PointController {
-
     private final PointService pointService;
 
     public PointController(PointService pointService) {
@@ -21,9 +20,8 @@ public class PointController {
     }
 
     @PostMapping("/charge")
-    public PointResponse chargePoint(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody PointAmount pointAmount) {
+    public PointResponse chargePoint(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                     @RequestBody PointAmount pointAmount) {
         return pointService.chargePoint(customUserDetails, pointAmount);
     }
 }

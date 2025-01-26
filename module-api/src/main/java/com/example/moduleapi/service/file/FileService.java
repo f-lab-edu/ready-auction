@@ -13,8 +13,7 @@ public interface FileService {
 
     List<ImageResponse> loadImages(List<ProductImage> productImages);
 
-    List<ProductImage> updateImages(User user, Product product, List<ProductImage> productImages,
-                                    List<MultipartFile> images);
+    List<ProductImage> updateImages(User user, Product product, List<ProductImage> productImages, List<MultipartFile> images);
 
     void deleteImages(List<ProductImage> productImages);
 

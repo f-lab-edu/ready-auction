@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProductFixtures {
-
     public static String 상품_이름 = "testProductName";
     public static String 상품_설명 = "Test Description";
     public static LocalDateTime 현재시간 = LocalDateTime.now();
@@ -28,8 +27,13 @@ public class ProductFixtures {
     public static Category 카테고리 = Category.ELECTRONICS;
     public static int 시작가격 = 50000;
 
-    private static ProductSaveRequest createProductSaveRequest(String userId, String productName, String description, Category category,
-                                                               LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
+    private static ProductSaveRequest createProductSaveRequest(String userId,
+                                                               String productName,
+                                                               String description,
+                                                               Category category,
+                                                               LocalDateTime startDate,
+                                                               LocalDateTime closeDate,
+                                                               int startPrice) {
         return ProductSaveRequest.builder()
                                  .userId(userId)
                                  .productName(productName)

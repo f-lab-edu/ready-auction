@@ -33,9 +33,11 @@ public class ProductFacade {
     private final ProductLikeService productLikeService;
     private final RestHttpClient restHttpClient;
 
-    public ProductFacade(FileService fileService, ProductImageService productImageService,
+    public ProductFacade(FileService fileService,
+                         ProductImageService productImageService,
                          ProductService productService,
-                         ProductLikeService productLikeService, RestHttpClient restHttpClient) {
+                         ProductLikeService productLikeService,
+                         RestHttpClient restHttpClient) {
         this.fileService = fileService;
         this.productImageService = productImageService;
         this.productService = productService;
@@ -63,8 +65,7 @@ public class ProductFacade {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(User user,
-                                                                                         ProductFilterRequest productFilterRequest) {
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(User user, ProductFilterRequest productFilterRequest) {
         // 1. 일반 상품 조회
         List<Product> products = productService.findProductWithCriteria(productFilterRequest);
         List<ProductFindResponse> defaultProductFindResponses = products
@@ -93,8 +94,7 @@ public class ProductFacade {
     }
 
     @Transactional
-    public ProductResponse update(User user, Long productId, ProductUpdateRequest productUpdateRequest,
-                                  List<MultipartFile> images) {
+    public ProductResponse update(User user, Long productId, ProductUpdateRequest productUpdateRequest, List<MultipartFile> images) {
         validUpdateRequest(productUpdateRequest);
         Product product = productService.update(user, productId, productUpdateRequest);
         List<ProductImage> productImages = productImageService.getImage(productId);

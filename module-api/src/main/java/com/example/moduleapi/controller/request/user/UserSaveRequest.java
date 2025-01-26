@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class UserSaveRequest {
-
     private String name;
     private String userId;
     private String password;
@@ -20,7 +19,11 @@ public class UserSaveRequest {
     private Gender gender;
 
     @Builder
-    public UserSaveRequest(String name, String userId, String password, LocalDate birthDate, Gender gender) {
+    public UserSaveRequest(String name,
+                           String userId,
+                           String password,
+                           LocalDate birthDate,
+                           Gender gender) {
         this.name = name;
         this.userId = userId;
         this.password = password;
@@ -30,11 +33,11 @@ public class UserSaveRequest {
 
     public User toEntity() {
         return User.builder()
-                .userId(userId)
-                .name(name)
-                .role(Role.ROLE_USER)
-                .birthDate(birthDate)
-                .gender(gender)
-                .build();
+                   .userId(userId)
+                   .name(name)
+                   .role(Role.ROLE_USER)
+                   .birthDate(birthDate)
+                   .gender(gender)
+                   .build();
     }
 }

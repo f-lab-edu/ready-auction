@@ -36,12 +36,10 @@ public class UserApiController {
     }
 
     @PutMapping("/users/{userId}/changePassword")
-    public PasswordUpdateResponse update(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody PasswordUpdateRequest passwordUpdateRequest,
-            @PathVariable String userId) {
-        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(userDetails, passwordUpdateRequest,
-                userId);
+    public PasswordUpdateResponse update(@AuthenticationPrincipal UserDetails userDetails,
+                                         @RequestBody PasswordUpdateRequest passwordUpdateRequest,
+                                         @PathVariable String userId) {
+        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(userDetails, passwordUpdateRequest, userId);
         return passwordUpdateResponse;
     }
 
@@ -50,10 +48,8 @@ public class UserApiController {
         String userId = loginService.login(loginRequest);
         UserDetails userDetails = loginService.loadUserByUsername(String.valueOf(userId));
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-        SecurityContextHolder.getContext()
-                             .setAuthentication(authentication);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
         session.setMaxInactiveInterval(3600);
     }
 

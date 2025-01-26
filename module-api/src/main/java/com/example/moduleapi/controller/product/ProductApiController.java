@@ -19,17 +19,15 @@ import java.util.List;
 @RequestMapping("/api/v1/products")
 public class ProductApiController {
     private final ProductFacade productFacade;
-    private static final String DEFAULT_SIZE = "6";
 
     public ProductApiController(ProductFacade productFacade) {
         this.productFacade = productFacade;
     }
 
     @PostMapping
-    public ProductResponse enroll(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestPart(name = "product") ProductSaveRequest productSaveRequest,
-            @RequestPart(name = "images") List<MultipartFile> files) {
+    public ProductResponse enroll(@AuthenticationPrincipal CustomUserDetails user,
+                                  @RequestPart(name = "product") ProductSaveRequest productSaveRequest,
+                                  @RequestPart(name = "images") List<MultipartFile> files) {
         return productFacade.enroll(user.getUser(), productSaveRequest, files);
     }
 
@@ -39,30 +37,28 @@ public class ProductApiController {
     }
 
     @PostMapping("/_search")
-    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestBody ProductFilterRequest productFilterRequest) {
+    public PagingResponse<ProductFindResponse> findProductsByCriteriaWithRecommendations(@AuthenticationPrincipal CustomUserDetails user,
+                                                                                         @RequestBody ProductFilterRequest productFilterRequest) {
         return productFacade.findProductsByCriteriaWithRecommendations(user.getUser(), productFilterRequest);
     }
 
     @PutMapping("/{id}")
-    public ProductResponse update(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long id,
-            @RequestPart(name = "product") ProductUpdateRequest productUpdateRequest,
-            @RequestPart(name = "images") List<MultipartFile> files) {
+    public ProductResponse update(@AuthenticationPrincipal CustomUserDetails user,
+                                  @PathVariable Long id,
+                                  @RequestPart(name = "product") ProductUpdateRequest productUpdateRequest,
+                                  @RequestPart(name = "images") List<MultipartFile> files) {
         return productFacade.update(user.getUser(), id, productUpdateRequest, files);
     }
 
     @DeleteMapping("/{id}")
-    public ProductResponse delete(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long id) {
+    public ProductResponse delete(@AuthenticationPrincipal CustomUserDetails user,
+                                  @PathVariable Long id) {
         return productFacade.delete(user.getUser(), id);
     }
 
     @PostMapping("/{id}/likes")
-    public ProductLikeResponse productLike(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id) {
+    public ProductLikeResponse productLike(@AuthenticationPrincipal CustomUserDetails user,
+                                           @PathVariable Long id) {
         return productFacade.addLike(user.getUser(), id);
     }
 

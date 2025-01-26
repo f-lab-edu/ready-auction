@@ -43,8 +43,7 @@ public class ProductLikeService {
 
     @Transactional(readOnly = true)
     public List<Long> getUsersByProductId(Long productId) {
-        Set<Long> userIds = redisTemplate.opsForSet()
-                                         .members(productId);
+        Set<Long> userIds = redisTemplate.opsForSet().members(productId);
         if (userIds == null) {
             userIds = Collections.emptySet();
         }
@@ -53,8 +52,7 @@ public class ProductLikeService {
 
     @Transactional
     public int countProductLikesByProductId(Long productId) {
-        Long count = redisTemplate.opsForSet()
-                                  .size(productId);
+        Long count = redisTemplate.opsForSet().size(productId);
         return count == null ? 0 : count.intValue();
     }
 }

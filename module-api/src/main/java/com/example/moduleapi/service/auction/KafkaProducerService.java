@@ -21,6 +21,5 @@ public class KafkaProducerService {
                                                                                     .build();
 
         kafkaTemplate.send("Auction-Price-Change-Notification", notification);
-
     }
 }
