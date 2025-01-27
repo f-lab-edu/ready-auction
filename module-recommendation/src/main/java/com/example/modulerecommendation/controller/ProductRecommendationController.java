@@ -18,10 +18,9 @@ public class ProductRecommendationController {
     }
 
     @PostMapping("/_recommendations")
-    public List<ProductFindResponse> findRecommendationProducts(
-            @RequestParam Gender gender,
-            @RequestParam int age,
-            @RequestBody ProductFilter productFilter) {
+    public List<ProductFindResponse> findRecommendationProducts(@RequestParam Gender gender,
+                                                                @RequestParam int age,
+                                                                @RequestBody ProductFilter productFilter) {
         return productRecommendationService.getRecommendationProducts(gender, age, productFilter);
     }
 }

@@ -32,9 +32,7 @@ public class ProductRecommendationService {
         this.productRepository = productRepository;
     }
 
-    public List<ProductFindResponse> getRecommendationProducts(Gender gender,
-                                                               int age,
-                                                               ProductFilter productFilter) {
+    public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, ProductFilter productFilter) {
         /*
          * 1. 카테고리별 필터
          * 1.1 필터링한 카테고리 상품이 추천 상품 카테고리에 없으면 빈 리스트 반환
@@ -84,8 +82,7 @@ public class ProductRecommendationService {
                         }
                     }
                 }
-            }  // 카테고리가 비어있고 상품 상태만 필터링하려면 여기서 처리
-            else if (!productFilter.getProductCondition().isEmpty()) {
+            } else if (!productFilter.getProductCondition().isEmpty()) {
                 // 카테고리 필터링이 없고, 경매 상품 상태만 필터링하는 경우
                 for (Map<ProductCondition, List<Long>> productConditionListMap : categoryMap.values()) {
                     for (ProductCondition productCondition : productFilter.getProductCondition()) {
