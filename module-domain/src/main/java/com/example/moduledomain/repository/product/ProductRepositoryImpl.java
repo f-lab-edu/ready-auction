@@ -23,7 +23,6 @@ import static com.example.moduledomain.domain.product.QProductLike.productLike;
 
 @Repository
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
-
     private final JPAQueryFactory jpaQueryFactory;
 
     public ProductRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
@@ -74,21 +73,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     public BooleanExpression containsKeyword(String keyword) {
-        return QueryHelperUtils.ifNotNull(keyword,
-                                          () -> product.productName.containsIgnoreCase(keyword)
-                                                                   .or(product.description.containsIgnoreCase(keyword)));
+        return QueryHelperUtils.ifNotNull(keyword, () -> product.productName.containsIgnoreCase(keyword)
+                                                                            .or(product.description.containsIgnoreCase(keyword)));
     }
 
     public BooleanExpression filterProductCondition(List<ProductCondition> productConditions) {
         LocalDateTime currentTime = LocalDateTime.now();
-        product.startDate.after(currentTime).or(product.startDate.loe(currentTime)
-                                                                 .and(product.closeDate.after(currentTime)));
+        product.startDate.after(currentTime).or(product.startDate.loe(currentTime).and(product.closeDate.after(currentTime)));
         if (!productConditions.isEmpty()) {
             return product.productCondition.in(productConditions);
         }
         //상태가 null인 경우 기본적으로 READY와 ACTIVE 상태 필터링
-        return product.startDate.after(currentTime).or(product.startDate.loe(currentTime)
-                                                                        .and(product.closeDate.after(currentTime)));
+        return product.startDate.after(currentTime).or(product.startDate.loe(currentTime).and(product.closeDate.after(currentTime)));
     }
 
     public BooleanExpression filterCategories(List<Category> categories) {

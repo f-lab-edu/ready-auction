@@ -15,10 +15,10 @@ public class Point extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "point")
+    @Column(name = "point", nullable = false)
     private int amount;
 
     public void plus(int plusAmount) {

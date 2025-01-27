@@ -6,6 +6,5 @@ import com.example.moduledomain.domain.product.Product;
 import java.util.List;
 
 public interface ProductRepositoryCustom {
-
     List<Product> findProductsWithCriteria(ProductFilterRequest productFilterRequest);
 }
