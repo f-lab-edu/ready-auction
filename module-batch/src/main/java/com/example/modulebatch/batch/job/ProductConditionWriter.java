@@ -45,10 +45,10 @@ public class ProductConditionWriter implements ItemWriter<Product> {
         }
         auctionService.getAuctionUserInfoByProductId(product.getId()).ifPresent(userInfo -> {
             AuctionWinners auctionWinners = AuctionWinners.builder()
-                    .productId(product.getId())
-                    .userId(userInfo.getFirst())
-                    .price(userInfo.getSecond().intValue())
-                    .build();
+                                                          .productId(product.getId())
+                                                          .userId(userInfo.getFirst())
+                                                          .price(userInfo.getSecond())
+                                                          .build();
             auctionWinnersRepository.save(auctionWinners);
         });
     }

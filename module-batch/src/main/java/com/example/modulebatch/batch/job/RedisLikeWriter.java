@@ -1,13 +1,12 @@
 package com.example.modulebatch.batch.job;
 
-import java.util.List;
-
+import com.example.moduledomain.domain.product.ProductLike;
+import com.example.moduledomain.repository.product.ProductLikeRepository;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
-import com.example.moduledomain.domain.product.ProductLike;
-import com.example.moduledomain.repository.product.ProductLikeRepository;
+import java.util.List;
 
 @Component("RedisLikeWriter")
 public class RedisLikeWriter implements ItemWriter<List<ProductLike>> {
