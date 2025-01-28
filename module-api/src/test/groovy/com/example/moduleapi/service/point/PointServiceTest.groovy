@@ -23,14 +23,15 @@ class PointServiceTest extends Specification {
 
         PointAmount pointAmount = new PointAmount(10000)
         Point point = PointFixtures.createPoint()
+        point.amount = 150000
         pointRepository.findByUserId(1L) >> point
 
         when:
         def response = pointService.chargePoint(customUserDetails, pointAmount)
 
         then:
-        response == pointAmount.getAmount()
-        point.getAmount() == pointAmount.getAmount()
+        response.currentPoint == 160000
+        response.message == "포인트 10000원 충전 완료. [현재 포인트 잔액 : 160000원]"
     }
 
     def "포인트 사용"() {

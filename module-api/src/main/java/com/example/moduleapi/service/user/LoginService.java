@@ -30,8 +30,7 @@ public class LoginService implements UserDetailsService {
     @Transactional
     public String login(LoginRequest loginRequest) {
         validLoginRequest(loginRequest);
-        User user = userRepository.findByUserId(loginRequest.getUserId())
-                .orElseThrow(() -> new LoginFailException(loginRequest.getUserId()));
+        User user = userRepository.findByUserId(loginRequest.getUserId()).orElseThrow(() -> new LoginFailException(loginRequest.getUserId()));
 
         if (!bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getEncodedPassword())) {
             throw new LoginFailException(loginRequest.getUserId());
@@ -53,7 +52,6 @@ public class LoginService implements UserDetailsService {
     private void validLoginRequest(LoginRequest loginRequest) {
         // 검증: userId가 비어있지 않은지 확인
         Preconditions.checkArgument(!Strings.isNullOrEmpty(loginRequest.getUserId()), "아이디를 입력해주세요.");
-
         // 검증: password가 비어있지 않은지 확인
         Preconditions.checkArgument(!Strings.isNullOrEmpty(loginRequest.getPassword()), "비밀번호를 입력해주세요.");
     }

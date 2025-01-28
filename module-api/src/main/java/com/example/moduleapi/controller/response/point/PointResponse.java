@@ -7,12 +7,19 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PointResponse {
-    private int currentPoint;
+    private Long currentPoint;
     private String message;
 
     @Builder
-    public PointResponse(int currentPoint, String message) {
+    public PointResponse(Long currentPoint, String message) {
         this.currentPoint = currentPoint;
         this.message = message;
+    }
+
+    public static PointResponse from(Long currentPoint, String message) {
+        return PointResponse.builder()
+                            .currentPoint(currentPoint)
+                            .message(message)
+                            .build();
     }
 }

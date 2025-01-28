@@ -1,14 +1,13 @@
-package com.example.moduledomain.request;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.example.moduledomain.common.request;
 
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.ProductCondition;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor

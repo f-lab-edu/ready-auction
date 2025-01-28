@@ -35,7 +35,7 @@ public class Product extends BaseEntity {
     private LocalDateTime closeDate;
 
     @Column(name = "startPrice", nullable = false)
-    private int startPrice;
+    private Long startPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
@@ -46,7 +46,7 @@ public class Product extends BaseEntity {
     private ProductCondition productCondition;
 
     @Builder
-    public Product(String userId, String productName, String description, LocalDateTime startDate, LocalDateTime closeDate, int startPrice, Category category, ProductCondition productCondition) {
+    public Product(String userId, String productName, String description, LocalDateTime startDate, LocalDateTime closeDate, Long startPrice, Category category, ProductCondition productCondition) {
         this.userId = userId;
         this.productName = productName;
         this.description = description;
@@ -58,7 +58,7 @@ public class Product extends BaseEntity {
     }
 
     public void updateProductInfo(String productName, String description, LocalDateTime startDate,
-                                  LocalDateTime closeDate, int startPrice) {
+                                  LocalDateTime closeDate, Long startPrice) {
         this.productName = productName;
         this.description = description;
         this.startDate = startDate;

@@ -7,13 +7,13 @@ import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.file.FileService
 import com.example.moduleapi.service.httpClient.RestHttpClient
+import com.example.moduledomain.common.request.ProductFilter
+import com.example.moduledomain.common.request.ProductFilterRequest
+import com.example.moduledomain.common.response.ImageResponse
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductImage
 import com.example.moduledomain.domain.user.User
-import com.example.moduledomain.request.ProductFilter
-import com.example.moduledomain.request.ProductFilterRequest
-import com.example.moduledomain.response.ImageResponse
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification

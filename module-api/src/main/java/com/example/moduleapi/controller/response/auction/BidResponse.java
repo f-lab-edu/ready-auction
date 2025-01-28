@@ -18,9 +18,9 @@ public class BidResponse {
 
     public static BidResponse from(Long productId, double rateOfIncrease) {
         return BidResponse.builder()
-            .productId(productId)
-            .rateOfIncrease(rateOfIncrease)
-            .build();
+                          .productId(productId)
+                          .rateOfIncrease(rateOfIncrease)
+                          .build();
     }
 
 }

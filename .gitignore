@@ -148,5 +148,6 @@ Images/*
 .gradle
 META-INF/*
 redis/*
+jenkins/*
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij

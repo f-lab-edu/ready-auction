@@ -38,12 +38,12 @@ public class EmitterService {
 
         try {
             emitter.send(SseEmitter.event()
-                    .id(emitterId)
-                    .name(name)
-                    .data(data));
+                                   .id(emitterId)
+                                   .name(name)
+                                   .data(data));
         } catch (IOException e) {
             kafkaEmitterRepository.deleteById(emitterId);
-            emitter.completeWithError(e); // 이게 필수인지는 모르겠음
+            emitter.completeWithError(e);
         }
     }
 }

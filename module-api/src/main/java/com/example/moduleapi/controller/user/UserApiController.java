@@ -36,12 +36,10 @@ public class UserApiController {
     }
 
     @PutMapping("/users/{userId}/changePassword")
-    public PasswordUpdateResponse update(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody PasswordUpdateRequest passwordUpdateRequest,
-            @PathVariable String userId) {
-        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(userDetails, passwordUpdateRequest,
-                userId);
+    public PasswordUpdateResponse update(@AuthenticationPrincipal UserDetails userDetails,
+                                         @RequestBody PasswordUpdateRequest passwordUpdateRequest,
+                                         @PathVariable String userId) {
+        PasswordUpdateResponse passwordUpdateResponse = userService.updatePassword(userDetails, passwordUpdateRequest, userId);
         return passwordUpdateResponse;
     }
 
@@ -49,15 +47,13 @@ public class UserApiController {
     public void login(@RequestBody LoginRequest loginRequest) {
         String userId = loginService.login(loginRequest);
         UserDetails userDetails = loginService.loadUserByUsername(String.valueOf(userId));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "",
-                userDetails.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
         session.setMaxInactiveInterval(3600);
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/users/logout")
     public void logout() {
         session.invalidate();
     }

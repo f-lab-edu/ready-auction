@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component("LikeRedisWriter")
-public class RedisLikeWriter implements ItemWriter<ProductLike> {
+@Component("RedisLikeWriter")
+public class RedisLikeWriter implements ItemWriter<List<ProductLike>> {
     private final ProductLikeRepository productLikeRepository;
 
     public RedisLikeWriter(ProductLikeRepository productLikeRepository) {
@@ -17,9 +17,9 @@ public class RedisLikeWriter implements ItemWriter<ProductLike> {
     }
 
     @Override
-    public void write(Chunk<? extends ProductLike> chunk) throws Exception {
-        List<? extends ProductLike> items = chunk.getItems();
-        productLikeRepository.saveAll(items);
-
+    public void write(Chunk<? extends List<ProductLike>> chunks) throws Exception {
+        for (List<ProductLike> productLikes : chunks) {
+            productLikeRepository.saveAll(productLikes);
+        }
     }
 }

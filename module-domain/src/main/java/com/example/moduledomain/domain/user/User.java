@@ -1,22 +1,15 @@
 package com.example.moduledomain.domain.user;
 
+import com.example.moduledomain.domain.BaseEntity;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Objects;
-
-import com.example.moduledomain.domain.BaseEntity;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -26,14 +19,27 @@ public class User extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
+
+    @Column(name = "userId", nullable = false)
     private String userId;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "encodedPassword", nullable = false)
     private String encodedPassword;
+
+    @Column(name = "birthDate", nullable = false)
     private LocalDate birthDate;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false)
     private Gender gender;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role = Role.ROLE_USER;
 
     @Builder
@@ -63,7 +69,7 @@ public class User extends BaseEntity implements Serializable {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        User user = (User)o;
+        User user = (User) o;
         return Objects.equals(getId(), user.getId());
     }
 

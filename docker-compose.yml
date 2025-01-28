@@ -85,3 +85,10 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT  # 외부만 PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: EXTERNAL  # 브로커 간 통신도 EXTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins
+    volumes:
+      - ./jenkins/:/var/jenkins_home
+    ports:
+      - "18080:8080"

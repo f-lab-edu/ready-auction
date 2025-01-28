@@ -1,7 +1,6 @@
 package com.example.moduleapi.service.auction
 
 import com.example.moduleapi.controller.request.auction.BidRequest
-import com.example.moduleapi.controller.response.product.ProductFindResponse
 import com.example.moduleapi.exception.auction.BiddingFailException
 import com.example.moduleapi.exception.auction.RedisLockAcquisitionException
 import com.example.moduleapi.exception.point.PointDeductionFailedException
@@ -9,6 +8,7 @@ import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
 import com.example.moduleapi.service.point.PointService
 import com.example.moduleapi.service.product.ProductFacade
+import com.example.moduledomain.common.response.ProductFindResponse
 import com.example.moduledomain.domain.user.CustomUserDetails
 import com.example.moduledomain.domain.user.User
 import org.redisson.api.RLock
@@ -31,7 +31,7 @@ class AuctionServiceTest extends Specification {
 
     AuctionService auctionService = new AuctionService(productFacade, bidSseNotificationService, redissonClient, kafkaProducerService, bidLoggingService, pointService)
 
-    def "경매 입찰 성공"() {
+    def "경매 최초 입찰"() {
         given:
         // Redisson Lock 관련
         RLock lock = Mock()
@@ -40,7 +40,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(7000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -51,6 +51,47 @@ class AuctionServiceTest extends Specification {
         // Redisson Map 관련
         RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
         redissonClient.getMap(_) >> highestBidMap
+        Pair<Long, Long> userIdAndCurrentPrice = null
+        highestBidMap.get(1L) >> userIdAndCurrentPrice
+
+        // Product 관련
+        ProductFindResponse productFindResponse = ProductFixtures.createProductFindResponse(
+                startPrice: 2000
+        )
+        productFacade.findById(1L) >> productFindResponse
+
+        when:
+        def response = auctionService.biddingPrice(customUserDetails, bidRequest, 1L)
+
+        then:
+        1 * lock.unlock()
+        1 * bidSseNotificationService.sendToAllUsers(_, _, _)
+        response.productId == 1L
+        response.rateOfIncrease == 250.0
+    }
+
+    def "경매 입찰 성공"() {
+        given:
+        // Redisson Lock 관련
+        RLock lock = Mock()
+        redissonClient.getLock(_) >> lock
+        lock.tryLock(5, 10, TimeUnit.SECONDS) >> true
+        lock.isHeldByCurrentThread() >> true
+
+        // 입찰 제시
+        BidRequest bidRequest = new BidRequest(5000L)
+
+        // User 관련
+        User user = UserFixtures.createUser()
+        user.id = 1L
+        CustomUserDetails customUserDetails = Mock()
+        customUserDetails.getUser() >> user
+
+        // Redisson Map 관련
+        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
+        redissonClient.getMap(_) >> highestBidMap
+        Pair<Long, Long> userIdAndCurrentPrice = Pair.of(user.id, 3000L)
+        highestBidMap.get(1L) >> userIdAndCurrentPrice
 
         // Product 관련
         ProductFindResponse productFindResponse = ProductFixtures.createProductFindResponse()
@@ -63,13 +104,14 @@ class AuctionServiceTest extends Specification {
         1 * lock.unlock()
         1 * bidSseNotificationService.sendToAllUsers(_, _, _)
         response.productId == 1L
+        response.rateOfIncrease == 66.67
     }
 
     def "경매 마감으로 인한 입찰 실패"() {
         given:
         LocalDateTime productAuctionClosedTime = LocalDateTime.of(2024, 11, 19, 12, 0, 0, 0);
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
         // User 관련
         User user = UserFixtures.createUser()
         user.id = 1L
@@ -96,7 +138,7 @@ class AuctionServiceTest extends Specification {
         redissonClient.getLock(_) >> lock
         lock.tryLock(5, 10, TimeUnit.SECONDS) >> false
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
         // User 관련
         User user = UserFixtures.createUser()
         user.id = 1L
@@ -123,7 +165,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -135,7 +177,7 @@ class AuctionServiceTest extends Specification {
         RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
         Pair<Long, Long> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
-        userIdAndCurrentPrice.getSecond() >> 7000L
+        userIdAndCurrentPrice.getSecond() >> 7000
         redissonClient.getMap(_) >> highestBidMap
 
         // Product 관련
@@ -159,7 +201,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
 
         // User 관련
         User user = UserFixtures.createUser()
