@@ -35,16 +35,16 @@ public class LikeBatchConfig {
     @Bean
     public Job readLikeInRedisJob() {
         return new JobBuilder("readLikeInRedisJob", jobRepository)
-            .start(updateProductLikeStep())
-            .build();
+                .start(updateProductLikeStep())
+                .build();
     }
 
     @Bean
     public Step updateProductLikeStep() {
         return new StepBuilder("updateProductLikeStep", jobRepository)
-            .chunk(CHUNK_SIZE, platformTransactionManager)
-            .reader(redisLikeReader)
-            .writer(redisLikeWriter)
-            .build();
+                .chunk(CHUNK_SIZE, platformTransactionManager)
+                .reader(redisLikeReader)
+                .writer(redisLikeWriter)
+                .build();
     }
 }

@@ -1,6 +1,5 @@
 package com.example.modulebatch;
 
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +7,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EnableBatchProcessing
 @ComponentScan(basePackages = {"com.example.modulebatch", "com.example.moduledomain", "com.example.moduleapi.service", "com.example.moduleapi.config"})
 public class ModuleBatchApplication {
     public static void main(String[] args) {

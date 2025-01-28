@@ -1,5 +1,7 @@
 package com.example.modulebatch.batch.config;
 
+import com.example.moduledomain.domain.product.Product;
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -13,10 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import com.example.moduledomain.domain.product.Product;
-
-import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
 public class ProductConditionBatchConfig {
@@ -44,27 +42,27 @@ public class ProductConditionBatchConfig {
     @Bean
     public Job updateProductConditionJob() {
         return new JobBuilder("updateProductCondition", jobRepository)
-            .start(updateProductConditionStep())
-            .build();
+                .start(updateProductConditionStep())
+                .build();
     }
 
     @Bean
     public Step updateProductConditionStep() {
         return new StepBuilder("updateProductConditionStep", jobRepository)
-            .chunk(CHUNK_SIZE, platformTransactionManager)
-            .reader(productReader())
-            .processor(productProcessor)
-            .writer(productConditionWriter)
-            .build();
+                .chunk(CHUNK_SIZE, platformTransactionManager)
+                .reader(productReader())
+                .processor(productProcessor)
+                .writer(productConditionWriter)
+                .build();
     }
 
     public JpaPagingItemReader<Product> productReader() {
         return new JpaPagingItemReaderBuilder<Product>()
-            .name("productReader")
-            .pageSize(CHUNK_SIZE)
-            .entityManagerFactory(entityManagerFactory)
-            .queryString("select p from Product p")
-            .build();
+                .name("productReader")
+                .pageSize(CHUNK_SIZE)
+                .entityManagerFactory(entityManagerFactory)
+                .queryString("select p from Product p")
+                .build();
     }
 
 }
