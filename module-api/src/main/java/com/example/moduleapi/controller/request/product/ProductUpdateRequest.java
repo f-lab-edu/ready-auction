@@ -13,14 +13,14 @@ public class ProductUpdateRequest {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
-    private int startPrice;
+    private Long startPrice;
 
     @Builder
     public ProductUpdateRequest(String productName,
                                 String description,
                                 LocalDateTime startDate,
                                 LocalDateTime closeDate,
-                                int startPrice) {
+                                Long startPrice) {
         this.productName = productName;
         this.description = description;
         this.startDate = startDate;

@@ -37,7 +37,7 @@ public class AuctionService {
     private final BidLoggingService bidLoggingService;
     private final PointService pointService;
 
-    private static final int FIRST_BID = -1;
+    private static final Long FIRST_BID = -1L;
 
     public AuctionService(ProductFacade productFacade,
                           HighestBidSseNotificationService bidSseNotificationService,
@@ -79,20 +79,20 @@ public class AuctionService {
     }
 
     @Transactional
-    public Optional<Pair<Long, Integer>> getAuctionUserInfoByProductId(Long productId) {
-        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId)); // productId : (userId, bestPrice)
-        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
+    public Optional<Pair<Long, Long>> getAuctionUserInfoByProductId(Long productId) {
+        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(String.valueOf(productId)); // productId : (userId, bestPrice)
+        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId); // (userId, 최고가) 가져오기
         return Optional.ofNullable(userIdAndCurrentPrice); // (userId, 최고가) 가져오기
     }
 
     private BiddingSuccessfulResult processBid(CustomUserDetails customUserDetails, BidRequest bidRequest, Long productId) {
 
-        RMap<Long, Pair<Long, Integer>> highestBidMap = redissonClient.getMap(String.valueOf(productId));
-        Pair<Long, Integer> userIdAndCurrentPrice = highestBidMap.get(productId);
+        RMap<Long, Pair<Long, Long>> highestBidMap = redissonClient.getMap(String.valueOf(productId));
+        Pair<Long, Long> userIdAndCurrentPrice = highestBidMap.get(productId);
         User user = customUserDetails.getUser();
 
         boolean isAuctionSuccessful = isAuctionSuccessful(userIdAndCurrentPrice, bidRequest);
-        BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(), bidRequest.getBiddingPrice(), user.getAge(), isAuctionSuccessful);
+        BidLogging bidLogging = createBidLogging(user.getId(), productId, user.getGender(), user.getAge(), bidRequest.getBiddingPrice(), isAuctionSuccessful);
         bidLoggingService.logging(bidLogging);
 
         if (userIdAndCurrentPrice == null) { // 최초 입찰
@@ -107,26 +107,26 @@ public class AuctionService {
         return updateRedisBidData(user, highestBidMap, bidRequest, productId);
     }
 
-    private BiddingSuccessfulResult updateRedisBidData(User user, RMap<Long, Pair<Long, Integer>> highestBidMap, BidRequest bidRequest, Long productId) {
-        Pair<Long, Integer> previousMap = highestBidMap.get(productId);
+    private BiddingSuccessfulResult updateRedisBidData(User user, RMap<Long, Pair<Long, Long>> highestBidMap, BidRequest bidRequest, Long productId) {
+        Pair<Long, Long> previousMap = highestBidMap.get(productId);
 
         if (previousMap == null) { // 최초 입찰
-            Pair<Long, Integer> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
+            Pair<Long, Long> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
             highestBidMap.put(productId, newPair);
             double rateOfIncrease = calculateIncreaseRate(productId, FIRST_BID, bidRequest.getBiddingPrice());
             return BiddingSuccessfulResult.from(bidRequest.getBiddingPrice(), rateOfIncrease);
         }
 
-        int previousPrice = previousMap.getSecond();
+        Long previousPrice = previousMap.getSecond();
         double rateOfIncrease = calculateIncreaseRate(productId, previousPrice, bidRequest.getBiddingPrice());
 
-        Pair<Long, Integer> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
+        Pair<Long, Long> newPair = Pair.of(user.getId(), bidRequest.getBiddingPrice());
         highestBidMap.put(productId, newPair); // productId에 대한 최고가 정보 업데이트
 
         return BiddingSuccessfulResult.from(bidRequest.getBiddingPrice(), rateOfIncrease);
     }
 
-    private double calculateIncreaseRate(Long productId, int previousPrice, int nextPrice) {
+    private double calculateIncreaseRate(Long productId, Long previousPrice, Long nextPrice) {
         if (previousPrice == FIRST_BID) {
             ProductFindResponse product = productFacade.findById(productId);
             return increaseRate(product.getStartPrice(), nextPrice);
@@ -134,7 +134,7 @@ public class AuctionService {
         return increaseRate(previousPrice, nextPrice);
     }
 
-    private double increaseRate(int previousPrice, int nextPrice) {
+    private double increaseRate(Long previousPrice, Long nextPrice) {
         double rate = ((double) (nextPrice - previousPrice) / previousPrice) * 100;
         BigDecimal rateDecimal = BigDecimal.valueOf(rate).setScale(2, RoundingMode.HALF_UP);
         return rateDecimal.doubleValue();
@@ -152,14 +152,14 @@ public class AuctionService {
         pointService.deductPoint(user, pointAmount);
     }
 
-    private boolean isAuctionSuccessful(Pair<Long, Integer> userIdAndCurrentPrice, BidRequest bidRequest) {
+    private boolean isAuctionSuccessful(Pair<Long, Long> userIdAndCurrentPrice, BidRequest bidRequest) {
         if (userIdAndCurrentPrice == null) {
             return true;
         }
         return bidRequest.getBiddingPrice() > userIdAndCurrentPrice.getSecond();
     }
 
-    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, int price, boolean isAuctionSuccessful) {
+    private BidLogging createBidLogging(Long userId, Long productId, Gender gender, int age, Long price, boolean isAuctionSuccessful) {
         ProductFindResponse product = productFacade.findById(productId);
         return BidLogging.builder()
                          .userId(userId)

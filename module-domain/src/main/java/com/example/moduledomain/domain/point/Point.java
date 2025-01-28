@@ -19,18 +19,18 @@ public class Point extends BaseEntity {
     private Long userId;
 
     @Column(name = "point", nullable = false)
-    private int amount;
+    private Long amount;
 
-    public void plus(int plusAmount) {
+    public void plus(Long plusAmount) {
         this.amount += plusAmount;
     }
 
-    public void minus(int minusAmount) {
+    public void minus(Long minusAmount) {
         this.amount -= minusAmount;
     }
 
     @Builder
-    public Point(Long userId, int amount) {
+    public Point(Long userId, Long amount) {
         this.userId = userId;
         this.amount = amount;
     }

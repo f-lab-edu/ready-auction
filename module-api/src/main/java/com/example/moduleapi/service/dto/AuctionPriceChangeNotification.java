@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuctionPriceChangeNotification {
     private Long productId;
-    private int newPrice;
+    private Long newPrice;
 
     @Builder
-    public AuctionPriceChangeNotification(Long productId, int newPrice) {
+    public AuctionPriceChangeNotification(Long productId, Long newPrice) {
         this.productId = productId;
         this.newPrice = newPrice;
     }

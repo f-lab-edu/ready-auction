@@ -18,7 +18,7 @@ public class ProductSaveRequest {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
-    private int startPrice;
+    private Long startPrice;
 
     @Builder
     public ProductSaveRequest(String userId,
@@ -27,7 +27,7 @@ public class ProductSaveRequest {
                               String description,
                               LocalDateTime startDate,
                               LocalDateTime closeDate,
-                              int startPrice) {
+                              Long startPrice) {
         this.userId = userId;
         this.productName = productName;
         this.category = category;

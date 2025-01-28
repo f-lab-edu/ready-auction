@@ -22,10 +22,10 @@ public class AuctionWinners {
     private Long productId;
 
     @Column(name = "price", nullable = false)
-    private int price;
+    private Long price;
 
     @Builder
-    public AuctionWinners(Long id, Long userId, Long productId, int price) {
+    public AuctionWinners(Long id, Long userId, Long productId, Long price) {
         this.userId = userId;
         this.productId = productId;
         this.price = price;

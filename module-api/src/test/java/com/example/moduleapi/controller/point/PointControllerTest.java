@@ -46,28 +46,28 @@ class PointControllerTest {
     @DisplayName("포인트 충전")
     @WithMockCustomUser
     public void pointChargeTest() throws Exception {
-        int chargedAmount = 100000;
-        int currentBalance = 150000;
+        Long chargedAmount = 100000L;
+        Long currentBalance = 150000L;
 
         when(pointService.chargePoint(
                 any(CustomUserDetails.class),
                 any(PointAmount.class))).thenReturn(PointFixtures.포인트_응답(chargedAmount, currentBalance));
 
         mockMvc.perform(post("/api/v1/point/charge")
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(PointFixtures.포인트_충전)))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(PointFixtures.포인트_충전)))
                .andExpect(status().isOk())
                .andDo(document("포인트 충전",
-                       preprocessRequest(prettyPrint()),
-                       preprocessResponse(prettyPrint()),
-                       requestFields(
-                               fieldWithPath("amount").type(JsonFieldType.NUMBER)
-                                                      .description("충전할 포인트")
-                       ),
-                       responseFields(
-                               fieldWithPath("currentPoint").description("현재 포인트 잔액"),
-                               fieldWithPath("message").description("충전된 포인트 금액과 현재 잔액을 포함한 메시지. 예시: '포인트 100000원 충전 완료. [현재 포인트 잔액 : 200000원]'")
-                       ))
+                               preprocessRequest(prettyPrint()),
+                               preprocessResponse(prettyPrint()),
+                               requestFields(
+                                       fieldWithPath("amount").type(JsonFieldType.NUMBER)
+                                                              .description("충전할 포인트")
+                               ),
+                               responseFields(
+                                       fieldWithPath("currentPoint").description("현재 포인트 잔액"),
+                                       fieldWithPath("message").description("충전된 포인트 금액과 현재 잔액을 포함한 메시지. 예시: '포인트 100000원 충전 완료. [현재 포인트 잔액 : 200000원]'")
+                               ))
                );
     }
 

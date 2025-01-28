@@ -44,7 +44,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         Point point = Point.builder()
                            .userId(user.getId())
-                           .amount(0)
+                           .amount(0L)
                            .build();
         pointRepository.save(point);
         return UserResponse.from(savedUser);

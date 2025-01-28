@@ -14,7 +14,7 @@ public class KafkaProducerService {
     }
 
     @Transactional
-    public void publishAuctionPriceChangeNotification(Long productId, int newPrice) {
+    public void publishAuctionPriceChangeNotification(Long productId, Long newPrice) {
         AuctionPriceChangeNotification notification = AuctionPriceChangeNotification.builder()
                                                                                     .productId(productId)
                                                                                     .newPrice(newPrice)

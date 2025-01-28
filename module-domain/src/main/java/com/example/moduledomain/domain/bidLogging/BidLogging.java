@@ -36,13 +36,13 @@ public class BidLogging extends BaseEntity {
     private int age;
 
     @Column(name = "bid_price", nullable = false)
-    private int price;
+    private Long price;
 
     @Column(name = "is_auction_successful", nullable = false)
     private boolean isAuctionSuccessful;
 
     @Builder
-    public BidLogging(Long userId, Long productId, Category category, Gender gender, int age, int price, boolean isAuctionSuccessful) {
+    public BidLogging(Long userId, Long productId, Category category, Gender gender, int age, Long price, boolean isAuctionSuccessful) {
         this.userId = userId;
         this.productId = productId;
         this.category = category;

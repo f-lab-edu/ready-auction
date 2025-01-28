@@ -23,12 +23,12 @@ public class PointService {
         User user = userDetails.getUser();
         Point point = pointRepository.findByUserId(user.getId());
         point.plus(pointAmount.getAmount());
-        int currentPoint = point.getAmount();
+        Long currentPoint = point.getAmount();
         return PointResponse.from(currentPoint, String.format("포인트 %d원 충전 완료. [현재 포인트 잔액 : %d원]", pointAmount.getAmount(), currentPoint));
     }
 
     @Transactional
-    public int deductPoint(CustomUserDetails userDetails, PointAmount pointAmount) {
+    public Long deductPoint(CustomUserDetails userDetails, PointAmount pointAmount) {
         User user = userDetails.getUser();
         Point point = pointRepository.findByUserId(user.getId());
 
@@ -39,7 +39,7 @@ public class PointService {
     }
 
     @Transactional
-    public void rollbackPoint(Long userId, int plusAmount) {
+    public void rollbackPoint(Long userId, Long plusAmount) {
         Point point = pointRepository.findByUserId(userId);
         point.plus(plusAmount);
     }

@@ -19,7 +19,7 @@ public class ProductFindResponse {
     private Category category;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
-    private int startPrice;
+    private Long startPrice;
     private boolean recommended;
 
     @Builder
@@ -30,7 +30,7 @@ public class ProductFindResponse {
                                Category category,
                                LocalDateTime startDate,
                                LocalDateTime closeDate,
-                               int startPrice,
+                               Long startPrice,
                                boolean recommended) {
         this.userId = userId;
         this.imageResponses = imageResponses;

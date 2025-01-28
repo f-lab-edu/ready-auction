@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PointAmount {
-    private int amount;
+    private Long amount;
 
     @Builder
-    public PointAmount(int amount) {
+    public PointAmount(Long amount) {
         this.amount = amount;
     }
 }

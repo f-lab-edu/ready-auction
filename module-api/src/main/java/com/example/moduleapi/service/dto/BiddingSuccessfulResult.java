@@ -7,16 +7,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class BiddingSuccessfulResult {
-    private int currentPrice;
+    private Long currentPrice;
     private double rateOfIncrease;
 
     @Builder
-    public BiddingSuccessfulResult(int currentPrice, double rateOfIncrease) {
+    public BiddingSuccessfulResult(Long currentPrice, double rateOfIncrease) {
         this.currentPrice = currentPrice;
         this.rateOfIncrease = rateOfIncrease;
     }
 
-    public static BiddingSuccessfulResult from(int currentPrice, double rateOfIncrease) {
+    public static BiddingSuccessfulResult from(Long currentPrice, double rateOfIncrease) {
         return BiddingSuccessfulResult.builder()
                                       .currentPrice(currentPrice)
                                       .rateOfIncrease(rateOfIncrease)

@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class BidRequest {
-    private int biddingPrice;
+    private Long biddingPrice;
 
-    public BidRequest(int biddingPrice) {
+    public BidRequest(Long biddingPrice) {
         this.biddingPrice = biddingPrice;
     }
 }

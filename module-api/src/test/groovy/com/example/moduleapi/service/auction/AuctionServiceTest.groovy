@@ -40,7 +40,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(7000)
+        BidRequest bidRequest = new BidRequest(7000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -49,9 +49,9 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
+        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
         redissonClient.getMap(_) >> highestBidMap
-        Pair<Long, Integer> userIdAndCurrentPrice = null
+        Pair<Long, Long> userIdAndCurrentPrice = null
         highestBidMap.get(1L) >> userIdAndCurrentPrice
 
         // Product 관련
@@ -79,7 +79,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -88,9 +88,9 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
+        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
         redissonClient.getMap(_) >> highestBidMap
-        Pair<Long, Integer> userIdAndCurrentPrice = Pair.of(user.id, 3000)
+        Pair<Long, Long> userIdAndCurrentPrice = Pair.of(user.id, 3000L)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
 
         // Product 관련
@@ -111,7 +111,7 @@ class AuctionServiceTest extends Specification {
         given:
         LocalDateTime productAuctionClosedTime = LocalDateTime.of(2024, 11, 19, 12, 0, 0, 0);
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
         // User 관련
         User user = UserFixtures.createUser()
         user.id = 1L
@@ -138,7 +138,7 @@ class AuctionServiceTest extends Specification {
         redissonClient.getLock(_) >> lock
         lock.tryLock(5, 10, TimeUnit.SECONDS) >> false
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
         // User 관련
         User user = UserFixtures.createUser()
         user.id = 1L
@@ -165,7 +165,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -174,8 +174,8 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
-        Pair<Long, Integer> userIdAndCurrentPrice = new Pair<>(1L, 7000)
+        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
+        Pair<Long, Long> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
         userIdAndCurrentPrice.getSecond() >> 7000
         redissonClient.getMap(_) >> highestBidMap
@@ -201,7 +201,7 @@ class AuctionServiceTest extends Specification {
         lock.isHeldByCurrentThread() >> true
 
         // 입찰 제시
-        BidRequest bidRequest = new BidRequest(5000)
+        BidRequest bidRequest = new BidRequest(5000L)
 
         // User 관련
         User user = UserFixtures.createUser()
@@ -210,8 +210,8 @@ class AuctionServiceTest extends Specification {
         customUserDetails.getUser() >> user
 
         // Redisson Map 관련
-        RMap<Long, Pair<Long, Integer>> highestBidMap = Mock()
-        Pair<Long, Integer> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
+        RMap<Long, Pair<Long, Long>> highestBidMap = Mock()
+        Pair<Long, Long> userIdAndCurrentPrice = new Pair<>(1L, 7000L)
         highestBidMap.get(1L) >> userIdAndCurrentPrice
         userIdAndCurrentPrice.getSecond() >> 7000L
         redissonClient.getMap(_) >> highestBidMap

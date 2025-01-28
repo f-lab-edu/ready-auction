@@ -25,7 +25,7 @@ public class ProductFixtures {
     public static LocalDateTime 현재시간 = LocalDateTime.now();
     public static LocalDateTime 종료일 = 현재시간.plusDays(30);
     public static Category 카테고리 = Category.ELECTRONICS;
-    public static int 시작가격 = 50000;
+    public static Long 시작가격 = 50000L;
 
     private static ProductSaveRequest createProductSaveRequest(String userId,
                                                                String productName,
@@ -33,7 +33,7 @@ public class ProductFixtures {
                                                                Category category,
                                                                LocalDateTime startDate,
                                                                LocalDateTime closeDate,
-                                                               int startPrice) {
+                                                               Long startPrice) {
         return ProductSaveRequest.builder()
                                  .userId(userId)
                                  .productName(productName)
@@ -46,7 +46,7 @@ public class ProductFixtures {
     }
 
     private static ProductUpdateRequest createProductUpdateRequest(String productName, String description,
-                                                                   LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
+                                                                   LocalDateTime startDate, LocalDateTime closeDate, Long startPrice) {
         return ProductUpdateRequest.builder()
                                    .productName(productName)
                                    .description(description)
@@ -87,7 +87,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductSaveRequest 상품_등록_요청_아이디_누락_유효성_검증실패_요청 = createProductSaveRequest(
@@ -97,7 +97,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductSaveRequest 상품_등록_요청_상품설명_유효성_검증실패_요청 = createProductSaveRequest(
@@ -107,7 +107,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductSaveRequest 상품_등록_요청_시작일_유효성_검증실패_요청 = createProductSaveRequest(
@@ -117,7 +117,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.minusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductSaveRequest 상품_등록_요청_종료일_유효성_검증실패_요청 = createProductSaveRequest(
@@ -127,7 +127,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.plusDays(1),
             현재시간.plusDays(1),
-            1000
+            1000L
     );
 
     public static ProductSaveRequest 상품_등록_요청_시작가격_유효성_검증실패_요청 = createProductSaveRequest(
@@ -137,7 +137,7 @@ public class ProductFixtures {
             카테고리,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            500
+            500L
     );
 
     public static ProductUpdateRequest 상품_수정_요청_상품명_유효성_검증실패_요청 = createProductUpdateRequest(
@@ -145,7 +145,7 @@ public class ProductFixtures {
             상품_설명,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductUpdateRequest 상품_수정_요청_상품설명_유효성_검증실패_요청 = createProductUpdateRequest(
@@ -153,7 +153,7 @@ public class ProductFixtures {
             "",
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductUpdateRequest 상품_수정_요청_시작일_유효성_검증실패_요청 = createProductUpdateRequest(
@@ -161,7 +161,7 @@ public class ProductFixtures {
             상품_설명,
             현재시간.minusDays(1),
             현재시간.plusDays(2),
-            1000
+            1000L
     );
 
     public static ProductUpdateRequest 상품_수정_요청_종료일_유효성_검증실패_요청 = createProductUpdateRequest(
@@ -169,7 +169,7 @@ public class ProductFixtures {
             상품_설명,
             현재시간.plusDays(1),
             현재시간.plusDays(1),
-            1000
+            1000L
     );
 
     public static ProductUpdateRequest 상품_수정_요청_시작가격_유효성_검증실패_요청 = createProductUpdateRequest(
@@ -177,7 +177,7 @@ public class ProductFixtures {
             상품_설명,
             현재시간.plusDays(1),
             현재시간.plusDays(2),
-            500
+            500L
     );
 
     public static ProductSaveRequest 상품_등록_요청 = createProductSaveRequest(UserFixtures.유저_아이디, 상품_이름, 상품_설명, 카테고리, 현재시간, 종료일, 시작가격);
