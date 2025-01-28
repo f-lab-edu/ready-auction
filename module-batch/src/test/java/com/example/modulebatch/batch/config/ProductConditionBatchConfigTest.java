@@ -7,6 +7,7 @@ import com.example.moduledomain.repository.product.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.batch.core.*;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBatchTest
 @SpringBootTest
 @Import(ProductConditionBatchConfig.class)
+@EnableBatchProcessing
 class ProductConditionBatchConfigTest {
     @Autowired
     private Job updateProductConditionJob;
@@ -83,7 +85,7 @@ class ProductConditionBatchConfigTest {
                                   .productCondition(ProductCondition.READY)
                                   .startDate(LocalDateTime.now())
                                   .closeDate(LocalDateTime.now().plusDays(7))
-                                  .startPrice(1000)
+                                  .startPrice(1000L)
                                   .build();
 
         Product product2 = Product.builder()
@@ -93,7 +95,7 @@ class ProductConditionBatchConfigTest {
                                   .productCondition(ProductCondition.ACTIVE)
                                   .startDate(LocalDateTime.now().minusDays(1))
                                   .closeDate(LocalDateTime.now().plusDays(5))
-                                  .startPrice(1000)
+                                  .startPrice(1000L)
                                   .build();
 
         return Arrays.asList(product1, product2);
