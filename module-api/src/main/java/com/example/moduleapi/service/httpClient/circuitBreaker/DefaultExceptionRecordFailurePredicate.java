@@ -1,10 +1,9 @@
 package com.example.moduleapi.service.httpClient.circuitBreaker;
 
-import java.util.function.Predicate;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.HttpClientErrorException;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.function.Predicate;
 
 @Slf4j
 public class DefaultExceptionRecordFailurePredicate implements Predicate<Throwable> {
@@ -15,7 +14,6 @@ public class DefaultExceptionRecordFailurePredicate implements Predicate<Throwab
      */
     @Override
     public boolean test(Throwable throwable) {
-        log.info("fallback 실행 확인");
         if (throwable instanceof HttpClientErrorException) {
             return false;
         }

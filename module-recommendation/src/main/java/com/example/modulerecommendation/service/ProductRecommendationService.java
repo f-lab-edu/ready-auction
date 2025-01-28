@@ -33,14 +33,6 @@ public class ProductRecommendationService {
     }
 
     public List<ProductFindResponse> getRecommendationProducts(Gender gender, int age, ProductFilter productFilter) {
-        /*
-         * 1. 카테고리별 필터
-         * 1.1 필터링한 카테고리 상품이 추천 상품 카테고리에 없으면 빈 리스트 반환
-         * 2. productCondition 필터
-         * 2.1 ProductConditon 필터링시 상품이 없으면 빈 리스트 반환
-         * 3. keyword 필터링은 ProductListingService에서 진행
-         * 3. 최종적인 ProductIds 조회 후 반환.
-         * */
         String ageGroup = AgeGroup.fromAge(age);
         List<Long> recommendationProductIds = new ArrayList<>(); // 최종 추천 상품 ID 리스트
 
