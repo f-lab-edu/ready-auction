@@ -127,7 +127,7 @@ public class AuctionService {
     }
 
     private double calculateIncreaseRate(Long productId, Long previousPrice, Long nextPrice) {
-        if (previousPrice == FIRST_BID) {
+        if (previousPrice.equals(FIRST_BID)) {
             ProductFindResponse product = productFacade.findById(productId);
             return increaseRate(product.getStartPrice(), nextPrice);
         }
