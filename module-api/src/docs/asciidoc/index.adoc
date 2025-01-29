@@ -534,6 +534,22 @@ include::{snippets}/상품 삭제 성공/response-fields.adoc[]
 
 include::{snippets}/상품 삭제 실패 - 경매 진행중/response-body.adoc[]
 
+== 포인트
+
+=== HTTP 요청
+
+include::{snippets}/포인트 충전/http-request.adoc[]
+
+=== 요청 본문
+
+include::{snippets}/포인트 충전/request-body.adoc[]
+include::{snippets}/포인트 충전/request-fields.adoc[]
+
+=== 응답 본문
+
+include::{snippets}/포인트 충전/response-body.adoc[]
+include::{snippets}/포인트 충전/response-fields.adoc[]
+
 == 경매 가격 제안
 
 === HTTP 요청
