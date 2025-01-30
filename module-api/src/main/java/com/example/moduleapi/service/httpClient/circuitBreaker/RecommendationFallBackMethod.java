@@ -1,14 +1,13 @@
 package com.example.moduleapi.service.httpClient.circuitBreaker;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.moduleapi.service.httpClient.ProductRecommendationServerClient;
+import com.example.moduledomain.common.request.ProductFilter;
+import com.example.moduledomain.common.response.ProductFindResponse;
+import com.example.moduledomain.domain.user.Gender;
 import org.springframework.stereotype.Component;
 
-import com.example.moduleapi.service.httpClient.ProductRecommendationServerClient;
-import com.example.moduledomain.domain.user.Gender;
-import com.example.moduledomain.request.ProductFilter;
-import com.example.moduledomain.response.ProductFindResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RecommendationFallBackMethod implements ProductRecommendationServerClient {

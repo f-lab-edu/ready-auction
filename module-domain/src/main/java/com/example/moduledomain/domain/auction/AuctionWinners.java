@@ -15,17 +15,17 @@ public class AuctionWinners {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_Id")
+    @Column(name = "user_Id", nullable = false)
     private Long userId;
 
-    @Column(name = "product_Id")
+    @Column(name = "product_Id", nullable = false)
     private Long productId;
 
-    @Column(name = "price")
-    private int price;
-    
+    @Column(name = "price", nullable = false)
+    private Long price;
+
     @Builder
-    public AuctionWinners(Long id, Long userId, Long productId, int price) {
+    public AuctionWinners(Long id, Long userId, Long productId, Long price) {
         this.userId = userId;
         this.productId = productId;
         this.price = price;

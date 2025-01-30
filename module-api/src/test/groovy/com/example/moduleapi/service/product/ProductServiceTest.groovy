@@ -5,13 +5,13 @@ import com.example.moduleapi.controller.request.product.ProductUpdateRequest
 import com.example.moduleapi.exception.product.ProductNotPendingException
 import com.example.moduleapi.fixture.product.ProductFixtures
 import com.example.moduleapi.fixture.user.UserFixtures
+import com.example.moduledomain.common.request.ProductFilter
+import com.example.moduledomain.common.request.ProductFilterRequest
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.user.User
 import com.example.moduledomain.repository.product.ProductRepository
-import com.example.moduledomain.request.ProductFilter
-import com.example.moduledomain.request.ProductFilterRequest
 import spock.lang.Specification
 
 class ProductServiceTest extends Specification {

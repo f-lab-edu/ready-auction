@@ -13,23 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/point")
 public class PointController {
-
     private final PointService pointService;
 
     public PointController(PointService pointService) {
         this.pointService = pointService;
     }
 
-    // 포인트 충전
     @PostMapping("/charge")
-    public PointResponse chargePoint(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody PointAmount pointAmount) {
-        int totalPoint = pointService.chargePoint(customUserDetails, pointAmount);
-        PointResponse pointResponse = PointResponse.builder()
-                .currentPoint(totalPoint)
-                .message("포인트가 성공적으로 충전되었습니다.")
-                .build();
-        return pointResponse;
+    public PointResponse chargePoint(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                     @RequestBody PointAmount pointAmount) {
+        return pointService.chargePoint(customUserDetails, pointAmount);
     }
 }

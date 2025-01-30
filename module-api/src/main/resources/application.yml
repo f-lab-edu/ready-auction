@@ -26,18 +26,19 @@ spring:
   logging:
     level:
       root: TRACE
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 management:
   endpoints:
     web:
       exposure:
-        include: prometheus
-
-  #Fegin에 서킷 브레이커 적용 활성화
-  cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true
+        include: "*"
+  health:
+    circuitbreakers:
+      enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -47,6 +48,8 @@ resilience4j:
         slowCallRateThreshold: 80
         slowCallDurationThreshold: 5s
         registerHealthIndicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
         recordFailurePredicate: com.example.moduleapi.service.httpClient.circuitBreaker.DefaultExceptionRecordFailurePredicate
     instances:
       recommendationServer:

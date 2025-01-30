@@ -13,7 +13,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
@@ -28,7 +27,8 @@ public class WebSecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/logout")).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
         );
 
         http.sessionManagement(session -> session
@@ -37,11 +37,10 @@ public class WebSecurityConfig {
                 .maxSessionsPreventsLogin(true)); // 설정한 다중 로그인 허용 갯수를 초과하였을 시 처리 방법 true(초과시 새로운 로그인 차단)
 
         http.logout(logout -> logout
-                .logoutUrl("/api/v1/logout")
+                .logoutUrl("/api/v1/users/logout")
                 .logoutSuccessUrl("/api/v1/login")
                 .invalidateHttpSession(true)
         );
-
         return http.build();
     }
 

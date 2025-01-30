@@ -18,10 +18,16 @@ public class ProductSaveRequest {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
-    private int startPrice;
+    private Long startPrice;
 
     @Builder
-    public ProductSaveRequest(String userId, String productName, Category category, String description, LocalDateTime startDate, LocalDateTime closeDate, int startPrice) {
+    public ProductSaveRequest(String userId,
+                              String productName,
+                              Category category,
+                              String description,
+                              LocalDateTime startDate,
+                              LocalDateTime closeDate,
+                              Long startPrice) {
         this.userId = userId;
         this.productName = productName;
         this.category = category;
@@ -33,15 +39,15 @@ public class ProductSaveRequest {
 
     public Product toEntity() {
         return Product.builder()
-                .userId(userId)
-                .productName(productName)
-                .description(description)
-                .category(category)
-                .startDate(startDate)
-                .closeDate(closeDate)
-                .startPrice(startPrice)
-                .productCondition(ProductCondition.READY)
-                .build();
+                      .userId(userId)
+                      .productName(productName)
+                      .description(description)
+                      .category(category)
+                      .startDate(startDate)
+                      .closeDate(closeDate)
+                      .startPrice(startPrice)
+                      .productCondition(ProductCondition.READY)
+                      .build();
     }
 
 }

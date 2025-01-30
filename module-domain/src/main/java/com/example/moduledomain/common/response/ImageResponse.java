@@ -1,7 +1,6 @@
-package com.example.moduledomain.response;
+package com.example.moduledomain.common.response;
 
 import com.example.moduledomain.domain.product.ProductImage;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

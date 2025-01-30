@@ -1,14 +1,13 @@
-package com.example.moduledomain.response;
-
-import java.time.LocalDateTime;
-import java.util.List;
+package com.example.moduledomain.common.response;
 
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -20,7 +19,7 @@ public class ProductFindResponse {
     private Category category;
     private LocalDateTime startDate;
     private LocalDateTime closeDate;
-    private int startPrice;
+    private Long startPrice;
     private boolean recommended;
 
     @Builder
@@ -31,7 +30,7 @@ public class ProductFindResponse {
                                Category category,
                                LocalDateTime startDate,
                                LocalDateTime closeDate,
-                               int startPrice,
+                               Long startPrice,
                                boolean recommended) {
         this.userId = userId;
         this.imageResponses = imageResponses;
@@ -48,16 +47,16 @@ public class ProductFindResponse {
                                            List<ImageResponse> imageResponses,
                                            boolean recommended) {
         return ProductFindResponse.builder()
-            .userId(product.getUserId())
-            .imageResponses(imageResponses)
-            .productName(product.getProductName())
-            .description(product.getDescription())
-            .category(product.getCategory())
-            .startDate(product.getStartDate())
-            .closeDate(product.getCloseDate())
-            .startPrice(product.getStartPrice())
-            .recommended(recommended)
-            .build();
+                                  .userId(product.getUserId())
+                                  .imageResponses(imageResponses)
+                                  .productName(product.getProductName())
+                                  .description(product.getDescription())
+                                  .category(product.getCategory())
+                                  .startDate(product.getStartDate())
+                                  .closeDate(product.getCloseDate())
+                                  .startPrice(product.getStartPrice())
+                                  .recommended(recommended)
+                                  .build();
 
     }
 }

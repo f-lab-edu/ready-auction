@@ -1,13 +1,12 @@
 package com.example.moduleapi.service.httpClient;
 
-import java.util.Base64;
-import java.util.List;
-
+import com.example.moduledomain.common.request.ProductFilter;
+import com.example.moduledomain.common.response.ProductFindResponse;
+import com.example.moduledomain.domain.user.User;
 import org.springframework.stereotype.Service;
 
-import com.example.moduledomain.domain.user.User;
-import com.example.moduledomain.request.ProductFilter;
-import com.example.moduledomain.response.ProductFindResponse;
+import java.util.Base64;
+import java.util.List;
 
 @Service
 public class RestHttpClient {
@@ -17,15 +16,14 @@ public class RestHttpClient {
         this.productRecommendationClient = productRecommendationClient;
     }
 
-    // 추천 상품 을 조회하는 메서드
     public List<ProductFindResponse> findRecommendationProducts(User user, ProductFilter productFilter) {
         String authorizationHeader = generateAuthorizationHeader(user);
 
         return productRecommendationClient.getRecommendationProduct(
-            authorizationHeader,
-            user.getGender(),
-            user.getAge(),
-            productFilter
+                authorizationHeader,
+                user.getGender(),
+                user.getAge(),
+                productFilter
         );
     }
 

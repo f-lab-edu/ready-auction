@@ -1,7 +1,10 @@
 spring:
   application:
     name: module-batch
-
+  batch:
+    jdbc:
+      initialize-schema: always
+        
   datasource:
     url: jdbc:mysql://localhost:33306/ready-auction
     username: root
