@@ -1,13 +1,7 @@
 package com.example.moduledomain.domain.product;
 
 import com.example.moduledomain.domain.BaseEntity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,11 +18,11 @@ public class ProductLike extends BaseEntity {
     @Column(name = "product_id", nullable = false, updatable = false)
     private Long productId;
 
-    @Column(name = "user_id", nullable = false, updatable = false)
-    private Long userId;
+    @Column(name = "like_count")
+    private int likeCount;
 
-    public ProductLike(Long productId, Long userId) {
+    public ProductLike(Long productId, int likeCount) {
         this.productId = productId;
-        this.userId = userId;
+        this.likeCount = likeCount;
     }
 }

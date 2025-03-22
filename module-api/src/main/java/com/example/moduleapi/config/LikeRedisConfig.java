@@ -22,12 +22,13 @@ public class LikeRedisConfig {
     }
 
     @Bean
-    public RedisTemplate<Long, Long> likeRedisTemplate() {
-        RedisTemplate<Long, Long> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Long> likeRedisTemplate() {
+        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(likeRedisConnectionFactory());
+        redisTemplate.setEnableTransactionSupport(true);
 
         // redis-cli을 통해 직접 데이터 조회 시 알아볼 수 없는 형태로 출력되는 것을 방지
-        redisTemplate.setKeySerializer(new GenericToStringSerializer<>(Long.class));
+        redisTemplate.setKeySerializer(new GenericToStringSerializer<>(String.class));
         redisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
         return redisTemplate;
     }

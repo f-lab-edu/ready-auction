@@ -6,17 +6,13 @@ import com.example.moduledomain.domain.product.OrderBy;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.repository.utils.QueryHelperUtils;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.moduledomain.domain.product.QProduct.product;
 import static com.example.moduledomain.domain.product.QProductLike.productLike;
@@ -42,23 +38,20 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         OrderSpecifier<?> orderSpecifier = order.toOrderSpecifier();
 
         if (order == OrderBy.LIKE) {
-            NumberPath<Long> like = Expressions.numberPath(Long.class, "like");
-            List<Tuple> result = jpaQueryFactory
-                    .select(product, productLike.id.count().as(like))
+            List<Product> result = jpaQueryFactory
+                    .select(product)
                     .from(product)
                     .leftJoin(productLike).on(product.id.eq(productLike.productId))
                     .where(containsKeyword(keyword),
                            filterProductCondition(productConditions),
                            filterCategories(categories))
-                    .groupBy(product.id)
-                    .orderBy(like.desc())
+                    .orderBy(productLike.likeCount.desc())
                     .offset(pageNo * pageSize)
                     .limit(pageSize)
                     .fetch();
 
-            return result.stream()
-                         .map(tuple -> tuple.get(product))
-                         .collect(Collectors.toList());
+
+            return result;
         }
 
         return jpaQueryFactory
