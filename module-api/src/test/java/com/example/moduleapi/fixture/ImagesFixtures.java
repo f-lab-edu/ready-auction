@@ -13,7 +13,7 @@ public class ImagesFixtures {
     public static String 원본_이미지_이름 = "original_name";
     public static String 이미지_경로 = "/images/products/test.jpg";
 
-    public static List<ImageResponse> 이미지_응답 = Arrays.asList(new ImageResponse(원본_이미지_이름, 이미지_경로));
+    public static List<ImageResponse> 이미지_응답 = Arrays.asList(new ImageResponse(1L, 원본_이미지_이름, 이미지_경로));
     public static MockMultipartFile mockMultipartFile = new MockMultipartFile(이미지_이름, 원본_이미지_이름, MediaType.IMAGE_JPEG_VALUE, 원본_이미지_이름.getBytes());
 
     public static MockMultipartFile 비어있는_이미지 = new MockMultipartFile("images", "", "image/jpeg", new byte[0]);

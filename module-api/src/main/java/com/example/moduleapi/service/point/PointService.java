@@ -24,7 +24,7 @@ public class PointService {
         Point point = pointRepository.findByUserId(user.getId());
         point.plus(pointAmount.getAmount());
         Long currentPoint = point.getAmount();
-        return PointResponse.from(currentPoint, String.format("포인트 %d원 충전 완료. [현재 포인트 잔액 : %d원]", pointAmount.getAmount(), currentPoint));
+        return PointResponse.from(point.getId(), currentPoint, String.format("포인트 %d원 충전 완료. [현재 포인트 잔액 : %d원]", pointAmount.getAmount(), currentPoint));
     }
 
     @Transactional

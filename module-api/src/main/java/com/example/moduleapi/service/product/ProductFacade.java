@@ -124,7 +124,7 @@ public class ProductFacade {
 
     @Transactional(readOnly = true)
     public ProductLikeResponse getProductLikes(Long productId) {
-        return productLikeService.getProductLikesByProductId(productId);
+        return new ProductLikeResponse(productLikeService.countProductLikesByProductId(productId));
     }
 
     private void validateUser(User currentUser, ProductSaveRequest productSaveRequest) {

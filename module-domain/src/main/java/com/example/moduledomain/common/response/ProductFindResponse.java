@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ProductFindResponse {
+    private Long id;
     private String userId;
     private List<ImageResponse> imageResponses;
     private String productName;
@@ -23,7 +24,8 @@ public class ProductFindResponse {
     private boolean recommended;
 
     @Builder
-    public ProductFindResponse(String userId,
+    public ProductFindResponse(Long id,
+                               String userId,
                                List<ImageResponse> imageResponses,
                                String productName,
                                String description,
@@ -32,6 +34,7 @@ public class ProductFindResponse {
                                LocalDateTime closeDate,
                                Long startPrice,
                                boolean recommended) {
+        this.id = id;
         this.userId = userId;
         this.imageResponses = imageResponses;
         this.productName = productName;
@@ -47,6 +50,7 @@ public class ProductFindResponse {
                                            List<ImageResponse> imageResponses,
                                            boolean recommended) {
         return ProductFindResponse.builder()
+                                  .id(product.getId())
                                   .userId(product.getUserId())
                                   .imageResponses(imageResponses)
                                   .productName(product.getProductName())

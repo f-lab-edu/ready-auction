@@ -11,6 +11,6 @@ public class PointFixtures {
 
     public static PointResponse 포인트_응답(Long chargedAmount, Long currentBalance) {
         String message = String.format("포인트 %d원 충전 완료. [현재 포인트 잔액 : %d원]", chargedAmount, currentBalance);
-        return PointResponse.from(currentBalance, message);
+        return PointResponse.from(1L, currentBalance, message);
     }
 }
