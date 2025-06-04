@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
@@ -352,7 +352,7 @@ class ProductApiControllerTest {
     public void findById() throws Exception {
         when(productFacade.findById(1L)).thenReturn(ProductFixtures.상품_조회_응답);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/products/{id}", 1L))
+        mockMvc.perform(get("/api/v1/products/{id}", 1L))
                .andExpect(status().isOk())
                .andDo(document("상품 단건 조회",
                                preprocessRequest(prettyPrint()),
@@ -362,31 +362,19 @@ class ProductApiControllerTest {
                                                            .description("조회할 상품 ID")
                                ),
                                responseFields(
-                                       fieldWithPath("userId").type(JsonFieldType.STRING)
-                                                              .description("상품 등록자 ID"),
-                                       fieldWithPath("productName").type(JsonFieldType.STRING)
-                                                                   .description("상품 이름"),
-                                       fieldWithPath("description").type(JsonFieldType.STRING)
-                                                                   .description("상품 설명"),
-                                       fieldWithPath("startDate").type(JsonFieldType.STRING)
-                                                                 .description("시작일"),
-                                       fieldWithPath("closeDate").type(JsonFieldType.STRING)
-                                                                 .description("종료일"),
-                                       fieldWithPath("startPrice").type(JsonFieldType.NUMBER)
-                                                                  .description("시작 가격"),
-                                       fieldWithPath("category").type(JsonFieldType.STRING)
-                                                                .description("상품 카테고리"),
-                                       fieldWithPath("recommended").type(JsonFieldType.BOOLEAN)
-                                                                   .description("추천 상품 구분"),
-                                       fieldWithPath("imageResponses[]")
-                                               .type(JsonFieldType.ARRAY)
-                                               .description("상품 이미지 리스트"),
-                                       fieldWithPath("imageResponses[].originalName")
-                                               .type(JsonFieldType.STRING)
-                                               .description("이미지 원본 이름"),
-                                       fieldWithPath("imageResponses[].imagePath")
-                                               .type(JsonFieldType.STRING)
-                                               .description("이미지 경로"))
+                                       fieldWithPath("id").description("상품 ID"),
+                                       fieldWithPath("userId").type(JsonFieldType.STRING).description("상품 등록자 ID"),
+                                       fieldWithPath("productName").type(JsonFieldType.STRING).description("상품 이름"),
+                                       fieldWithPath("description").type(JsonFieldType.STRING).description("상품 설명"),
+                                       fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
+                                       fieldWithPath("closeDate").type(JsonFieldType.STRING).description("종료일"),
+                                       fieldWithPath("startPrice").type(JsonFieldType.NUMBER).description("시작 가격"),
+                                       fieldWithPath("category").type(JsonFieldType.STRING).description("상품 카테고리"),
+                                       fieldWithPath("recommended").type(JsonFieldType.BOOLEAN).description("추천 상품 구분"),
+                                       fieldWithPath("imageResponses[]").type(JsonFieldType.ARRAY).description("상품 이미지 리스트"),
+                                       fieldWithPath("imageResponses[].id").description("상품 이미지 ID"),
+                                       fieldWithPath("imageResponses[].originalName").type(JsonFieldType.STRING).description("이미지 원본 이름"),
+                                       fieldWithPath("imageResponses[].imagePath").type(JsonFieldType.STRING).description("이미지 경로"))
                ));
     }
 
@@ -396,7 +384,7 @@ class ProductApiControllerTest {
     public void findByIdFail() throws Exception {
         when(productFacade.findById(999L)).thenThrow(ProductFixtures.존재하지_않는_상품_예외);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/products/{id}", 999L))
+        mockMvc.perform(get("/api/v1/products/{id}", 999L))
                .andExpect(status().isNotFound())
                .andDo(document("상품 단건 조회 실패 - 존재하지 않는 상품",
                                preprocessRequest(prettyPrint()),
@@ -419,9 +407,9 @@ class ProductApiControllerTest {
                 any(User.class),
                 any(ProductFilterRequest.class))).thenReturn(ProductFixtures.페이징_상품_조회);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/products/_search")
-                                                        .contentType(MediaType.APPLICATION_JSON)
-                                                        .content(objectMapper.writeValueAsString(ProductFixtures.상품_조회_요청)))
+        mockMvc.perform(post("/api/v1/products/_search")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(ProductFixtures.상품_조회_요청)))
                .andExpect(status().isOk())
                .andDo(document("상품 리스트 조회",
                                preprocessRequest(prettyPrint()),
@@ -444,8 +432,10 @@ class ProductApiControllerTest {
                                ),
                                responseFields(
                                        fieldWithPath("items[]").description("상품 리스트"),
+                                       fieldWithPath("items[].id").description("상품 ID"),
                                        fieldWithPath("items[].userId").description("상품 등록자 ID"),
                                        fieldWithPath("items[].imageResponses[]").description("상품 이미지"),
+                                       fieldWithPath("items[].imageResponses[].id").description("상품 이미지 ID"),
                                        fieldWithPath("items[].imageResponses[].originalName").description("원본 이미지 이름"),
                                        fieldWithPath("items[].imageResponses[].imagePath").description("이미지 경로"),
                                        fieldWithPath("items[].productName").description("상품 이름"),
@@ -771,7 +761,7 @@ class ProductApiControllerTest {
                 any(User.class),
                 eq(1L))).thenReturn(ProductFixtures.상품_응답);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/products/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/products/{id}", 1L))
                .andExpect(status().isOk())
                .andDo(document("상품 삭제 성공",
                                preprocessRequest(prettyPrint()),
@@ -795,7 +785,7 @@ class ProductApiControllerTest {
                 any(User.class),
                 eq(999L))).thenThrow(ProductFixtures.경매_상품_접근_권한_없음);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/products/{id}", 999L))
+        mockMvc.perform(delete("/api/v1/products/{id}", 999L))
                .andExpect(status().isUnauthorized())
                .andDo(document("상품 삭제 실패 - 본인 등록 상품이 아닌 경우",
                                preprocessRequest(prettyPrint()),
@@ -818,7 +808,7 @@ class ProductApiControllerTest {
                 any(User.class),
                 eq(999L))).thenThrow(ProductFixtures.경매_상품_접근_권한_없음);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/products/{id}", 999L))
+        mockMvc.perform(delete("/api/v1/products/{id}", 999L))
                .andExpect(status().isUnauthorized())
                .andDo(document("상품 삭제 실패 - 경매 진행중",
                                preprocessRequest(prettyPrint()),
@@ -834,6 +824,25 @@ class ProductApiControllerTest {
     }
 
     @Test
+    @DisplayName("상품 카테고리 목록 조회")
+    public void 상품_카테고리_목록_조회() throws Exception {
+        when(productFacade.getCategories()).thenReturn(ProductFixtures.상품_카테고리_목록);
+
+        mockMvc.perform(get("/api/v1/products/category")
+                                .accept(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andDo(document("상품 카테고리 목록",
+                               preprocessRequest(prettyPrint()),
+                               preprocessResponse(prettyPrint()),
+                               responseFields(
+                                       fieldWithPath("[].name").description("카테고리 enum 값 (예: ELECTRONICS)"),
+                                       fieldWithPath("[].description").description("카테고리 설명 (예: 전자제품)")
+                               )
+               ));
+
+    }
+
+    @Test
     @DisplayName("상품 좋아요 추가 API")
     @WithMockCustomUser
     public void 상품_좋아요() throws Exception {
@@ -841,8 +850,8 @@ class ProductApiControllerTest {
                 any(User.class),
                 any(Long.class))).thenReturn(ProductFixtures.상품_좋아요_응답);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/products/{id}/likes", 1L)
-                                                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/v1/products/{id}/likes", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andDo(document("상품 좋아요",
                                preprocessRequest(prettyPrint()),
@@ -866,8 +875,8 @@ class ProductApiControllerTest {
                 any(User.class),
                 any(Long.class))).thenReturn(ProductFixtures.상품_좋아요_응답);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/products/{id}/likes", 1L)
-                                                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/api/v1/products/{id}/likes", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andDo(document("상품 좋아요 삭제",
                                preprocessRequest(prettyPrint()),
@@ -890,8 +899,8 @@ class ProductApiControllerTest {
                 any(Long.class)))
                 .thenReturn(ProductFixtures.상품_좋아요_응답);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/products/{id}/likes", 1L)
-                                                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/products/{id}/likes", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andDo(document("상품 좋아요 삭제",
                                preprocessRequest(prettyPrint()),

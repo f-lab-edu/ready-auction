@@ -3,6 +3,7 @@ package com.example.moduleapi.fixture;
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
+import com.example.moduleapi.controller.response.product.ProductCategoryResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.NotFoundProductException;
@@ -17,6 +18,7 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductFixtures {
@@ -179,6 +181,10 @@ public class ProductFixtures {
             현재시간.plusDays(2),
             500L
     );
+
+    public static List<ProductCategoryResponse> 상품_카테고리_목록 = Arrays.stream(Category.values())
+                                                                   .map(category -> new ProductCategoryResponse(category.name(), category.getDescription()))
+                                                                   .toList();
 
     public static ProductSaveRequest 상품_등록_요청 = createProductSaveRequest(UserFixtures.유저_아이디, 상품_이름, 상품_설명, 카테고리, 현재시간, 종료일, 시작가격);
     public static ProductUpdateRequest 상품_수정_요청 = createProductUpdateRequest(상품_이름, 상품_설명, 현재시간, 종료일, 시작가격);
