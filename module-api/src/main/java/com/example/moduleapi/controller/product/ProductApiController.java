@@ -3,6 +3,7 @@ package com.example.moduleapi.controller.product;
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
+import com.example.moduleapi.controller.response.product.ProductCategoryResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.service.product.ProductFacade;
@@ -54,6 +55,11 @@ public class ProductApiController {
     public ProductResponse delete(@AuthenticationPrincipal CustomUserDetails user,
                                   @PathVariable Long id) {
         return productFacade.delete(user.getUser(), id);
+    }
+
+    @GetMapping("/category")
+    public List<ProductCategoryResponse> getCategory() {
+        return productFacade.getCategories();
     }
 
     @PostMapping("/{id}/likes")

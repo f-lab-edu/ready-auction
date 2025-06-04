@@ -8,13 +8,10 @@ public enum Category {
     FASHION("패션"),
     FURNITURE("가구"),
     HOME_APPLIANCES("가전제품"),
-    BOOKS("도서"),
-    TOYS("장난감"),
     SPORTS("스포츠"),
     CAR("자동차"),
     ART("미술품"),
     JEWELRY("보석"),
-    BEAUTY("뷰티"),
     MUSIC_INSTRUMENTS("악기"),
     OTHER("기타");
 

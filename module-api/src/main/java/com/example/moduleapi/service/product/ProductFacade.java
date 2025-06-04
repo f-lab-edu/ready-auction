@@ -3,6 +3,7 @@ package com.example.moduleapi.service.product;
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
+import com.example.moduleapi.controller.response.product.ProductCategoryResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.UnauthorizedEnrollException;
@@ -12,6 +13,7 @@ import com.example.moduledomain.common.request.ProductFilter;
 import com.example.moduledomain.common.request.ProductFilterRequest;
 import com.example.moduledomain.common.response.ImageResponse;
 import com.example.moduledomain.common.response.ProductFindResponse;
+import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.domain.user.User;
@@ -22,6 +24,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,8 @@ public class ProductFacade {
     private final ProductLikeService productLikeService;
     private final RestHttpClient restHttpClient;
 
+    private List<ProductCategoryResponse> productCategoryResponses;
+
     public ProductFacade(FileService fileService,
                          ProductImageService productImageService,
                          ProductService productService,
@@ -43,6 +48,7 @@ public class ProductFacade {
         this.productService = productService;
         this.productLikeService = productLikeService;
         this.restHttpClient = restHttpClient;
+        initProductCategory();
     }
 
     @Transactional
@@ -112,6 +118,10 @@ public class ProductFacade {
 
     }
 
+    public List<ProductCategoryResponse> getCategories() {
+        return productCategoryResponses;
+    }
+
     @Transactional
     public ProductLikeResponse addLike(User user, Long productId) {
         return productLikeService.addLike(user, productId);
@@ -125,6 +135,12 @@ public class ProductFacade {
     @Transactional(readOnly = true)
     public ProductLikeResponse getProductLikes(Long productId) {
         return new ProductLikeResponse(productLikeService.countProductLikesByProductId(productId));
+    }
+
+    private void initProductCategory() {
+        productCategoryResponses = Arrays.stream(Category.values())
+                                         .map(category -> new ProductCategoryResponse(category.name(), category.getDescription()))
+                                         .toList();
     }
 
     private void validateUser(User currentUser, ProductSaveRequest productSaveRequest) {
