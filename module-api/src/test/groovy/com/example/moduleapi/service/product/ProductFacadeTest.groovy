@@ -14,6 +14,8 @@ import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductImage
 import com.example.moduledomain.domain.user.User
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
@@ -24,6 +26,7 @@ class ProductFacadeTest extends Specification {
     ProductService productService = Mock()
     ProductLikeService productLikeService = Mock()
     RestHttpClient restHttpClient = Mock()
+
     def productFacade = new ProductFacade(fileService, productImageService, productService, productLikeService, restHttpClient)
 
     def "상품 등록 성공"() {
@@ -233,5 +236,24 @@ class ProductFacadeTest extends Specification {
         1 * productImageService.deleteImage(1L) >> productImages
         1 * fileService.deleteImages(productImages)
         response.id == 1L
+    }
+
+    def "내가 등록한 상품 목록 조회"() {
+        given:
+        User user = UserFixtures.createUser()
+        Pageable pageable = PageRequest.of(0, 9)
+
+        List<Product> products = [
+                ProductFixtures.createProduct(["productName": "productName1"]),
+                ProductFixtures.createProduct(["productName": "productName2"]),
+                ProductFixtures.createProduct(["productName": "productName3"])
+        ]
+
+        when:
+        def response = productFacade.getMyProducts(user, pageable)
+
+        then:
+        1 * productService.getMyProduct(user, pageable) >> products
+        response.items.size() == 3
     }
 }

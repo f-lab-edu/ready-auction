@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -32,8 +33,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -865,6 +865,46 @@ class ProductApiControllerTest {
                                )
                ));
 
+    }
+
+    @Test
+    @DisplayName("내가 등록한 상품 목록 조회 API")
+    @WithMockCustomUser
+    public void 내가_등록한_상품_목록_조회() throws Exception {
+        when(productFacade.getMyProducts(
+                any(User.class),
+                any(Pageable.class))).thenReturn(ProductFixtures.페이징_상품_조회);
+
+        mockMvc.perform(get("/api/v1/products/my")
+                                .param("page", "0")
+                                .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andDo(document("내가 등록한 상품 목록 조회",
+                               preprocessRequest(prettyPrint()),
+                               preprocessResponse(prettyPrint()),
+                               queryParameters(
+                                       parameterWithName("page").description("페이지 번호")
+                               ),
+                               responseFields(
+                                       fieldWithPath("items[]").description("상품 리스트"),
+                                       fieldWithPath("items[].id").description("상품 ID"),
+                                       fieldWithPath("items[].userId").description("상품 등록자 ID"),
+                                       fieldWithPath("items[].imageResponses[]").description("상품 이미지"),
+                                       fieldWithPath("items[].imageResponses[].id").description("상품 이미지 ID"),
+                                       fieldWithPath("items[].imageResponses[].originalName").description("원본 이미지 이름"),
+                                       fieldWithPath("items[].imageResponses[].imagePath").description("이미지 경로"),
+                                       fieldWithPath("items[].productName").description("상품 이름"),
+                                       fieldWithPath("items[].description").description("상품 설명"),
+                                       fieldWithPath("items[].startDate").description("시작일"),
+                                       fieldWithPath("items[].closeDate").description("종료일"),
+                                       fieldWithPath("items[].startPrice").description("시작 가격"),
+                                       fieldWithPath("items[].category").type(JsonFieldType.STRING)
+                                                                        .description("상품 카테고리"),
+                                       fieldWithPath("items[].recommended").type(JsonFieldType.BOOLEAN)
+                                                                           .description("추천 상품 구분"),
+                                       fieldWithPath("pageNo").description("현재 페이지 번호")
+                               )
+               ));
     }
 
     @Test
