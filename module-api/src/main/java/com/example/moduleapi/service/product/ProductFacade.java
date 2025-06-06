@@ -18,6 +18,7 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductImage;
 import com.example.moduledomain.domain.user.User;
 import com.google.common.base.Preconditions;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -120,6 +121,16 @@ public class ProductFacade {
 
     public List<ProductCategoryResponse> getCategories() {
         return productCategoryResponses;
+    }
+
+    @Transactional(readOnly = true)
+    public PagingResponse<ProductFindResponse> getMyProducts(User user, Pageable pageable) {
+        List<Product> products = productService.getMyProduct(user, pageable);
+        List<ProductFindResponse> myProducts = products
+                .stream()
+                .map(this::convertToProductFindResponse)
+                .toList();
+        return PagingResponse.from(myProducts, pageable.getPageNumber());
     }
 
     @Transactional

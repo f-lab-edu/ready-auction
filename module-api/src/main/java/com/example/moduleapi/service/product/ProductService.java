@@ -10,6 +10,8 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.User;
 import com.example.moduledomain.repository.product.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +72,12 @@ public class ProductService {
         productRepository.deleteById(product.getId());
 
         return product.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getMyProduct(User user, Pageable pageable) {
+        Page<Product> products = productRepository.findByUserId(user.getUserId(), pageable);
+        return products.getContent();
     }
 
     private void checkProductAccessPermission(Product product, String userId) {

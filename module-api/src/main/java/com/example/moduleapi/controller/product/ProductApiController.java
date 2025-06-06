@@ -10,6 +10,9 @@ import com.example.moduleapi.service.product.ProductFacade;
 import com.example.moduledomain.common.request.ProductFilterRequest;
 import com.example.moduledomain.common.response.ProductFindResponse;
 import com.example.moduledomain.domain.user.CustomUserDetails;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +63,12 @@ public class ProductApiController {
     @GetMapping("/category")
     public List<ProductCategoryResponse> getCategory() {
         return productFacade.getCategories();
+    }
+
+    @GetMapping("/my")
+    public PagingResponse<ProductFindResponse> getMyProducts(@AuthenticationPrincipal CustomUserDetails user,
+                                                             @PageableDefault(size = 9, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return productFacade.getMyProducts(user.getUser(), pageable);
     }
 
     @PostMapping("/{id}/likes")
