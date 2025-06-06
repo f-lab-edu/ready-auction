@@ -75,7 +75,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<Product> getMyProduct(User user, Pageable pageable) {
+    public List<Product> getMyProducts(User user, Pageable pageable) {
         Page<Product> products = productRepository.findByUserId(user.getUserId(), pageable);
         return products.getContent();
     }

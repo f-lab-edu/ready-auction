@@ -125,7 +125,7 @@ public class ProductFacade {
 
     @Transactional(readOnly = true)
     public PagingResponse<ProductFindResponse> getMyProducts(User user, Pageable pageable) {
-        List<Product> products = productService.getMyProduct(user, pageable);
+        List<Product> products = productService.getMyProducts(user, pageable);
         List<ProductFindResponse> myProducts = products
                 .stream()
                 .map(this::convertToProductFindResponse)
