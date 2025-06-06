@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = "com.example.moduledomain")
 @EntityScan(basePackages = "com.example.moduledomain")
-public class JpaConfiguration {
+public class JpaConfig {
 }
