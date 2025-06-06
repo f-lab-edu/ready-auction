@@ -253,7 +253,7 @@ class ProductFacadeTest extends Specification {
         def response = productFacade.getMyProducts(user, pageable)
 
         then:
-        1 * productService.getMyProduct(user, pageable) >> products
+        1 * productService.getMyProducts(user, pageable) >> products
         response.items.size() == 3
     }
 }

@@ -196,7 +196,7 @@ class ProductServiceTest extends Specification {
         productRepository.findByUserId(user.getUserId(), pageable) >> mockPageProducts
 
         when:
-        List<Product> result = productService.getMyProduct(user, pageable)
+        List<Product> result = productService.getMyProducts(user, pageable)
 
         then:
         result.size() == 3
