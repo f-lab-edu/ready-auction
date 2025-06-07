@@ -9,6 +9,7 @@ import com.example.moduledomain.common.request.ProductFilterRequest;
 import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 import com.example.moduledomain.domain.user.User;
+import com.example.moduledomain.repository.bidLogging.BidLoggingRepository;
 import com.example.moduledomain.repository.product.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +17,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
-
     private final ProductRepository productRepository;
+    private final BidLoggingRepository bidLoggingRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, BidLoggingRepository bidLoggingRepository) {
         this.productRepository = productRepository;
+        this.bidLoggingRepository = bidLoggingRepository;
     }
 
     @Transactional
@@ -78,6 +83,19 @@ public class ProductService {
     public List<Product> getMyProducts(User user, Pageable pageable) {
         Page<Product> products = productRepository.findByUserId(user.getUserId(), pageable);
         return products.getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getMostBiddersProducts(User user) {
+        List<Long> productIds = bidLoggingRepository.findTop10ProductIdsByGender(user.getGender());
+        List<Product> products = productRepository.findByIdIn(productIds);
+        Map<Long, Product> productMap = products.stream()
+                                                .collect(Collectors.toMap(Product::getId, product -> product));
+        List<Product> orderProducts = productIds.stream()
+                                                .map(productMap::get)
+                                                .filter(Objects::nonNull)
+                                                .toList();
+        return orderProducts;
     }
 
     private void checkProductAccessPermission(Product product, String userId) {

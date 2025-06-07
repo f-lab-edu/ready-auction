@@ -133,6 +133,13 @@ public class ProductFacade {
         return PagingResponse.from(myProducts, pageable.getPageNumber());
     }
 
+    @Transactional(readOnly = true)
+    public List<ProductFindResponse> getMostBiddersProducts(User user) {
+        List<Product> products = productService.getMostBiddersProducts(user);
+        List<ProductFindResponse> popularProducts = products.stream().map(this::convertToProductFindResponse).toList();
+        return popularProducts;
+    }
+
     @Transactional
     public ProductLikeResponse addLike(User user, Long productId) {
         return productLikeService.addLike(user, productId);

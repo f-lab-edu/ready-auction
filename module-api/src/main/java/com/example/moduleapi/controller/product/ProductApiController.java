@@ -71,6 +71,11 @@ public class ProductApiController {
         return productFacade.getMyProducts(user.getUser(), pageable);
     }
 
+    @GetMapping("/popular")
+    public List<ProductFindResponse> getMostBiddersProducts(@AuthenticationPrincipal CustomUserDetails user) {
+        return productFacade.getMostBiddersProducts(user.getUser());
+    }
+
     @PostMapping("/{id}/likes")
     public ProductLikeResponse productLike(@AuthenticationPrincipal CustomUserDetails user,
                                            @PathVariable Long id) {
