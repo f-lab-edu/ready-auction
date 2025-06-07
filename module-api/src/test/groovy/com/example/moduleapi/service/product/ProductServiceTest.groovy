@@ -11,6 +11,7 @@ import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
 import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.user.User
+import com.example.moduledomain.repository.bidLogging.BidLoggingRepository
 import com.example.moduledomain.repository.product.ProductRepository
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -19,7 +20,8 @@ import spock.lang.Specification
 
 class ProductServiceTest extends Specification {
     ProductRepository productRepository = Mock(ProductRepository)
-    ProductService productService = new ProductService(productRepository)
+    BidLoggingRepository bidLoggingRepository = Mock(BidLoggingRepository)
+    ProductService productService = new ProductService(productRepository, bidLoggingRepository)
 
     def "경매 상품 등록"() {
         given:
@@ -200,5 +202,35 @@ class ProductServiceTest extends Specification {
 
         then:
         result.size() == 3
+    }
+
+    def "인기 상품 조회"() {
+        given:
+        User user = UserFixtures.createUser()
+        List<Long> productIds = [1L, 5L, 3L, 4L, 2L]
+
+        List<Product> mockProducts = [
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE])
+        ]
+
+        mockProducts[0].id = 1L
+        mockProducts[1].id = 2L
+        mockProducts[2].id = 3L
+        mockProducts[3].id = 4L
+        mockProducts[4].id = 5L
+
+        bidLoggingRepository.findTop10ProductIdsByGender(user.getGender()) >> productIds
+        productRepository.findByIdIn(productIds) >> mockProducts
+
+        when:
+        List<Product> result = productService.getMostBiddersProducts(user)
+
+        then:
+        result.size() == 5
+        result*.id == productIds
     }
 }

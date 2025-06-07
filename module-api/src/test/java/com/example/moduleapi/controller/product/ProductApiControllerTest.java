@@ -843,29 +843,37 @@ class ProductApiControllerTest {
     }
 
     @Test
-    @DisplayName("상품 좋아요 추가 API")
+    @DisplayName("인기 상품 조회 API")
     @WithMockCustomUser
-    public void 상품_좋아요() throws Exception {
-        when(productFacade.addLike(
-                any(User.class),
-                any(Long.class))).thenReturn(ProductFixtures.상품_좋아요_응답);
+    public void 인기_상품_목록_조회() throws Exception {
+        when(productFacade.getMostBiddersProducts(
+                any(User.class))).thenReturn(ProductFixtures.상품_조회_응답_리스트);
 
-        mockMvc.perform(post("/api/v1/products/{id}/likes", 1L)
+        mockMvc.perform(get("/api/v1/products/popular")
                                 .contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
-               .andDo(document("상품 좋아요",
+               .andDo(document("인기 상품 목록 조회",
                                preprocessRequest(prettyPrint()),
                                preprocessResponse(prettyPrint()),
-                               RequestDocumentation.pathParameters(
-                                       RequestDocumentation.parameterWithName("id")
-                                                           .description("좋아요누른 상품 ID")
-                               ),
                                responseFields(
-                                       fieldWithPath("likesCount").description("해당 기능 동작 후 좋아요 개수")
+                                       fieldWithPath("[]").description("상품 리스트"),
+                                       fieldWithPath("[].id").description("상품 ID"),
+                                       fieldWithPath("[].userId").description("상품 등록자 ID"),
+                                       fieldWithPath("[].imageResponses[]").description("상품 이미지"),
+                                       fieldWithPath("[].imageResponses[].id").description("상품 이미지 ID"),
+                                       fieldWithPath("[].imageResponses[].originalName").description("원본 이미지 이름"),
+                                       fieldWithPath("[].imageResponses[].imagePath").description("이미지 경로"),
+                                       fieldWithPath("[].productName").description("상품 이름"),
+                                       fieldWithPath("[].description").description("상품 설명"),
+                                       fieldWithPath("[].startDate").description("시작일"),
+                                       fieldWithPath("[].closeDate").description("종료일"),
+                                       fieldWithPath("[].startPrice").description("시작 가격"),
+                                       fieldWithPath("[].category").type(JsonFieldType.STRING).description("상품 카테고리"),
+                                       fieldWithPath("[].recommended").type(JsonFieldType.BOOLEAN).description("추천 상품 구분")
                                )
                ));
-
     }
+
 
     @Test
     @DisplayName("내가 등록한 상품 목록 조회 API")
@@ -905,6 +913,32 @@ class ProductApiControllerTest {
                                        fieldWithPath("pageNo").description("현재 페이지 번호")
                                )
                ));
+    }
+
+
+    @Test
+    @DisplayName("상품 좋아요 추가 API")
+    @WithMockCustomUser
+    public void 상품_좋아요() throws Exception {
+        when(productFacade.addLike(
+                any(User.class),
+                any(Long.class))).thenReturn(ProductFixtures.상품_좋아요_응답);
+
+        mockMvc.perform(post("/api/v1/products/{id}/likes", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andDo(document("상품 좋아요",
+                               preprocessRequest(prettyPrint()),
+                               preprocessResponse(prettyPrint()),
+                               RequestDocumentation.pathParameters(
+                                       RequestDocumentation.parameterWithName("id")
+                                                           .description("좋아요누른 상품 ID")
+                               ),
+                               responseFields(
+                                       fieldWithPath("likesCount").description("해당 기능 동작 후 좋아요 개수")
+                               )
+               ));
+
     }
 
     @Test

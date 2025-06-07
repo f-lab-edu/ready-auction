@@ -12,6 +12,7 @@ import com.example.moduledomain.common.request.ProductFilterRequest
 import com.example.moduledomain.common.response.ImageResponse
 import com.example.moduledomain.domain.product.Category
 import com.example.moduledomain.domain.product.Product
+import com.example.moduledomain.domain.product.ProductCondition
 import com.example.moduledomain.domain.product.ProductImage
 import com.example.moduledomain.domain.user.User
 import org.springframework.data.domain.PageRequest
@@ -255,5 +256,25 @@ class ProductFacadeTest extends Specification {
         then:
         1 * productService.getMyProducts(user, pageable) >> products
         response.items.size() == 3
+    }
+
+    def "인기 상품 목록 조회"() {
+        given:
+        User user = UserFixtures.createUser()
+
+        List<Product> mockProducts = [
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE]),
+                ProductFixtures.createProduct([productCondition: ProductCondition.ACTIVE])
+        ]
+
+        when:
+        def response = productFacade.getMostBiddersProducts(user)
+
+        then:
+        1 * productService.getMostBiddersProducts(user) >> mockProducts
+        response.size() == 5
     }
 }

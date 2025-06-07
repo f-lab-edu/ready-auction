@@ -191,9 +191,8 @@ public class ProductFixtures {
     public static ProductResponse 상품_응답 = ProductResponse.from(1L);
 
     public static ProductFindResponse 상품_조회_응답 = ProductFindResponse.from(상품, ImagesFixtures.이미지_응답, false);
-    public static ProductFindResponse 상품_조회_응답2 = ProductFindResponse.from(상품, ImagesFixtures.이미지_응답, false);
-    public static List<ProductFindResponse> 상품_조회_응담_여러개 = List.of(상품_조회_응답, 상품_조회_응답2);
-    public static PagingResponse<ProductFindResponse> 페이징_상품_조회 = PagingResponse.from(상품_조회_응담_여러개, 0);
+    public static List<ProductFindResponse> 상품_조회_응답_리스트 = List.of(상품_조회_응답, 상품_조회_응답);
+    public static PagingResponse<ProductFindResponse> 페이징_상품_조회 = PagingResponse.from(상품_조회_응답_리스트, 0);
     public static NotFoundProductException 존재하지_않는_상품_예외 = new NotFoundProductException(999L);
     public static ProductLikeResponse 상품_좋아요_응답 = new ProductLikeResponse(10);
     public static ProductNotPendingException 경매_상품_상태_접근_불가능 = new ProductNotPendingException(999L);
