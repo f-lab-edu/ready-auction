@@ -70,7 +70,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     public BooleanExpression filterProductCondition(List<ProductCondition> productConditions) {
         LocalDateTime currentTime = LocalDateTime.now();
-        product.startDate.after(currentTime).or(product.startDate.loe(currentTime).and(product.closeDate.after(currentTime)));
+
         if (!productConditions.isEmpty()) {
             return product.productCondition.in(productConditions);
         }

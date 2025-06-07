@@ -15,6 +15,12 @@ public enum OrderBy {
             return QProduct.product.startDate.asc();
         }
     },
+    CLOSE_DATE("종료일 임박") {
+        @Override
+        public OrderSpecifier<?> toOrderSpecifier() {
+            return QProduct.product.closeDate.asc();
+        }
+    },
     LIKE("좋아요") {
         @Override
         public OrderSpecifier<?> toOrderSpecifier() {
