@@ -49,8 +49,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     .offset(pageNo * pageSize)
                     .limit(pageSize)
                     .fetch();
-
-
             return result;
         }
 
