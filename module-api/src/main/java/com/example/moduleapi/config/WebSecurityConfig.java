@@ -27,6 +27,7 @@ public class WebSecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/users")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/api/v1/logout")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/products/category")).permitAll()
                 .anyRequest()
                 .authenticated()
         );

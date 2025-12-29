@@ -3,6 +3,7 @@ package com.example.moduleapi.fixture;
 import com.example.moduleapi.controller.request.product.ProductSaveRequest;
 import com.example.moduleapi.controller.request.product.ProductUpdateRequest;
 import com.example.moduleapi.controller.response.PagingResponse;
+import com.example.moduleapi.controller.response.product.ProductCategoryResponse;
 import com.example.moduleapi.controller.response.product.ProductLikeResponse;
 import com.example.moduleapi.controller.response.product.ProductResponse;
 import com.example.moduleapi.exception.product.NotFoundProductException;
@@ -17,6 +18,7 @@ import com.example.moduledomain.domain.product.Product;
 import com.example.moduledomain.domain.product.ProductCondition;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductFixtures {
@@ -180,14 +182,17 @@ public class ProductFixtures {
             500L
     );
 
+    public static List<ProductCategoryResponse> 상품_카테고리_목록 = Arrays.stream(Category.values())
+                                                                   .map(category -> new ProductCategoryResponse(category.name(), category.getDescription()))
+                                                                   .toList();
+
     public static ProductSaveRequest 상품_등록_요청 = createProductSaveRequest(UserFixtures.유저_아이디, 상품_이름, 상품_설명, 카테고리, 현재시간, 종료일, 시작가격);
     public static ProductUpdateRequest 상품_수정_요청 = createProductUpdateRequest(상품_이름, 상품_설명, 현재시간, 종료일, 시작가격);
     public static ProductResponse 상품_응답 = ProductResponse.from(1L);
 
     public static ProductFindResponse 상품_조회_응답 = ProductFindResponse.from(상품, ImagesFixtures.이미지_응답, false);
-    public static ProductFindResponse 상품_조회_응답2 = ProductFindResponse.from(상품, ImagesFixtures.이미지_응답, false);
-    public static List<ProductFindResponse> 상품_조회_응담_여러개 = List.of(상품_조회_응답, 상품_조회_응답2);
-    public static PagingResponse<ProductFindResponse> 페이징_상품_조회 = PagingResponse.from(상품_조회_응담_여러개, 0);
+    public static List<ProductFindResponse> 상품_조회_응답_리스트 = List.of(상품_조회_응답, 상품_조회_응답);
+    public static PagingResponse<ProductFindResponse> 페이징_상품_조회 = PagingResponse.from(상품_조회_응답_리스트, 0);
     public static NotFoundProductException 존재하지_않는_상품_예외 = new NotFoundProductException(999L);
     public static ProductLikeResponse 상품_좋아요_응답 = new ProductLikeResponse(10);
     public static ProductNotPendingException 경매_상품_상태_접근_불가능 = new ProductNotPendingException(999L);

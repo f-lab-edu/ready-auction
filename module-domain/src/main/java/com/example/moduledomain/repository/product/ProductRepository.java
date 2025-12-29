@@ -2,6 +2,8 @@ package com.example.moduledomain.repository.product;
 
 import com.example.moduledomain.domain.product.Category;
 import com.example.moduledomain.domain.product.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +14,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     List<Product> findByCategory(Category category);
 
     List<Product> findByIdIn(List<Long> productIds);
+
+    Page<Product> findByUserId(String userId, Pageable pageable);
+
 
 }

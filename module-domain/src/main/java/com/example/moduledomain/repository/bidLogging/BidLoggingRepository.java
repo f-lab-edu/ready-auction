@@ -1,15 +1,14 @@
 package com.example.moduledomain.repository.bidLogging;
 
-import java.util.List;
-
+import com.example.moduledomain.domain.bidLogging.BidLogging;
+import com.example.moduledomain.domain.user.Gender;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.moduledomain.domain.bidLogging.BidLogging;
-import com.example.moduledomain.domain.user.Gender;
+import java.util.List;
 
 @Repository
-public interface BidLoggingRepository extends JpaRepository<BidLogging, Long> {
+public interface BidLoggingRepository extends JpaRepository<BidLogging, Long>, BidLoggingRepositoryCustom {
     List<BidLogging> findByGender(Gender gender);
 
 }
